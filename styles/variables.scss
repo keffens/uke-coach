@@ -1,0 +1,18 @@
+@charset "utf-8";
+
+// Import a Google Font
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700');
+
+// Define colors.
+$turquoise: #61dafb;
+
+// Override Bulma's initial variables.
+$family-sans-serif: "Lato", sans-serif;
+$primary: $turquoise;
+
+@import "../node_modules/bulma/sass/utilities/derived-variables.sass";
+
+// Override Bulma's variables with derived values.
+$link: $primary;
+$link-hover: $primary-dark;
+$title-color: $primary;

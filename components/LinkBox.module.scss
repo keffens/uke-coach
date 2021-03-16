@@ -1,0 +1,10 @@
+@import "../styles/variables.scss";
+
+.linkBox {
+  transition: background-color;
+  transition-duration: 500ms;
+}
+
+.linkBox:hover {
+  background-color: $primary-light;
+}
