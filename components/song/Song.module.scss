@@ -2,6 +2,7 @@
 
 $stringColor: $grey-light;
 $stringWidth: 2px;
+$strumSize: 1.75em;
 
 .flexRow {
   display: flex;
@@ -12,21 +13,25 @@ $stringWidth: 2px;
   }
 }
 
+.chord {
+  color: $primary-dark;
+  font-size: 110%;
+  font-weight: bold;
+  text-align: center;
+  width: $strumSize / 1.1;
+}
+
 .barContainer {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
-  width: fit-content;
+  width: max-content;
 }
 
 .beatCount {
   @extend .flexRow;
-  font-weight: bold;
-  color: $primary-dark;
 
   > * {
-    font-size: 110%;
-    width: calc(1.5em / 1.1);
-    text-align: center;
+    @extend .chord;
   }
 }
 
@@ -34,7 +39,7 @@ $stringWidth: 2px;
   @extend .flexRow;
 
   $color: $black-bis;
-  font-size: 150%;
+  font-size: $strumSize;
   line-height: 1.1em;
 
   > * {
@@ -67,4 +72,22 @@ $stringWidth: 2px;
 .pause {
   display: inline-block;
   width: 1em;
+}
+
+.lyricsRow {
+  display: grid;
+}
+
+.lyrics {
+  padding: 0.1em;
+
+  // Justify content even thought it's just one line.
+  text-align: justify;
+  margin-bottom: -1.2em;
+
+  &:after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+  }
 }

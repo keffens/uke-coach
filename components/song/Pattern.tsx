@@ -1,7 +1,10 @@
-import Strum from "./Strum";
+import { runInThisContext } from "node:vm";
+import React from "react";
+import { Strum } from ".";
+import { range } from "../util";
 import styles from "./Song.module.scss";
 
-export default class Pattern {
+export class Pattern {
   constructor(
     private _strums: Strum[],
     private _beatsPerBar = 4,
@@ -75,40 +78,38 @@ export default class Pattern {
     return this._strums.length / this._bars;
   }
 
-  render() {
+  Render = ({ bar = 0 }: { bar: number }) => {
+    bar = bar % this.bars;
+    const strums = this._strums.slice(
+      bar * this.strumsPerBar,
+      (bar + 1) * this.strumsPerBar
+    );
     return (
       <div className={styles.pattern}>
-        {this._strums.map((s, i) => {
-          if (i % this.strumsPerBar === 0) {
-            return (
-              <>
-                <span className={styles.barSeperator} />
-                {s.render()}
-              </>
-            );
-          } else {
-            return s.render();
-          }
-        })}
+        <span className={styles.barSeperator} />
+        {strums.map((s, i) => (
+          <s.Render key={`strum-${i}`} />
+        ))}
         <span className={styles.barSeperator} />
       </div>
     );
-  }
+  };
 
-  renderWithBeats() {
-    const beats = new Array();
-    for (let i = 0; i < this.beatsPerBar * this.bars; i++) {
-      beats.push((i % this.beatsPerBar) + 1);
-    }
+  RenderWithCount = () => {
+    const beats = range(1, this.beatsPerBar + 1);
     return (
-      <div className={styles.barContainer}>
-        <div className={styles.beatCount}>
-          {beats.map((b) => (
-            <span>{b}</span>
-          ))}
-        </div>
-        {this.render()}
-      </div>
+      <>
+        {range(this.bars).map((bar) => (
+          <div className={styles.barContainer} key={`bar-${bar}`}>
+            <div className={styles.beatCount}>
+              {beats.map((b, i) => (
+                <span key={`beat-${i}`}>{b}</span>
+              ))}
+            </div>
+            <this.Render bar={bar} />
+          </div>
+        ))}
+      </>
     );
-  }
+  };
 }

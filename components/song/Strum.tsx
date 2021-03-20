@@ -1,3 +1,4 @@
+import React from "react";
 import { FaLongArrowAltDown, FaLongArrowAltUp, FaTimes } from "react-icons/fa";
 import styles from "./Song.module.scss";
 
@@ -10,7 +11,7 @@ enum Type {
   Plugged,
 }
 
-export default class Strum {
+export class Strum {
   private constructor(
     readonly type: Type,
     readonly emphasize = false,
@@ -65,7 +66,7 @@ export default class Strum {
     }
   }
 
-  render() {
+  Render = () => {
     // Handle missing strums
     switch (this.type) {
       case Type.Down:
@@ -78,5 +79,5 @@ export default class Strum {
       default:
         return <span className={styles.pause} />;
     }
-  }
+  };
 }
