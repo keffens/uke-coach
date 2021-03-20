@@ -1,12 +1,13 @@
 .content {
-  min-height: 100vh;
-  min-width: 280px;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  min-width: fit-content;
 }
 
 .main {
   margin: 5em 10%;
+  min-width: fit-content;
 }
 
 .footer {
