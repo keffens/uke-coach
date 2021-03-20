@@ -1,0 +1,70 @@
+@import "../../styles/variables.scss";
+
+$stringColor: $grey-light;
+$stringWidth: 2px;
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+
+  > * {
+    margin-right: auto;
+  }
+}
+
+.barContainer {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+}
+
+.beatCount {
+  @extend .flexRow;
+  font-weight: bold;
+  color: $primary-dark;
+
+  > * {
+    font-size: 110%;
+    width: calc(1.5em / 1.1);
+    text-align: center;
+  }
+}
+
+.pattern {
+  @extend .flexRow;
+
+  $color: $black-bis;
+  font-size: 150%;
+  line-height: 1.1em;
+
+  > * {
+    vertical-align: middle;
+  }
+
+  > .barSeperator {
+    flex: none;
+    margin: 0 -$stringWidth / 2;
+    background-color: $stringColor;
+    display: inline-block;
+    width: $stringWidth;
+    height: 1.1em;
+  }
+
+  // Background line.
+  position: relative;
+
+  &:before {
+    border-top: $stringWidth solid $stringColor;
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    z-index: -1;
+  }
+}
+
+.pause {
+  display: inline-block;
+  width: 1em;
+}

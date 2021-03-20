@@ -1,11 +1,12 @@
 .content {
   min-height: 100vh;
+  min-width: 280px;
   display: flex;
   flex-direction: column;
 }
 
 .main {
-  margin: 5em 10vw;
+  margin: 5em 10%;
 }
 
 .footer {

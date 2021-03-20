@@ -121,7 +121,7 @@ Supported symbols in a strumming pattern (maybe not all in the beginning):
 - `U` accented down stroke
 - `x` percursion strum
 - (`X` [chuck strum](https://ukulelego.com/tips/chucking-chunking/))
-- (`a` [arpegio](https://en.wikipedia.org/wiki/Arpeggio))
+- (`a` [arpeggio](https://en.wikipedia.org/wiki/Arpeggio))
 
 ## Internal data representation
 
