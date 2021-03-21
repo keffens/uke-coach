@@ -44,7 +44,7 @@ export class Strum {
 
   // Reads 1 Strum from the pattern starting at the given position.
   // Returns the position after the last character that was read.
-  static parseStrum(pattern: string, pos: number): [Strum, number] {
+  static parse(pattern: string, pos: number): [Strum, number] {
     // TODO: Handle parenthesized chords.
     switch (pattern[pos].toLowerCase()) {
       case "-":

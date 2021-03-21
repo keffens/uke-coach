@@ -1,4 +1,3 @@
-import { runInThisContext } from "node:vm";
 import React from "react";
 import { Strum } from ".";
 import { range } from "../util";
@@ -10,6 +9,7 @@ export class Pattern {
     private _beatsPerBar = 4,
     private _bars = 1
   ) {
+    if (_bars === 0 && _strums.length === 0) return;
     if (_strums.length % _bars !== 0) {
       throw new Error(
         `Cannot create pattern with ${_strums.length} strums and ` +
@@ -60,7 +60,7 @@ export class Pattern {
         continue;
       }
       let strum: Strum;
-      [strum, pos] = Strum.parseStrum(pattern, pos);
+      [strum, pos] = Strum.parse(pattern, pos);
       strums.push(strum);
     }
     return new Pattern(strums, beatsPerBar, bars);
@@ -79,6 +79,14 @@ export class Pattern {
   }
 
   Render = ({ bar = 0 }: { bar: number }) => {
+    if (this._bars === 0) {
+      const pause = Strum.pause();
+      return (
+        <div className={styles.pattern}>
+          <pause.Render />
+        </div>
+      );
+    }
     bar = bar % this.bars;
     const strums = this._strums.slice(
       bar * this.strumsPerBar,

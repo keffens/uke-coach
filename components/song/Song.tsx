@@ -1,6 +1,6 @@
 import React from "react";
 import { Column, Columns, Content, Title, Subtitle } from "bloomer";
-import { Bar, Chord, Pattern } from ".";
+import { BarLine, Chord, Pattern } from ".";
 
 interface NameValueColumnProps {
   name: string;
@@ -27,14 +27,9 @@ export class Song {
 
   Render = () => {
     const pattern = Pattern.fromString("|DuX.uuX.|", 4);
-    const bar1 = new Bar([Chord.fromString("C")], pattern, 0, [
-      "Nací un 29 de feb-",
-    ]);
-    const bar2 = new Bar(
-      [Chord.fromString("F"), Chord.fromString("G")],
-      pattern,
-      1,
-      ["rero en San", "Juan de Wawani"]
+    const line = BarLine.parse(
+      "Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni. [F..][G..]",
+      pattern
     );
     return (
       <Content>
@@ -53,8 +48,7 @@ export class Song {
           <pattern.RenderWithCount />
         </div>
         <div>
-          <bar1.Render />
-          <bar2.Render />
+          <line.Render />
         </div>
       </Content>
     );

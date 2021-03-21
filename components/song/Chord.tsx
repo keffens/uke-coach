@@ -34,7 +34,7 @@ enum Extension {
 const PARSE_CHORD_RE = new RegExp(
   `^(${Object.values(Note).join("|")})` +
     `(${Object.values(Qualifier).join("|")})` +
-    `(${Object.values(Extension).join("|")})$`
+    `(${Object.values(Extension).join("|")})\.*$`
 );
 
 function renderNote(note: Note) {
@@ -43,12 +43,19 @@ function renderNote(note: Note) {
 
 export class Chord {
   constructor(
-    readonly root: Note,
-    readonly qualifier?: Qualifier,
-    readonly extension?: Extension
+    readonly root?: Note,
+    readonly qualifier: Qualifier = Qualifier.Major,
+    readonly extension: Extension = Extension.None
   ) {}
 
-  static fromString(chord: string) {
+  static makeEmpty() {
+    return new Chord();
+  }
+
+  // Parses a chord. Returns null for an empty string. Allows trailing dots but
+  // otherwise throws an error if parsing fails.
+  static parse(chord: string): Chord | null {
+    if (chord.match(/^\.*$/)) return new Chord();
     const match = PARSE_CHORD_RE.exec(chord);
     if (match == null) {
       throw new Error(`Failed to parse chord from ${chord}.`);
@@ -61,10 +68,14 @@ export class Chord {
   }
 
   toString() {
+    if (!this.root) return "";
     return this.root + this.qualifier + this.extension;
   }
 
   Render = () => {
+    if (!this.root) {
+      return <span className={styles.chord}>&nbsp;</span>;
+    }
     const base = renderNote(this.root) + this.qualifier;
     const sup = this.extension;
     return (
