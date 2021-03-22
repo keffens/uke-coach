@@ -37,7 +37,7 @@ export class Pattern {
     );
   }
 
-  static fromString(pattern: string, beatsPerBar: number = 4) {
+  static parse(pattern: string, beatsPerBar: number = 4) {
     const strums = new Array<Strum>();
     let pos = 0;
     let bars = 1;
@@ -80,12 +80,7 @@ export class Pattern {
 
   Render = ({ bar = 0 }: { bar: number }) => {
     if (this._bars === 0) {
-      const pause = Strum.pause();
-      return (
-        <div className={styles.pattern}>
-          <pause.Render />
-        </div>
-      );
+      return <div className={styles.pattern}></div>;
     }
     bar = bar % this.bars;
     const strums = this._strums.slice(

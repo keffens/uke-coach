@@ -26,7 +26,7 @@ export class Song {
   tempo = 100;
 
   Render = () => {
-    const pattern = Pattern.fromString("|DuX.uuX.|", 4);
+    const pattern = Pattern.parse("|DuX.uuX.|", 4);
     const line = BarLine.parse(
       "Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni. [F..][G..]",
       pattern

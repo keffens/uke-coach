@@ -42,6 +42,7 @@ $strumSize: 1.75em;
   $color: $black-bis;
   font-size: $strumSize;
   line-height: 1.1em;
+  height: 1.1em;
 
   > * {
     vertical-align: middle;
@@ -53,7 +54,7 @@ $strumSize: 1.75em;
     background-color: $stringColor;
     display: inline-block;
     width: $stringWidth;
-    height: 1em;
+    height: 1.1em;
   }
 
   // Background line.
