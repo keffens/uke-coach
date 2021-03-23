@@ -1,4 +1,3 @@
-import { BADRESP } from "node:dns";
 import React from "react";
 import { Chord, Pattern } from ".";
 import styles from "./Song.module.scss";
@@ -29,14 +28,14 @@ export class Bar {
     private _lyrics?: string[]
   ) {}
 
-  Render = () => (
+  render = () => (
     <div className={styles.barContainer}>
       <div className={styles.flexRow}>
         {this._chords.map((chord, i) => (
-          <chord.Render key={`chord-${i}`} />
+          <chord.render key={`chord-${i}`} />
         ))}
       </div>
-      <this._pattern.Render bar={this._patternIdx} />
+      <this._pattern.render bar={this._patternIdx} />
       <Lyrics lyrics={this._lyrics} />
     </div>
   );
@@ -86,10 +85,10 @@ export class BarLine {
     return null;
   }
 
-  Render = () => (
+  render = () => (
     <div className={styles.barLine}>
       {this._bars.map((bar, i) => (
-        <bar.Render key={`bar-${i}`} />
+        <bar.render key={`bar-${i}`} />
       ))}
     </div>
   );

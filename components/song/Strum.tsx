@@ -66,7 +66,7 @@ export class Strum {
     }
   }
 
-  Render = () => {
+  render = () => {
     // Handle missing strums
     switch (this.type) {
       case Type.Down:

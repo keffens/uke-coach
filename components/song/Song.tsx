@@ -1,6 +1,6 @@
 import React from "react";
 import { Column, Columns, Content, Title, Subtitle } from "bloomer";
-import { BarLine, Chord, Pattern } from ".";
+import { BarLine, Pattern } from ".";
 
 interface NameValueColumnProps {
   name: string;
@@ -25,7 +25,7 @@ export class Song {
   time = "4/4";
   tempo = 100;
 
-  Render = () => {
+  render = () => {
     const pattern = Pattern.parse("|DuX.uuX.|", 4);
     const line = BarLine.parse(
       "Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni. [F..][G..]",
@@ -45,10 +45,10 @@ export class Song {
           <NameValueColumn name="tempo" value={this.tempo} />
         </Columns>
         <div>
-          <pattern.RenderWithCount />
+          <pattern.renderWithCount />
         </div>
         <div>
-          <line.Render />
+          <line.render />
         </div>
       </Content>
     );

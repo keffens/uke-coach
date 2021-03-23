@@ -72,7 +72,7 @@ export class Chord {
     return this.root + this.qualifier + this.extension;
   }
 
-  Render = () => {
+  render = () => {
     if (!this.root) {
       return <span className={styles.chord}>&nbsp;</span>;
     }

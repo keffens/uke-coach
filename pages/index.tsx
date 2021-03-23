@@ -5,7 +5,7 @@ export default function Home() {
   const song = new Song();
   return (
     <Layout title={`Ukulele Coach - ${song.title} by ${song.artist}`}>
-      <song.Render />
+      <song.render />
     </Layout>
   );
 }

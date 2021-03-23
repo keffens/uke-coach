@@ -1,6 +1,6 @@
 import React from "react";
 import { Strum } from ".";
-import { range } from "../util";
+import { range } from "../../lib/util";
 import styles from "./Song.module.scss";
 
 export class Pattern {
@@ -78,7 +78,7 @@ export class Pattern {
     return this._strums.length / this._bars;
   }
 
-  Render = ({ bar = 0 }: { bar: number }) => {
+  render = ({ bar = 0 }: { bar: number }) => {
     if (this._bars === 0) {
       return <div className={styles.pattern}></div>;
     }
@@ -91,14 +91,14 @@ export class Pattern {
       <div className={styles.pattern}>
         <span className={styles.barSeperator} />
         {strums.map((s, i) => (
-          <s.Render key={`strum-${i}`} />
+          <s.render key={`strum-${i}`} />
         ))}
         <span className={styles.barSeperator} />
       </div>
     );
   };
 
-  RenderWithCount = () => {
+  renderWithCount = () => {
     const beats = range(1, this.beatsPerBar + 1);
     return (
       <>
@@ -109,7 +109,7 @@ export class Pattern {
                 <span key={`beat-${i}`}>{b}</span>
               ))}
             </div>
-            <this.Render bar={bar} />
+            <this.render bar={bar} />
           </div>
         ))}
       </>

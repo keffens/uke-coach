@@ -15,7 +15,7 @@ export default function SongPage({ songCrd }: SongPageProps) {
   console.log(songCrd);
   return (
     <Layout title={`Ukulele Coach - ${song.title} by ${song.artist}`}>
-      <song.Render />
+      <song.render />
     </Layout>
   );
 }
