@@ -3,7 +3,7 @@
 
 {key: C}
 {time: 4/4}
-{tempo: 100}
+{tempo: 117}
 
 {comment: Strumming pattern}
 {define_pattern: BasePattern |DuX.uuX.|}

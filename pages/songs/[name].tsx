@@ -3,6 +3,7 @@ import { join } from "path";
 import Layout from "../../components/Layout";
 import { Song } from "../../components/song";
 import { GetStaticProps, GetStaticPaths } from "next";
+import { SongMetadata, tokenize } from "../../lib/music";
 
 const SONGS_DIR = join(process.cwd(), "songs");
 
@@ -12,7 +13,9 @@ interface SongPageProps {
 
 export default function SongPage({ songCrd }: SongPageProps) {
   const song = new Song();
-  console.log(songCrd);
+  const tokens = tokenize(songCrd);
+  const metadata = SongMetadata.fromTokens(tokens);
+  console.log(metadata);
   return (
     <Layout title={`Ukulele Coach - ${song.title} by ${song.artist}`}>
       <song.render />
