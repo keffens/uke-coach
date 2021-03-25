@@ -25,7 +25,7 @@ export default function SongPage({ songCrd }: SongPageProps) {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const song = fs.readFileSync(
-    join(SONGS_DIR, `${context.params.name}.crd`),
+    join(SONGS_DIR, `${context.params.id}.crd`),
     "utf8"
   );
   return { props: { songCrd: song } };
@@ -37,7 +37,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     .filter((file) => file.endsWith(".crd"))
     .map((file) => file.replace(/\.crd$/, ""));
   return {
-    paths: songs.map((song) => ({ params: { name: song } })),
+    paths: songs.map((song) => ({ params: { id: song } })),
     fallback: false,
   };
 };

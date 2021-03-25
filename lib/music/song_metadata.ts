@@ -18,6 +18,10 @@ export class SongMetadata {
     public capo?: number
   ) {}
 
+  get sortby() {
+    return this.sorttitle || this.title;
+  }
+
   static fromTokens(tokens: Token[]) {
     const metadata = new Map<string, string>();
     let envLevel = 0;
