@@ -1,7 +1,8 @@
 import fs from "fs";
 import { join } from "path";
 import Layout from "../../components/Layout";
-import { Song } from "../../components/song";
+import { Song } from "../../lib/music";
+import { SongComponent } from "../../components/song";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { SongMetadata, tokenize } from "../../lib/music";
 
@@ -12,13 +13,11 @@ interface SongPageProps {
 }
 
 export default function SongPage({ songCrd }: SongPageProps) {
-  const song = new Song();
-  const tokens = tokenize(songCrd);
-  const metadata = SongMetadata.fromTokens(tokens);
-  console.log(metadata);
+  const song = Song.fromTokens(tokenize(songCrd));
+  const artist = song.metadata.artist ? ` by ${song.metadata.artist}` : "";
   return (
-    <Layout title={`Ukulele Coach - ${song.title} by ${song.artist}`}>
-      <song.render />
+    <Layout title={`Ukulele Coach - ${song.metadata.title}${artist}`}>
+      <SongComponent song={song} />
     </Layout>
   );
 }

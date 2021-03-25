@@ -1,56 +1,16 @@
 import React from "react";
-import { Column, Columns, Content, Title, Subtitle } from "bloomer";
-import { BarLine, Pattern } from ".";
+import { Content, Title, Subtitle } from "bloomer";
+import { Song } from "../../lib/music";
+import { SongMetadataComponent } from "./SongMetadata";
 
-interface NameValueColumnProps {
-  name: string;
-  value?: string | number;
+export interface SongComponentProps {
+  song: Song;
 }
 
-function NameValueColumn({ name, value }: NameValueColumnProps) {
-  if (value == null) {
-    return <></>;
-  }
+export function SongComponent({ song }: SongComponentProps) {
   return (
-    <Column>
-      {name}: {value}
-    </Column>
+    <Content>
+      <SongMetadataComponent metadata={song.metadata} />
+    </Content>
   );
-}
-
-export class Song {
-  title = "Marinero Wawani";
-  artist = "Monsieur Periné";
-  key? = "C";
-  time = "4/4";
-  tempo = 100;
-
-  render = () => {
-    const pattern = Pattern.parse("|DuX.uuX.|", 4);
-    const line = BarLine.parse(
-      "Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni. [F..][G..]",
-      pattern
-    );
-    return (
-      <Content>
-        <Title tag="h1" hasTextAlign="centered">
-          {this.title}
-        </Title>
-        <Subtitle tag="h2" hasTextAlign="centered">
-          by {this.artist}
-        </Subtitle>
-        <Columns>
-          <NameValueColumn name="key" value={this.key} />
-          <NameValueColumn name="time" value={this.time} />
-          <NameValueColumn name="tempo" value={this.tempo} />
-        </Columns>
-        <div>
-          <pattern.renderWithCount />
-        </div>
-        <div>
-          <line.render />
-        </div>
-      </Content>
-    );
-  };
 }
