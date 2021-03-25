@@ -1,4 +1,4 @@
-import { SONG_METADATA_KEYS, Token, TokenType } from ".";
+import { NONEMPTY_TOKENS, SONG_METADATA_KEYS, Token, TokenType } from ".";
 
 const KEY_ALIAS = new Map([
   ["t", "title"],
@@ -45,9 +45,9 @@ function tokenizeDirective(key: string, value?: string) {
     }
   }
   if (SONG_METADATA_KEYS.has(key)) {
-    return new Token(TokenType.Metadata, value, key);
+    return new Token(TokenType.Metadata, key, value);
   }
-  return new Token(TokenType.Directive, value, key);
+  return new Token(TokenType.Directive, key, value);
 }
 
 export function tokenize(content: string): Array<Token> {
@@ -76,17 +76,73 @@ export function tokenize(content: string): Array<Token> {
       }
       pos += match[0].length || 1;
       if (match[1]) {
-        tokens.push(new Token(TokenType.Text, match[1]));
+        tokens.push(new Token(TokenType.Text, /*key=*/ undefined, match[1]));
       } else if (match[2]) {
-        tokens.push(new Token(TokenType.Chord, match[2]));
+        tokens.push(new Token(TokenType.Chord, /*key=*/ undefined, match[2]));
       } else if (match[3]) {
         tokens.push(tokenizeDirective(match[3], match[4]));
       } else if (match[5]) {
-        tokens.push(new Token(TokenType.FileComment, match[5]));
+        tokens.push(
+          new Token(TokenType.FileComment, /*key=*/ undefined, match[5])
+        );
       }
     }
     tokens.push(new Token(TokenType.LineBreak));
   }
 
   return tokens;
+}
+
+export class TokenEnvironment {
+  constructor(readonly startToken: Token, readonly tokens: Token[]) {}
+}
+
+export function splitByEnvironment(tokens: Token[]) {
+  const envs = new Array<TokenEnvironment>();
+  let start = 0;
+  let hasTokens = false;
+  let envLevel = 0;
+  for (let i = 0; i < tokens.length; i++) {
+    if (tokens[i].type === TokenType.StartEnv) {
+      if (envLevel === 0) {
+        if (hasTokens) {
+          envs.push(
+            new TokenEnvironment(
+              new Token(TokenType.StartEnv),
+              tokens.slice(start, i)
+            )
+          );
+        }
+        start = i;
+        hasTokens = false;
+      }
+      envLevel++;
+    } else if (tokens[i].type === TokenType.EndEnv) {
+      if (envLevel === 0) {
+        throw new Error(
+          "There are more closing environment directives than opening " +
+            "environment directives"
+        );
+      }
+      if (envLevel === 1) {
+        if (tokens[i].key !== tokens[start].key) {
+          throw new Error(
+            `Environtment "start_of_${tokens[start].key}" was closed by ` +
+              `"end_of_${tokens[i].key}".`
+          );
+        }
+        if (hasTokens) {
+          envs.push(
+            new TokenEnvironment(tokens[start], tokens.slice(start + 1, i))
+          );
+          start = i + 1;
+          hasTokens = false;
+        }
+      }
+      envLevel--;
+    } else if (NONEMPTY_TOKENS.has(tokens[i].type)) {
+      hasTokens = true;
+    }
+  }
+  return envs;
 }

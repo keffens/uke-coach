@@ -8,10 +8,8 @@
 {comment: Strumming pattern}
 {define_pattern: BasePattern |DuX.uuX.|}
 
-{start_of_instrumental}
 [C][F..][G..][C][F..][G..]
 [C][F..][G..][C][F..][G..]
-{end_of_instrumental}
 
 {start_of_verse: Verse 1}
 Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni. [F..][G..]

@@ -1,10 +1,9 @@
 import fs from "fs";
+import { GetStaticProps, GetStaticPaths } from "next";
 import { join } from "path";
 import Layout from "../../components/Layout";
-import { Song } from "../../lib/music";
-import { SongComponent } from "../../components/song";
-import { GetStaticProps, GetStaticPaths } from "next";
-import { SongMetadata, tokenize } from "../../lib/music";
+import SongComponent from "../../components/song/SongComponent";
+import { Song, tokenize } from "../../lib/music";
 
 const SONGS_DIR = join(process.cwd(), "songs");
 

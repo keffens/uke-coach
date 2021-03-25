@@ -1,5 +1,5 @@
 import React from "react";
-import { Strum } from ".";
+import { Strum } from "./Strum";
 import { range } from "../../lib/util";
 import styles from "./Song.module.scss";
 

@@ -1,5 +1,6 @@
 import React from "react";
-import { Chord, Pattern } from ".";
+import { Chord } from "./Chord";
+import { Pattern } from "./Pattern";
 import styles from "./Song.module.scss";
 
 function Lyrics({ lyrics }: { lyrics?: string[] }) {

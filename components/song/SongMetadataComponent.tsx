@@ -2,14 +2,14 @@ import { Column, Columns, Title, Subtitle } from "bloomer";
 import { SongMetadata } from "../../lib/music";
 
 interface SubtitleProps {
-  subtitle?: string;
+  artist?: string;
 }
 
-function SongSubtitle({ subtitle }: SubtitleProps) {
-  if (!subtitle) return <></>;
+function SongSubtitle({ artist }: SubtitleProps) {
+  if (!artist) return <></>;
   return (
     <Subtitle tag="h2" hasTextAlign="centered">
-      by {this.artist}
+      by {artist}
     </Subtitle>
   );
 }
@@ -34,7 +34,7 @@ export interface SongMetadataComponentProps {
   metadata: SongMetadata;
 }
 
-export function SongMetadataComponent({
+export default function SongMetadataComponent({
   metadata,
 }: SongMetadataComponentProps) {
   return (
@@ -42,7 +42,7 @@ export function SongMetadataComponent({
       <Title tag="h1" hasTextAlign="centered">
         {metadata.title}
       </Title>
-      <SongSubtitle subtitle={metadata.subtitle} />
+      <SongSubtitle artist={metadata.artist} />
       <Columns>
         <MetadataColumn name="composer" value={metadata.composer} />
         <MetadataColumn name="lyricist" value={metadata.lyricist} />
