@@ -51,8 +51,8 @@ export function SongMetadataComponent({
         <MetadataColumn name="©" value={metadata.copyright} />
       </Columns>
       <Columns>
-        <MetadataColumn name="key" value={metadata.key} />
-        <MetadataColumn name="time" value={metadata.time} />
+        <MetadataColumn name="key" value={metadata.key.toString()} />
+        <MetadataColumn name="time" value={metadata.time.toString()} />
         <MetadataColumn name="tempo" value={metadata.tempo} />
         <MetadataColumn name="capo" value={metadata.capo} />
       </Columns>
