@@ -1,11 +1,2 @@
-import Layout from "../components/Layout";
-import { Song } from "../components/song";
-
-export default function Home() {
-  const song = new Song();
-  return (
-    <Layout title={`Ukulele Coach - ${song.title} by ${song.artist}`}>
-      <song.render />
-    </Layout>
-  );
-}
+// Just use the song index page for now.
+export { default, getStaticProps } from "./songs";
