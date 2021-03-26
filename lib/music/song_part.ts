@@ -1,4 +1,5 @@
-import { PartMetadata, SongMetadata, Token } from ".";
+import { PartMetadata, SongMetadata } from "./metadata";
+import { Token } from "./token";
 
 export enum SongPartType {
   None = "",

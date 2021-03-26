@@ -1,4 +1,5 @@
-import { NONEMPTY_TOKENS, SONG_METADATA_KEYS, Token, TokenType } from ".";
+import { SONG_METADATA_KEYS } from "./metadata";
+import { NONEMPTY_TOKENS, Token, TokenType } from "./token";
 
 const KEY_ALIAS = new Map([
   ["t", "title"],

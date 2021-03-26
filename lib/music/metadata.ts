@@ -2,9 +2,8 @@ import {
   DEFAULT_TIME_SIGNATURE,
   KeySignature,
   TimeSignature,
-  Token,
-  TokenType,
-} from ".";
+} from "./signature";
+import { Token, TokenType } from "./token";
 
 function populateMap(tokens: Token[]) {
   const metadata = new Map<string, string>();
@@ -21,6 +20,9 @@ function populateMap(tokens: Token[]) {
       }
       envLevel--;
     } else if (token.type === TokenType.Metadata && envLevel === 0) {
+      if (metadata.get(token.key)) {
+        throw new Error(`Metadata "${token.key}" is defined twice.`);
+      }
       metadata.set(token.key, token.value);
     }
   }

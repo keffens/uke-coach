@@ -1,4 +1,4 @@
-import { Note, Scale } from ".";
+import { Note, Scale, renderNote } from "./note";
 
 const PARSE_KEY_RE = new RegExp(
   `^(${Object.values(Note).join("|")})(${Object.values(Scale).join("|")})$`
@@ -17,6 +17,10 @@ export class KeySignature {
 
   toString() {
     return `${this.note}${this.scale}`;
+  }
+
+  render() {
+    return `${renderNote(this.note)}${this.scale}`;
   }
 }
 

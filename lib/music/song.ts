@@ -1,11 +1,7 @@
-import {
-  isSongPartType,
-  splitByEnvironment,
-  SongMetadata,
-  SongPart,
-  SongPartType,
-  Token,
-} from ".";
+import { SongMetadata } from "./metadata";
+import { SongPart, SongPartType, isSongPartType } from "./song_part";
+import { Token } from "./token";
+import { splitByEnvironment } from "./tokenizer";
 
 export class Song {
   constructor(public metadata: SongMetadata, public parts: SongPart[]) {}
