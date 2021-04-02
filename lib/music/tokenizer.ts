@@ -30,7 +30,7 @@ const FIRST_TOKEN = new RegExp(
 );
 const SPLIT_META = new RegExp(String.raw`^(${KEY_RE})\s*(${TEXT_RE})$`, "u");
 const SPLIT_PATTERN = new RegExp(
-  String.raw`^(?:(${TEXT_RE})\s+)?([-.\|\dduxa\(\)]+)$`,
+  String.raw`^(?:(${TEXT_RE})\s+)?([-.\|\dduxat\(\)]+)$`,
   "iu"
 );
 

@@ -13,11 +13,25 @@ $strumSize: 1.25em;
   }
 }
 
+.barParagraph {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  // Don't grow elements in last line.
+  &:after {
+    content: "";
+    min-width: 20.1%;
+    flex-grow: 1000000;
+  }
+}
+
 .barContainer {
   display: inline-flex;
   flex-direction: column;
+  flex-grow: 1;
   width: max-content;
-  min-width: 20.1%; // use at most 4 columns
+  min-width: 20.1%; // Use at most 4 columns.
 }
 
 .firstBarContainer {
@@ -87,6 +101,10 @@ $strumSize: 1.25em;
     position: relative;
     height: 1em;
     width: 1em;
+  }
+
+  svg.emStrum {
+    transform: scale(1.25);
   }
 }
 

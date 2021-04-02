@@ -4,6 +4,7 @@ export enum StrumType {
   Up,
   Percursion,
   Arpeggio,
+  Tremolo,
   Plugged,
 }
 
@@ -34,6 +35,10 @@ export class Strum {
     return new Strum(StrumType.Arpeggio);
   }
 
+  static tremolo() {
+    return new Strum(StrumType.Tremolo);
+  }
+
   static plugged(strings: number[]) {
     return new Strum(StrumType.Plugged, false, strings);
   }
@@ -53,6 +58,8 @@ export class Strum {
         return [Strum.percursion(), pos + 1];
       case "a":
         return [Strum.arpeggio(), pos + 1];
+      case "t":
+        return [Strum.tremolo(), pos + 1];
     }
     if (pattern[pos] >= "1" && pattern[pos] <= "9") {
       return [Strum.plugged([parseInt(pattern[pos])]), pos + 1];
@@ -97,6 +104,8 @@ export class Strum {
         return "x";
       case StrumType.Arpeggio:
         return "a";
+      case StrumType.Tremolo:
+        return "t";
       case StrumType.Plugged:
         return this.strings.length === 1
           ? this.strings[0]

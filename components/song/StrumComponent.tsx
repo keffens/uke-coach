@@ -1,5 +1,10 @@
 import React from "react";
-import { FaLongArrowAltDown, FaLongArrowAltUp, FaTimes } from "react-icons/fa";
+import {
+  FaLongArrowAltDown,
+  FaLongArrowAltUp,
+  FaTimes,
+  FaExchangeAlt,
+} from "react-icons/fa";
 import { Strum, StrumType } from "../../lib/music";
 import styles from "./Song.module.scss";
 
@@ -18,11 +23,21 @@ export default function StrumComponent({ strum }: StrumComponentProps) {
   switch (strum.type) {
     case StrumType.Arpeggio:
     case StrumType.Down:
-      return <FaLongArrowAltDown />;
+      return (
+        <FaLongArrowAltDown className={strum.emphasize ? styles.emStrum : ""} />
+      );
     case StrumType.Up:
-      return <FaLongArrowAltUp />;
+      return (
+        <FaLongArrowAltUp className={strum.emphasize ? styles.emStrum : ""} />
+      );
     case StrumType.Percursion:
       return <FaTimes />;
+    case StrumType.Tremolo:
+      return (
+        <div style={{ transform: "rotate(-90deg) scaleX(0.9) scaleY(-1.1)" }}>
+          <FaExchangeAlt />
+        </div>
+      );
     case StrumType.Plugged:
       return (
         <span className={styles.strum}>
