@@ -28,7 +28,6 @@ export enum Scale {
 }
 
 export const BEAT_LENGTHS = new Map<string, number>([
-  ["_", 2], // half note in 4/4
   [".", 1], // quarter note in 4/4
   [",", 1 / 2], // eigth note in 4/4
   [":", 1 / 4], // sixteenth note in 4/4
@@ -44,7 +43,11 @@ export const BEAT_LENGTHS_RE = `[_.,:;'"]*`;
 export function parseBeats(value: string, beatsInBar = 4) {
   let sum = 0;
   for (let i = 0; i < value.length; i++) {
-    sum += BEAT_LENGTHS.get(value[i]) ?? 0;
+    if (value[i] === "_") {
+      sum += beatsInBar;
+    } else {
+      sum += BEAT_LENGTHS.get(value[i]) ?? 0;
+    }
   }
   return sum || beatsInBar;
 }

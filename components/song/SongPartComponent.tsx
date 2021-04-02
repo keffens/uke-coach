@@ -10,7 +10,13 @@ export interface SongPartComponentProps {
 export default function SongPartComponent({ part }: SongPartComponentProps) {
   return (
     <>
-      {part.header ? <Title tag="h4">{part.header}</Title> : <></>}
+      {part.header ? (
+        <Title tag="h4" isMarginless className="mt-4">
+          {part.header}
+        </Title>
+      ) : (
+        <div className="mt-6"></div>
+      )}
       {part.paragraphs.map((paragraph, i) => (
         <BarParagraphComponent key={i} paragraph={paragraph} />
       ))}

@@ -11,13 +11,13 @@ function LyricsCellComponent({
   lyric,
   nextAnacrusis,
 }: LyricsCellComponentProps) {
-  if (!lyric && !nextAnacrusis) return <></>;
+  if (!lyric && !nextAnacrusis) return <div />;
   if (lyric && !nextAnacrusis) {
     return (
       <div className={styles.lyrics}>
         <div
           className={`${styles.streched} ${
-            lyric.slice(-1) === "-" ? "" : "pr-2"
+            lyric.slice(-1) === "-" ? "" : "pr-1"
           } ${lyric[0] === " " ? "pl-5" : ""}`}
         >
           {lyric}

@@ -9,10 +9,42 @@ import SpacedGridRow from "./SpacedGridRow";
 
 interface BarComponentProps {
   bar: Bar;
+  isFirst: boolean;
   nextAnacrusis?: string;
 }
 
-function BarComponent({ bar, nextAnacrusis }: BarComponentProps) {
+function BarComponent({ bar, isFirst, nextAnacrusis }: BarComponentProps) {
+  if (isFirst && bar.anacrusis) {
+    return (
+      <div className={styles.firstBarContainer}>
+        <div className={styles.barContainer}>
+          <ChordComponent />
+          <PatternComponent pattern={Pattern.makeEmpty(bar.pattern.time, 0)} />
+          <LyricsComponent
+            lyrics={[]}
+            beats={[]}
+            nextAnacrusis={bar.anacrusis}
+          />
+        </div>
+        <div
+          className={styles.barContainer}
+          style={{ minWidth: "unset", flexGrow: 1 }}
+        >
+          <SpacedGridRow spacing={bar.beats}>
+            {bar.chords.map((chord, i) => (
+              <ChordComponent key={i} chord={chord} />
+            ))}
+          </SpacedGridRow>
+          <PatternComponent pattern={bar.pattern} bar={bar.patternIdx} />
+          <LyricsComponent
+            lyrics={bar.lyrics}
+            beats={bar.beats}
+            nextAnacrusis={nextAnacrusis}
+          />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={styles.barContainer}>
       <SpacedGridRow spacing={bar.beats}>
@@ -30,17 +62,6 @@ function BarComponent({ bar, nextAnacrusis }: BarComponentProps) {
   );
 }
 
-interface AnacrusisCompomentProps {
-  anacrusis?: string;
-  time?: TimeSignature;
-}
-
-function AnacrusisCompoment({ anacrusis, time }: AnacrusisCompomentProps) {
-  if (!anacrusis) return <></>;
-  const pattern = Pattern.makeEmpty(time, 0);
-  return <BarComponent bar={new Bar([null], [], pattern, 0, [anacrusis])} />;
-}
-
 export interface BarParagraphComponentProps {
   paragraph: BarParagraph;
 }
@@ -49,15 +70,12 @@ export default function BarParagraphComponent({
   paragraph,
 }: BarParagraphComponentProps) {
   return (
-    <div className={styles.barLine}>
-      <AnacrusisCompoment
-        anacrusis={paragraph.bars[0]?.anacrusis}
-        time={paragraph.bars[0]?.pattern.time}
-      />
+    <div className={styles.barParagraph}>
       {paragraph.bars.map((bar, i) => (
         <BarComponent
           key={i}
           bar={bar}
+          isFirst={i === 0}
           nextAnacrusis={paragraph.bars[i + 1]?.anacrusis}
         />
       ))}
