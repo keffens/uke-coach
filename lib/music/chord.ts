@@ -1,4 +1,4 @@
-import { BEAT_DIVIDER_RE, Note, renderNote } from "./note";
+import { BEAT_LENGTHS_RE, Note, renderNote } from "./note";
 
 enum Qualifier {
   Major = "",
@@ -18,10 +18,10 @@ const CHORD_RE = new RegExp(
   `^(${Object.values(Note).join("|")})` +
     `(${Object.values(Qualifier).join("|")})` +
     `(${Object.values(Extension).join("|")})` +
-    `${BEAT_DIVIDER_RE}$`
+    `${BEAT_LENGTHS_RE}$`
 );
 
-const ONLY_BEATS_RE = new RegExp(`^${BEAT_DIVIDER_RE}$`);
+const ONLY_BEATS_RE = new RegExp(`^${BEAT_LENGTHS_RE}$`);
 
 export class Chord {
   constructor(

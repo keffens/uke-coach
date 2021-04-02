@@ -1,6 +1,7 @@
+import { Title } from "bloomer";
 import React from "react";
 import { SongPart } from "../../lib/music";
-import styles from "./Song.module.scss";
+import BarParagraphComponent from "./BarParagraphComponent";
 
 export interface SongPartComponentProps {
   part: SongPart;
@@ -9,11 +10,10 @@ export interface SongPartComponentProps {
 export default function SongPartComponent({ part }: SongPartComponentProps) {
   return (
     <>
-      {part.header ? (
-        <h3 className={styles.partHeader}>{part.header}</h3>
-      ) : (
-        <></>
-      )}
+      {part.header ? <Title tag="h4">{part.header}</Title> : <></>}
+      {part.paragraphs.map((paragraph, i) => (
+        <BarParagraphComponent key={i} paragraph={paragraph} />
+      ))}
     </>
   );
 }

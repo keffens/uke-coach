@@ -2,7 +2,7 @@
 
 $stringColor: $grey-light;
 $stringWidth: 2px;
-$strumSize: 1.75em;
+$strumSize: 1.25em;
 
 .flexRow {
   display: flex;
@@ -11,15 +11,6 @@ $strumSize: 1.75em;
   > * {
     margin-right: auto;
   }
-}
-
-.chord {
-  color: $primary-dark;
-  font-size: 110%;
-  font-weight: bold;
-  text-align: center;
-  height: 1.3em;
-  width: $strumSize / 1.1;
 }
 
 .barContainer {
@@ -36,11 +27,29 @@ $strumSize: 1.75em;
   }
 }
 
+// Chord row.
+.chord {
+  color: $primary-dark;
+  font-size: 100%;
+  font-weight: bold;
+  text-align: center;
+  height: 1.3em;
+  width: $strumSize / 1.1;
+
+  sup {
+    font-size: 70%;
+    vertical-align: top;
+  }
+}
+
+// The strumming pattern row.
 .pattern {
   @extend .flexRow;
 
   $color: $black-bis;
   font-size: $strumSize;
+  position: relative;
+  margin: 0.1em 0;
   line-height: 1.1em;
   height: 1.1em;
 
@@ -57,45 +66,62 @@ $strumSize: 1.75em;
     height: 1.1em;
   }
 
-  // Background line.
-  position: relative;
-
-  &:before {
-    border-top: $stringWidth solid $stringColor;
-    content: "";
+  .tabLine {
+    background-color: $stringColor;
+    height: $stringWidth;
+    width: calc(100% + #{$stringWidth});
     position: absolute;
-    top: calc(50% - #{$stringWidth / 2});
-    left: 0;
-    right: 0;
+    left: -$stringWidth / 2;
     z-index: -1;
   }
-}
 
-.pause {
-  display: inline-block;
-  height: 1em;
-  width: 1em;
-}
-
-.lyricsRow {
-  display: grid;
-}
-
-.lyrics {
-  padding: 0.1em;
-
-  // Justify content even thought it's just one line.
-  text-align: justify;
-  margin-bottom: -1.2em;
-
-  &:after {
-    content: "";
+  .strum,
+  svg {
     display: inline-block;
-    width: 100%;
+    position: relative;
+    height: 1em;
+    width: 1em;
   }
 }
 
-h3.partHeader {
-  font-size: 120%;
-  font-style: italic;
+.stringLabel {
+  display: inline-block;
+  position: absolute;
+  left: -0.5em;
+  height: 1em;
+  width: 0.5em;
+  font-weight: bold;
+}
+
+.string {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 40%;
+}
+
+// Lyrics row.
+.lyrics {
+  padding: 0 0.2em;
+  height: 2em;
+
+  .left {
+    float: left;
+  }
+
+  .right {
+    float: right;
+    margin-left: 1em;
+  }
+
+  .streched {
+    // Justify content even thought it's just one line.
+    text-align: justify;
+
+    &:after {
+      content: "";
+      display: inline-block;
+      width: 100%;
+    }
+  }
 }

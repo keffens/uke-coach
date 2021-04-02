@@ -2,6 +2,7 @@ export enum TokenType {
   Text,
   Chord,
   Metadata,
+  Pattern,
   Directive,
   StartEnv,
   EndEnv,
@@ -23,6 +24,7 @@ export class Token {
   constructor(
     readonly type: TokenType,
     readonly key?: string,
-    readonly value?: string
+    readonly value?: string,
+    readonly children?: Token[]
   ) {}
 }

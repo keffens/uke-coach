@@ -4,3 +4,8 @@
 {key: Am}
 {time: 4/4}
 {tempo: 125}
+
+{pattern: Single Plugged |1234----|}
+{pattern: Double Plugged |12341234|}
+{pattern: Chorus Upstroke |xu-u-u-u|}
+{pattern: Offbeat Plugged |1(234)-(234)-(234)-(234)|}

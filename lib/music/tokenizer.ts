@@ -21,7 +21,7 @@ const KEY_ALIAS = new Map([
 
 const TEXT_RE = String.raw`(?:[^\[\]\{\}\\#]|\\\[|\\\]|\\\{|\\\}|\\\\|\\#)+`;
 // This allows a lot more than valid chords.
-const CHORD_RE = String.raw`[\w.,/*]*`;
+const CHORD_RE = String.raw`[\w_.,:;'"/*]*`;
 const KEY_RE = String.raw`[A-Za-z_]+`;
 const FIRST_TOKEN = new RegExp(
   String.raw`^(?:(${TEXT_RE})|\[(${CHORD_RE})\]|` +
@@ -29,40 +29,64 @@ const FIRST_TOKEN = new RegExp(
   "u"
 );
 const SPLIT_META = new RegExp(String.raw`^(${KEY_RE})\s*(${TEXT_RE})$`, "u");
+const SPLIT_PATTERN = new RegExp(
+  String.raw`^(?:(${TEXT_RE})\s+)?([-.\|\dduxa\(\)]+)$`,
+  "iu"
+);
 
 function tokenizeDirective(key: string, value?: string) {
   key = KEY_ALIAS.get(key) ?? key;
+  value = value?.trim();
   if (key.startsWith("start_of_")) {
-    return new Token(TokenType.StartEnv, key.replace(/^start_of_/, ""), value);
+    return new Token(
+      TokenType.StartEnv,
+      key.replace(/^start_of_/, ""),
+      value,
+      []
+    );
   }
   if (key.startsWith("end_of_")) {
     return new Token(TokenType.EndEnv, key.replace(/^end_of_/, ""));
   }
   if (key === "meta") {
     const match = value.match(SPLIT_META);
-    if (match) {
-      key = match[1];
-      value = match[2];
+    if (!match) {
+      throw new Error(`Invalid meta directive with value "${value}".`);
     }
+    key = match[1];
+    value = match[2].trim();
   }
   if (SONG_METADATA_KEYS.has(key)) {
-    return new Token(TokenType.Metadata, key, value);
+    return new Token(TokenType.Metadata, key, value?.trim());
+  }
+  if (key === "pattern") {
+    value = value?.trim();
+    if (!value) {
+      throw new Error("Found pattern directive without pattern or name.");
+    }
+    const match = value.match(SPLIT_PATTERN);
+    if (match) {
+      return new Token(TokenType.Pattern, match[1]?.trim(), match[2]);
+    }
+    return new Token(TokenType.Pattern, value);
   }
   return new Token(TokenType.Directive, key, value);
 }
 
-export function tokenize(content: string): Array<Token> {
-  const tokens = new Array<Token>();
+export function tokenize(content: string): Token {
+  const stack = new Array<Token>();
+  stack.push(new Token(TokenType.StartEnv, undefined, undefined, []));
+  let activeTokens = stack[0].children;
   const lines = content.split(/\r?\n/);
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (!line.trim().length) {
       if (
-        tokens.length &&
-        tokens[tokens.length - 1].type != TokenType.Paragraph
+        activeTokens.length &&
+        activeTokens[activeTokens.length - 1].type != TokenType.Paragraph
       ) {
-        tokens.push(new Token(TokenType.Paragraph));
+        activeTokens.push(new Token(TokenType.Paragraph));
       }
       continue;
     }
@@ -77,73 +101,65 @@ export function tokenize(content: string): Array<Token> {
       }
       pos += match[0].length || 1;
       if (match[1]) {
-        tokens.push(new Token(TokenType.Text, /*key=*/ undefined, match[1]));
+        activeTokens.push(
+          new Token(TokenType.Text, /*key=*/ undefined, match[1])
+        );
       } else if (match[2]) {
-        tokens.push(new Token(TokenType.Chord, /*key=*/ undefined, match[2]));
+        activeTokens.push(
+          new Token(TokenType.Chord, /*key=*/ undefined, match[2])
+        );
       } else if (match[3]) {
-        tokens.push(tokenizeDirective(match[3], match[4]));
+        const token = tokenizeDirective(match[3], match[4]);
+        switch (token.type) {
+          case TokenType.StartEnv:
+            activeTokens.push(token);
+            stack.push(token);
+            activeTokens = token.children;
+            break;
+          case TokenType.EndEnv:
+            if (stack.length <= 1) {
+              throw new Error(
+                `end_of_${
+                  token.key
+                } directive does not have an opening directive at line ${
+                  i + 1
+                }.`
+              );
+            }
+            stack.pop();
+            activeTokens = stack[stack.length - 1].children;
+            if (activeTokens[activeTokens.length - 1].key !== token.key) {
+              throw new Error(
+                `Closing environment end_of_${
+                  token.key
+                } does not match opening environment start_of_${
+                  activeTokens[activeTokens.length - 1].key
+                } at line ${i + 1}.`
+              );
+            }
+            break;
+          default:
+            activeTokens.push(token);
+        }
       } else if (match[5]) {
-        tokens.push(
+        activeTokens.push(
           new Token(TokenType.FileComment, /*key=*/ undefined, match[5])
         );
       }
     }
-    tokens.push(new Token(TokenType.LineBreak));
+    if (
+      activeTokens.length &&
+      NONEMPTY_TOKENS.has(activeTokens[activeTokens.length - 1].type)
+    ) {
+      activeTokens.push(new Token(TokenType.LineBreak));
+    }
   }
-
-  return tokens;
+  if (stack.length !== 1) {
+    throw new Error("File has unclosed environments.");
+  }
+  return stack[0];
 }
 
 export class TokenEnvironment {
   constructor(readonly startToken: Token, readonly tokens: Token[]) {}
-}
-
-export function splitByEnvironment(tokens: Token[]) {
-  const envs = new Array<TokenEnvironment>();
-  let start = 0;
-  let hasTokens = false;
-  let envLevel = 0;
-  for (let i = 0; i < tokens.length; i++) {
-    if (tokens[i].type === TokenType.StartEnv) {
-      if (envLevel === 0) {
-        if (hasTokens) {
-          envs.push(
-            new TokenEnvironment(
-              new Token(TokenType.StartEnv),
-              tokens.slice(start, i)
-            )
-          );
-        }
-        start = i;
-        hasTokens = false;
-      }
-      envLevel++;
-    } else if (tokens[i].type === TokenType.EndEnv) {
-      if (envLevel === 0) {
-        throw new Error(
-          "There are more closing environment directives than opening " +
-            "environment directives"
-        );
-      }
-      if (envLevel === 1) {
-        if (tokens[i].key !== tokens[start].key) {
-          throw new Error(
-            `Environtment "start_of_${tokens[start].key}" was closed by ` +
-              `"end_of_${tokens[i].key}".`
-          );
-        }
-        if (hasTokens) {
-          envs.push(
-            new TokenEnvironment(tokens[start], tokens.slice(start + 1, i))
-          );
-          start = i + 1;
-          hasTokens = false;
-        }
-      }
-      envLevel--;
-    } else if (NONEMPTY_TOKENS.has(tokens[i].type)) {
-      hasTokens = true;
-    }
-  }
-  return envs;
 }

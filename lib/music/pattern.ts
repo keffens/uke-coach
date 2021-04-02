@@ -1,16 +1,17 @@
 import { TimeSignature } from "./signature";
 import { Strum } from "./strum";
+import { Token } from "./token";
 
 export class Pattern {
   private constructor(
     private _time: TimeSignature,
-    private _strums: Strum[],
+    public strums: Strum[],
     private _bars = 1
   ) {
-    if (_bars === 0 && _strums.length === 0) return;
-    if (_strums.length % _bars !== 0) {
+    if (_bars === 0 && strums.length === 0) return;
+    if (strums.length % _bars !== 0) {
       throw new Error(
-        `Cannot create pattern with ${_strums.length} strums and ` +
+        `Cannot create pattern with ${strums.length} strums and ` +
           `${_bars} bars.`
       );
     }
@@ -33,6 +34,22 @@ export class Pattern {
       Array(bars * strumsPerBar).fill(Strum.pause()),
       bars
     );
+  }
+
+  get bars() {
+    return this._bars;
+  }
+
+  get time() {
+    return this._time;
+  }
+
+  get strumsPerBar() {
+    return this.strums.length / this._bars;
+  }
+
+  useTab() {
+    return this.strums.some((s) => s.strings?.length);
   }
 
   static parse(pattern: string, time: TimeSignature) {
@@ -64,15 +81,25 @@ export class Pattern {
     return new Pattern(time, strums, bars);
   }
 
-  get bars() {
-    return this._bars;
-  }
-
-  get time() {
-    return this._time;
-  }
-
-  get strumsPerBar() {
-    return this._strums.length / this._bars;
+  static fromToken(
+    token: Token,
+    time: TimeSignature,
+    patterns: Map<string, Pattern>
+  ) {
+    if (!token.value) {
+      const res = patterns.get(token.key);
+      if (!res) {
+        throw new Error(`Unknown pattern name "${token.key}".`);
+      }
+      return res;
+    }
+    const pattern = Pattern.parse(token.value, time);
+    if (token.key) {
+      if (patterns.has(token.key)) {
+        throw new Error(`Redefinition of pattern "${token.key}".`);
+      }
+      patterns.set(token.key, pattern);
+    }
+    return pattern;
   }
 }

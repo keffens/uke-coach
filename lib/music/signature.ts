@@ -40,6 +40,10 @@ export class TimeSignature {
   toString() {
     return `${this.beats}/${this.noteValue}`;
   }
+
+  equals(that: TimeSignature) {
+    return this.beats === that.beats && this.noteValue === that.noteValue;
+  }
 }
 
 export const DEFAULT_TIME_SIGNATURE = new TimeSignature(4, 4);

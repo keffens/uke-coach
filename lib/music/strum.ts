@@ -9,9 +9,9 @@ export enum StrumType {
 
 export class Strum {
   private constructor(
-    readonly strum: StrumType,
+    readonly type: StrumType,
     readonly emphasize = false,
-    readonly fingers?: number[]
+    readonly strings?: number[]
   ) {}
 
   static pause() {
@@ -34,17 +34,15 @@ export class Strum {
     return new Strum(StrumType.Arpeggio);
   }
 
-  static plugged(fingers: number[]) {
-    return new Strum(StrumType.Plugged, false, fingers);
+  static plugged(strings: number[]) {
+    return new Strum(StrumType.Plugged, false, strings);
   }
 
   // Reads 1 Strum from the pattern starting at the given position.
   // Returns the position after the last character that was read.
   static parse(pattern: string, pos: number): [Strum, number] {
-    // TODO: Handle parenthesized chords.
     switch (pattern[pos].toLowerCase()) {
       case "-":
-      case " ":
       case ".":
         return [Strum.pause(), pos + 1];
       case "d":
@@ -55,15 +53,40 @@ export class Strum {
         return [Strum.percursion(), pos + 1];
       case "a":
         return [Strum.arpeggio(), pos + 1];
-      default:
-        throw new Error(
-          `There's no strum associated with letter ${pattern[pos]}`
-        );
     }
+    if (pattern[pos] >= "1" && pattern[pos] <= "9") {
+      return [Strum.plugged([parseInt(pattern[pos])]), pos + 1];
+    }
+    if (pattern[pos] === "(") {
+      pos++;
+      const strings = new Array<number>();
+      while (pos < pattern.length && pattern[pos] !== ")") {
+        const string = parseInt(pattern[pos]);
+        if (string >= 1 && string <= 9) {
+          strings.push(string);
+        } else {
+          throw new Error(
+            `Failed to parse parenthesized chord in pattern "${pattern}".`
+          );
+        }
+        pos++;
+      }
+      if (pos >= pattern.length) {
+        throw new Error(
+          `Failed to parse parenthesized chord in pattern "${pattern}".`
+        );
+      }
+      strings.sort((a, b) => a - b);
+      return [Strum.plugged(strings), pos + 1];
+    }
+    throw new Error(
+      `There's no strum associated with "${pattern[pos]}" in pattern ` +
+        `"${pattern}".`
+    );
   }
 
   toString() {
-    switch (this.strum) {
+    switch (this.type) {
       case StrumType.Pause:
         return "-";
       case StrumType.Down:
@@ -75,11 +98,11 @@ export class Strum {
       case StrumType.Arpeggio:
         return "a";
       case StrumType.Plugged:
-        return this.fingers.length === 1
-          ? this.fingers[0]
-          : `(${this.fingers.join("")})`;
+        return this.strings.length === 1
+          ? this.strings[0]
+          : `(${this.strings.join("")})`;
       default:
-        throw new Error(`Unknown strum StrumType: "${this.strum}"`);
+        throw new Error(`Unknown strum StrumType: "${this.type}"`);
     }
   }
 }

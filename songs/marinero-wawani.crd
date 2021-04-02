@@ -5,8 +5,7 @@
 {time: 4/4}
 {tempo: 117}
 
-{comment: Strumming pattern}
-{define_pattern: BasePattern |DuX.uuX.|}
+{pattern: Base Pattern |DuX.uuX.|}
 
 [C][F..][G..][C][F..][G..]
 [C][F..][G..][C][F..][G..]
@@ -14,7 +13,7 @@
 {start_of_verse: Verse 1}
 Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni. [F..][G..]
 Mi [C]padre marinero en su ve[F..]lero me lle[G..]vó a nave[C]gar. [F..][G..]
-Cre[F]cí mirando el viento transfor[G]mar el movimiento de la [C]mar [Am]
+Cre[F]cí mirando el viento transfor[G]mar el movimiento de la [C]mar. [Am]
 Y [F]así fui comprendiendo con el [G]tiempo lo que soy y lo que [C]fui. [C7]
 {end_of_verse}
 
@@ -22,7 +21,8 @@ Y [F]así fui comprendiendo con el [G]tiempo lo que soy y lo que [C]fui. [C7]
 Porque en el [F]mar quiero pa[G]sar la vida en[C]tera sin record[Am]ar
 que existe un [F]mundo rodeado de fron[G]teras que gobierna el cora[C]zón. [C7]
 Porque en el [F]mar quiero vi[G]vir, enveje[C]cerme, perderme y mo[Am]rir
-[Am] ser un re[F]cuerdo que se a[G]leja [G]
-{pattern: |D.......|........|}[G][G] como el eco de mi {pattern: BasePattern}[C]voz. [F..][G..]
+[F]ser un recuerdo que se a[G]leja
+{pattern: |D-------|--------|}[G][G]
+como el eco {pattern: Base Pattern}[C...]de [.]mi [F..]voz. [G..]
 [C][F..][G..][C][F..][G..]
 {end_of_chorus}

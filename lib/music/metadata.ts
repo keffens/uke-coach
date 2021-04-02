@@ -7,19 +7,8 @@ import { Token, TokenType } from "./token";
 
 function populateMap(tokens: Token[]) {
   const metadata = new Map<string, string>();
-  let envLevel = 0;
   for (const token of tokens) {
-    if (token.type === TokenType.StartEnv) {
-      envLevel++;
-    } else if (token.type === TokenType.EndEnv) {
-      if (envLevel === 0) {
-        throw new Error(
-          "There are more closing environment directives than opening " +
-            "environment directives"
-        );
-      }
-      envLevel--;
-    } else if (token.type === TokenType.Metadata && envLevel === 0) {
+    if (token.type === TokenType.Metadata) {
       if (metadata.get(token.key)) {
         throw new Error(`Metadata "${token.key}" is defined twice.`);
       }
@@ -46,8 +35,8 @@ export class SongMetadata {
     public capo?: number
   ) {}
 
-  static fromTokens(tokens: Token[]) {
-    const metadata = populateMap(tokens);
+  static fromTokens(env: Token) {
+    const metadata = populateMap(env.children);
     if (!metadata.get("title")) {
       throw new Error("The song metadata does not have a title.");
     }
@@ -81,11 +70,11 @@ export class PartMetadata {
   ) {}
 
   static fromTokens(
-    tokens: Token[],
+    env: Token,
     name?: string,
     fallback?: SongMetadata | PartMetadata
   ) {
-    const metadata = populateMap(tokens);
+    const metadata = populateMap(env.children);
     return new PartMetadata(
       name,
       metadata.get("key")
