@@ -21,7 +21,6 @@ export interface StrumComponentProps {
 export default function StrumComponent({ strum }: StrumComponentProps) {
   // Handle missing strums
   switch (strum.type) {
-    case StrumType.Arpeggio:
     case StrumType.Down:
       return (
         <FaLongArrowAltDown className={strum.emphasize ? styles.emStrum : ""} />
@@ -38,6 +37,8 @@ export default function StrumComponent({ strum }: StrumComponentProps) {
           <FaExchangeAlt />
         </div>
       );
+    case StrumType.Arpeggio:
+      return <FaLongArrowAltDown className={styles.emStrum} />;
     case StrumType.Plugged:
       return (
         <span className={styles.strum}>

@@ -17,7 +17,7 @@ function BarComponent({ bar, isFirst, nextAnacrusis }: BarComponentProps) {
   if (isFirst && bar.anacrusis) {
     return (
       <div className={styles.firstBarContainer}>
-        <div className={styles.barContainer}>
+        <div className={styles.barContainer} style={{ flexGrow: 0 }}>
           <ChordComponent />
           <PatternComponent pattern={Pattern.makeEmpty(bar.pattern.time, 0)} />
           <LyricsComponent
@@ -26,10 +26,7 @@ function BarComponent({ bar, isFirst, nextAnacrusis }: BarComponentProps) {
             nextAnacrusis={bar.anacrusis}
           />
         </div>
-        <div
-          className={styles.barContainer}
-          style={{ minWidth: "unset", flexGrow: 1 }}
-        >
+        <div className={styles.barContainer} style={{ minWidth: "unset" }}>
           <SpacedGridRow spacing={bar.beats}>
             {bar.chords.map((chord, i) => (
               <ChordComponent key={i} chord={chord} />
