@@ -17,7 +17,7 @@ export default function Layout({ title, children }: LayoutProps) {
       </Head>
       <div className={styles.content}>
         <main className={styles.main}>
-          <Container>{children}</Container>
+          <Container isFluid>{children}</Container>
         </main>
 
         <Footer className={styles.footer}>

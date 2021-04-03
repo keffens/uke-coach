@@ -24,7 +24,7 @@ function MetadataColumn({ name, value }: MetadataColumnProps) {
     return <></>;
   }
   return (
-    <Column>
+    <Column style={{ whiteSpace: "nowrap" }}>
       {name}: {value}
     </Column>
   );
@@ -43,14 +43,12 @@ export default function SongMetadataComponent({
         {metadata.title}
       </Title>
       <SongSubtitle artist={metadata.artist} />
-      <Columns>
+      <Columns isMultiline isMobile>
         <MetadataColumn name="composer" value={metadata.composer} />
         <MetadataColumn name="lyricist" value={metadata.lyricist} />
         <MetadataColumn name="album" value={metadata.album} />
         <MetadataColumn name="year" value={metadata.year} />
         <MetadataColumn name="©" value={metadata.copyright} />
-      </Columns>
-      <Columns>
         <MetadataColumn name="key" value={metadata.key?.render()} />
         <MetadataColumn name="time" value={metadata.time?.toString()} />
         <MetadataColumn name="tempo" value={metadata.tempo} />

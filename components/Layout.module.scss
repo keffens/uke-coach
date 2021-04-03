@@ -1,13 +1,17 @@
+@import "../styles/variables.scss";
+
 .content {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-width: fit-content;
+  min-width: 320px;
 }
 
 .main {
-  margin: 5em 10%;
-  min-width: fit-content;
+  margin: 4em calc(5%);
+  @media screen and (max-width: $tablet) {
+    margin: 2em 0;
+  }
 }
 
 .footer {

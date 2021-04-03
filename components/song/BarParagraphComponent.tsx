@@ -10,10 +10,16 @@ import SpacedGridRow from "./SpacedGridRow";
 interface BarComponentProps {
   bar: Bar;
   isFirst: boolean;
+  useTab: boolean;
   nextAnacrusis?: string;
 }
 
-function BarComponent({ bar, isFirst, nextAnacrusis }: BarComponentProps) {
+function BarComponent({
+  bar,
+  isFirst,
+  useTab,
+  nextAnacrusis,
+}: BarComponentProps) {
   if (isFirst && bar.anacrusis) {
     return (
       <div className={styles.firstBarContainer}>
@@ -24,6 +30,7 @@ function BarComponent({ bar, isFirst, nextAnacrusis }: BarComponentProps) {
             lyrics={[]}
             beats={[]}
             nextAnacrusis={bar.anacrusis}
+            isSoloAnacrusis
           />
         </div>
         <div className={styles.barContainer} style={{ minWidth: "unset" }}>
@@ -32,7 +39,12 @@ function BarComponent({ bar, isFirst, nextAnacrusis }: BarComponentProps) {
               <ChordComponent key={i} chord={chord} />
             ))}
           </SpacedGridRow>
-          <PatternComponent pattern={bar.pattern} bar={bar.patternIdx} />
+          <PatternComponent
+            pattern={bar.pattern}
+            bar={bar.patternIdx}
+            useTab={useTab}
+            showStringLabels
+          />
           <LyricsComponent
             lyrics={bar.lyrics}
             beats={bar.beats}
@@ -49,7 +61,12 @@ function BarComponent({ bar, isFirst, nextAnacrusis }: BarComponentProps) {
           <ChordComponent key={i} chord={chord} />
         ))}
       </SpacedGridRow>
-      <PatternComponent pattern={bar.pattern} bar={bar.patternIdx} />
+      <PatternComponent
+        pattern={bar.pattern}
+        bar={bar.patternIdx}
+        useTab={useTab}
+        showStringLabels={isFirst}
+      />
       <LyricsComponent
         lyrics={bar.lyrics}
         beats={bar.beats}
@@ -66,6 +83,7 @@ export interface BarParagraphComponentProps {
 export default function BarParagraphComponent({
   paragraph,
 }: BarParagraphComponentProps) {
+  const useTab = paragraph.useTab();
   return (
     <div className={styles.barParagraph}>
       {paragraph.bars.map((bar, i) => (
@@ -73,6 +91,7 @@ export default function BarParagraphComponent({
           key={i}
           bar={bar}
           isFirst={i === 0}
+          useTab={useTab}
           nextAnacrusis={paragraph.bars[i + 1]?.anacrusis}
         />
       ))}

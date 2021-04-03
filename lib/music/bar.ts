@@ -19,6 +19,10 @@ export class Bar {
 
 export class BarParagraph {
   constructor(readonly bars: Bar[]) {}
+
+  useTab(): boolean {
+    return this.bars.some((bar) => bar.pattern.useTab());
+  }
 }
 
 export class BarParagraphBuilder {

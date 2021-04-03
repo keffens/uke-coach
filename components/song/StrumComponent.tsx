@@ -10,7 +10,7 @@ import styles from "./Song.module.scss";
 
 export function stringHeight(string: number) {
   const f = (string - 1) / 3;
-  const top = 1.3 - 2.75 * f;
+  const top = 1.25 - 2.75 * f;
   return `${top}em`;
 }
 
@@ -31,14 +31,18 @@ export default function StrumComponent({ strum }: StrumComponentProps) {
       );
     case StrumType.Percursion:
       return <FaTimes />;
+    case StrumType.Arpeggio:
+      return (
+        <div style={{ transform: "scale(1.2) rotate(-30deg)" }}>
+          <FaLongArrowAltDown />
+        </div>
+      );
     case StrumType.Tremolo:
       return (
         <div style={{ transform: "rotate(-90deg) scaleX(0.9) scaleY(-1.1)" }}>
           <FaExchangeAlt />
         </div>
       );
-    case StrumType.Arpeggio:
-      return <FaLongArrowAltDown className={styles.emStrum} />;
     case StrumType.Plugged:
       return (
         <span className={styles.strum}>

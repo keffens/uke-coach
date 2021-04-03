@@ -4,11 +4,11 @@ import styles from "./Song.module.scss";
 import StrumComponent, { stringHeight } from "./StrumComponent";
 
 interface StringLabelsProps {
-  pattern: Pattern;
+  useTab: boolean;
 }
 
-function StringLabels({ pattern }: StringLabelsProps) {
-  if (!pattern.useTab()) return <></>;
+function StringLabels({ useTab }: StringLabelsProps) {
+  if (!useTab) return <></>;
   const strings = ["G", "C", "E", "A"];
   return (
     <span className={styles.stringLabel}>
@@ -26,12 +26,12 @@ function StringLabels({ pattern }: StringLabelsProps) {
 }
 
 interface TabLinesComponent {
-  pattern: Pattern;
+  useTab: boolean;
 }
 
-function TabLines({ pattern }: TabLinesComponent) {
+function TabLines({ useTab }: TabLinesComponent) {
   const lines = new Array<string>();
-  if (pattern.useTab()) {
+  if (useTab) {
     for (const i of range(0, 101, 33.3333)) {
       lines.push(`${i}%`);
     }
@@ -56,13 +56,16 @@ export interface PatternComponentProps {
   pattern: Pattern;
   bar?: number;
   showStringLabels?: boolean;
+  useTab?: boolean;
 }
 
 export default function PatternComponent({
   pattern,
   bar,
   showStringLabels,
+  useTab,
 }: PatternComponentProps) {
+  useTab = useTab || pattern.useTab();
   if (pattern.bars === 0) {
     return <div className={styles.pattern}></div>;
   }
@@ -73,8 +76,8 @@ export default function PatternComponent({
   );
   return (
     <div className={styles.pattern}>
-      <TabLines pattern={pattern} />
-      {showStringLabels ? <StringLabels pattern={pattern} /> : <></>}
+      <TabLines useTab={useTab} />
+      {showStringLabels ? <StringLabels useTab={useTab} /> : <></>}
       <span className={styles.barSeperator} />
       {strums.map((s, i) => (
         <StrumComponent key={`strum-${i}`} strum={s} />

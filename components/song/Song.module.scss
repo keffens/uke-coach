@@ -3,6 +3,8 @@
 $stringColor: $grey-light;
 $stringWidth: 2px;
 $strumSize: 1.25em;
+$sixColWidth: 1360px;
+$eightColWidth: 1760px;
 
 .flexRow {
   display: flex;
@@ -23,6 +25,13 @@ $strumSize: 1.25em;
     content: "";
     min-width: 20.1%;
     flex-grow: 1000000;
+
+    @media screen and (min-width: $sixColWidth) {
+      min-width: 14.3%; // Use at most 6 columns.
+    }
+    @media screen and (min-width: $eightColWidth) {
+      min-width: 11.2%; // Use at most 8 columns.
+    }
   }
 }
 
@@ -32,6 +41,13 @@ $strumSize: 1.25em;
   flex-grow: 1;
   width: max-content;
   min-width: 20.1%; // Use at most 4 columns.
+
+  @media screen and (min-width: $sixColWidth) {
+    min-width: 14.3%; // Use at most 6 columns.
+  }
+  @media screen and (min-width: $eightColWidth) {
+    min-width: 11.2%; // Use at most 8 columns.
+  }
 }
 
 .firstBarContainer {
@@ -79,7 +95,7 @@ $strumSize: 1.25em;
 
   > .barSeperator {
     flex: none;
-    margin: 0 -$stringWidth / 2;
+    margin-right: -$stringWidth;
     background-color: $stringColor;
     display: inline-block;
     width: $stringWidth;
@@ -91,7 +107,6 @@ $strumSize: 1.25em;
     height: $stringWidth;
     width: calc(100% + #{$stringWidth});
     position: absolute;
-    left: -$stringWidth / 2;
     z-index: -1;
   }
 
@@ -134,7 +149,6 @@ $strumSize: 1.25em;
 
   .right {
     float: right;
-    margin-left: 1em;
   }
 
   .streched {

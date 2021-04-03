@@ -6,6 +6,43 @@
 {tempo: 125}
 
 {pattern: Single Plugged |1234----|}
+[Am][C][G][Am]
+[Am][C][G][Am]
+
+{start_of_verse: Verse 1}
+{pattern: Single Plugged}
+Un lu[Am]gar para es[C]tar y vi[G]vir lo que se he[Am]reda.
+Una can[Am]ción sin condi[C]ción para so[G]nar lo que noes [Am]queda.
 {pattern: Double Plugged |12341234|}
+Hoy puedo [Am]ver lo que yo [C]fui. De donde [G]soy, de donde [Am]vengo.
+No es prote[Am]star no es una [C]guerra, es lo que [G]soy y lo que {pattern: Single Plugged}[Am]tengo.
+{end_of_verse}
+
+{start_of_chorus}
 {pattern: Chorus Upstroke |xu-u-u-u|}
+Hay cosas en la [Am]vida que no se pueden cam[C]biar, intentos de orde[G]nar a la natura[Am]leza.
+Pero yo prefiero es[Am]tar en un lugar  donde se [C]da un ritmo natu[G]ral, chaótica belle[Am]za.
+
+Uh oh [Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh [Am]oh_, uh oh
+[Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh {pattern: |xu------|}[Am]oh_.
+{end_of_chorus}
+
+{start_of_verse: Verse 2}
+{pattern: Single Plugged}
+Por un [Am]fluir, por lo esen[C]tial, por lo que [G]hace, por lo que [Am]muere,
+por lo sen[Am]tido y lo sinsen[C]tido, por lo que [G]hay y nunca [Am]hubo,
+{pattern: Double Plugged}
+por una his[Am]torio, por mil his[C]torias, que sean con[G]tadas, pero sin [Am]huecos,
+por lo di[Am]verso, por este [C]caos, desorde [G]nado con mil en{pattern: Single Plugged}[Am]cantos.
+{end_of_verse}
+
+{start_of_chorus}
 {pattern: Offbeat Plugged |1(234)-(234)-(234)-(234)|}
+Hay cosas en la [Am]vida que no se pueden cam[C]biar, intentos de orde[G]nar a la natura[Am]leza.
+Pero yo prefiero es[Am]tar en un lugar  donde se [C]da un ritmo natu[G]ral, chaótica belle
+{pattern: |a-------|}[Am]za.
+
+{pattern: Chorus Upstroke}
+Uh oh [Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh [Am]oh_, uh oh
+[Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh {pattern: |xu------|}[Am]oh_.
+{end_of_chorus}
