@@ -36,6 +36,12 @@ export class Pattern {
     );
   }
 
+  static makeDefault(time: TimeSignature) {
+    const strums = Array(time.beats * 2).fill(Strum.pause());
+    strums[0] = Strum.down();
+    return new Pattern(time, strums, 1);
+  }
+
   get bars() {
     return this._bars;
   }

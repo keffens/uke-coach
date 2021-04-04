@@ -1,11 +1,11 @@
 import React from "react";
+import { Column, Columns } from "bloomer";
 import ChordComponent from "./ChordComponent";
 import LyricsComponent from "./LyricsComponent";
 import PatternComponent from "./PatternComponent";
-import { Bar, BarParagraph, TimeSignature } from "../../lib/music";
-import styles from "./Song.module.scss";
-import { Pattern } from "../../lib/music/pattern";
 import SpacedGridRow from "./SpacedGridRow";
+import { Bar, BarParagraph, Pattern } from "../../lib/music";
+import styles from "./Song.module.scss";
 
 interface BarComponentProps {
   bar: Bar;
@@ -22,7 +22,7 @@ function BarComponent({
 }: BarComponentProps) {
   if (isFirst && bar.anacrusis) {
     return (
-      <div className={styles.firstBarContainer}>
+      <Column isPaddingless className={styles.firstBarContainer}>
         <div className={styles.barContainer} style={{ flexGrow: 0 }}>
           <ChordComponent />
           <PatternComponent pattern={Pattern.makeEmpty(bar.pattern.time, 0)} />
@@ -51,11 +51,11 @@ function BarComponent({
             nextAnacrusis={nextAnacrusis}
           />
         </div>
-      </div>
+      </Column>
     );
   }
   return (
-    <div className={styles.barContainer}>
+    <Column isPaddingless className={styles.barContainer}>
       <SpacedGridRow spacing={bar.beats}>
         {bar.chords.map((chord, i) => (
           <ChordComponent key={i} chord={chord} />
@@ -72,7 +72,7 @@ function BarComponent({
         beats={bar.beats}
         nextAnacrusis={nextAnacrusis}
       />
-    </div>
+    </Column>
   );
 }
 
@@ -85,7 +85,7 @@ export default function BarParagraphComponent({
 }: BarParagraphComponentProps) {
   const useTab = paragraph.useTab();
   return (
-    <div className={styles.barParagraph}>
+    <Columns isMultiline isMobile isMarginless className={styles.barParagraph}>
       {paragraph.bars.map((bar, i) => (
         <BarComponent
           key={i}
@@ -95,6 +95,6 @@ export default function BarParagraphComponent({
           nextAnacrusis={paragraph.bars[i + 1]?.anacrusis}
         />
       ))}
-    </div>
+    </Columns>
   );
 }

@@ -2,6 +2,7 @@ export * from "./bar";
 export * from "./chord";
 export * from "./metadata";
 export * from "./note";
+export * from "./pattern";
 export * from "./signature";
 export * from "./song_part";
 export * from "./song";

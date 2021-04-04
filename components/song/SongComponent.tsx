@@ -1,8 +1,9 @@
+import React from "react";
 import { Column, Columns, Content, Title } from "bloomer";
-import { Song } from "../../lib/music";
 import SongMetadataComponent from "./SongMetadataComponent";
 import SongPartComponent from "./SongPartComponent";
 import PatternWithCountComponent from "./PatternWithCountComponent";
+import { Song } from "../../lib/music";
 
 export interface SongComponentProps {
   song: Song;
@@ -15,7 +16,7 @@ export default function SongComponent({ song }: SongComponentProps) {
       <Title tag="h3">Strumming patterns</Title>
       <Columns isMultiline isMobile>
         {[...song.patterns.keys()].map((name, i) => (
-          <Column key={i}>
+          <Column key={i} style={{ minWidth: "max-content" }}>
             <PatternWithCountComponent
               key={name}
               name={name}

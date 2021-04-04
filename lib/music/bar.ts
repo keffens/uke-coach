@@ -1,6 +1,6 @@
 import { Chord } from "./chord";
-import { Pattern } from "./pattern";
 import { parseBeats, sumBeats } from "./note";
+import { Pattern } from "./pattern";
 
 export class Bar {
   constructor(
@@ -37,6 +37,7 @@ export class BarParagraphBuilder {
   constructor(private _pattern?: Pattern) {}
 
   addLyrics(value: string) {
+    if (!value.trim()) return;
     this.requirePattern();
     if (value.match(/\w$/)) {
       value += "-";

@@ -37,6 +37,9 @@ export class SongPart {
     const type = env.key as SongPartType;
     const name = env.value;
     const metadata = PartMetadata.fromTokens(env, name, fallback);
+    activePattern = activePattern?.time.equals(metadata.time)
+      ? activePattern
+      : Pattern.makeDefault(metadata.time);
     let builder = new BarParagraphBuilder(activePattern);
     let paragraphs = null;
 

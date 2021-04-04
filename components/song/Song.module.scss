@@ -3,10 +3,10 @@
 $stringColor: $grey-light;
 $stringWidth: 2px;
 $strumSize: 1.25em;
-$sixColWidth: 1360px;
+$sixColWidth: 1400px;
 $eightColWidth: 1760px;
 
-.flexRow {
+.flexRowTemplate {
   display: flex;
   flex-direction: row;
 
@@ -15,39 +15,31 @@ $eightColWidth: 1760px;
   }
 }
 
-.barParagraph {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+.colSizingTemplate {
+  min-width: max-content;
+  flex: 1 0 21%; // At most 4 columns.
+  @media screen and (min-width: $sixColWidth) {
+    flex: 1 0 15%; // At most 6 columns.
+  }
+  @media screen and (min-width: $eightColWidth) {
+    flex: 1 0 12%; // At most 8 columns.
+  }
+}
 
+.barParagraph {
   // Don't grow elements in last line.
   &:after {
+    @extend .colSizingTemplate;
     content: "";
-    min-width: 20.1%;
-    flex-grow: 1000000;
-
-    @media screen and (min-width: $sixColWidth) {
-      min-width: 14.3%; // Use at most 6 columns.
-    }
-    @media screen and (min-width: $eightColWidth) {
-      min-width: 11.2%; // Use at most 8 columns.
-    }
+    min-width: 160px;
+    flex-grow: 1000;
   }
 }
 
 .barContainer {
+  @extend .colSizingTemplate;
   display: inline-flex;
   flex-direction: column;
-  flex-grow: 1;
-  width: max-content;
-  min-width: 20.1%; // Use at most 4 columns.
-
-  @media screen and (min-width: $sixColWidth) {
-    min-width: 14.3%; // Use at most 6 columns.
-  }
-  @media screen and (min-width: $eightColWidth) {
-    min-width: 11.2%; // Use at most 8 columns.
-  }
 }
 
 .firstBarContainer {
@@ -56,7 +48,7 @@ $eightColWidth: 1760px;
 }
 
 .beatCount {
-  @extend .flexRow;
+  @extend .flexRowTemplate;
 
   > * {
     @extend .chord;
@@ -80,7 +72,7 @@ $eightColWidth: 1760px;
 
 // The strumming pattern row.
 .pattern {
-  @extend .flexRow;
+  @extend .flexRowTemplate;
 
   $color: $black-bis;
   font-size: $strumSize;

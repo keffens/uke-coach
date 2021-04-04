@@ -5,7 +5,7 @@
 {time: 4/4}
 {tempo: 117}
 
-{pattern: Base Pattern |duX-uuX-|}
+{pattern: base pattern |duX-uuX-|}
 
 [C][F..][G..][C][F..][G..]
 
@@ -21,7 +21,7 @@ Porque en el [F]mar quiero pa[G]sar la vida en[C]tera sin record[Am]ar, que exis
 [F]mundo rodeado de fron[G]teras que gobierna el [C]corazón. [C7]
 Porque en el [F]mar quiero vi[G]vir, enveje[C]cerme, perderme y mo[Am]rir.
 [F] Ser un recuerdo que se a[G]leja, {pattern: |a-------|--------|}[G][_]
-como el eco {pattern: Base Pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
+como el eco {pattern: base pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
 {end_of_chorus}
 
 {start_of_verse: Verse 2}
@@ -37,6 +37,6 @@ Porque en el [F]mar quiero pa[G]sar la vida en[C]tera sin record[Am]ar, que exis
 Porque en el [F]mar quiero vi[G]vir, enveje[C]cerme, perderme y mo[Am]rir. [Am]
 Mirando a[F]nochecer el [F]cielo. Ser un re[Fm]curedo que se a[Fm]leja,
 {pattern: |a-------|--------|--------|}[Fm][_][_]
-como el eco {pattern: Base Pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
+como el eco {pattern: base pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
 [C][F..][G..] {pattern: |a-------|}[C]
 {end_of_chorus}
