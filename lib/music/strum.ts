@@ -15,36 +15,51 @@ export class Strum {
     readonly strings?: number[]
   ) {}
 
-  static pause() {
+  /** Creates a pause. */
+  static pause(): Strum {
     return new Strum(StrumType.Pause);
   }
 
-  static down(emphasize = false) {
+  /** Creates a down stroke. */
+  static down(emphasize = false): Strum {
     return new Strum(StrumType.Down, emphasize);
   }
 
-  static up(emphasize = false) {
+  /** Creates a up stroke. */
+  static up(emphasize = false): Strum {
     return new Strum(StrumType.Up, emphasize);
   }
 
-  static percursion() {
+  /** Creates a percursion. */
+  static percursion(): Strum {
     return new Strum(StrumType.Percursion);
   }
 
-  static arpeggio() {
+  /** Creates an arpeggio. */
+  static arpeggio(): Strum {
     return new Strum(StrumType.Arpeggio);
   }
 
-  static tremolo() {
+  /** Creates an tremolo. */
+  static tremolo(): Strum {
     return new Strum(StrumType.Tremolo);
   }
 
-  static plugged(strings: number[]) {
+  /** Creates a plugged strum using the given strings. */
+  static plugged(strings: number[]): Strum {
+    if (!strings.length) {
+      throw new Error("Plugged strum requires a string set.");
+    }
+    // Sort and deduplicate the array.
+    strings.sort((a, b) => a - b);
+    strings = strings.filter((s, i) => s !== strings[i + 1]);
     return new Strum(StrumType.Plugged, false, strings);
   }
 
-  // Reads 1 Strum from the pattern starting at the given position.
-  // Returns the position after the last character that was read.
+  /**
+   * Reads 1 Strum from the pattern starting at the given position. Returns the
+   * position after the last character that was read.
+   */
   static parse(pattern: string, pos: number): [Strum, number] {
     switch (pattern[pos].toLowerCase()) {
       case "-":
@@ -83,7 +98,6 @@ export class Strum {
           `Failed to parse parenthesized chord in pattern "${pattern}".`
         );
       }
-      strings.sort((a, b) => a - b);
       return [Strum.plugged(strings), pos + 1];
     }
     throw new Error(
@@ -92,6 +106,7 @@ export class Strum {
     );
   }
 
+  /** Converts the strum to its string representation. */
   toString() {
     switch (this.type) {
       case StrumType.Pause:
@@ -108,7 +123,7 @@ export class Strum {
         return "t";
       case StrumType.Plugged:
         return this.strings.length === 1
-          ? this.strings[0]
+          ? `${this.strings[0]}`
           : `(${this.strings.join("")})`;
       default:
         throw new Error(`Unknown strum StrumType: "${this.type}"`);
