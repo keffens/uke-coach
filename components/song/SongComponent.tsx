@@ -15,15 +15,15 @@ export default function SongComponent({ song }: SongComponentProps) {
       <SongMetadataComponent metadata={song.metadata} />
       <Title tag="h3">Strumming patterns</Title>
       <Columns isMultiline isMobile>
-        {[...song.patterns.keys()].map((name, i) => (
-          <Column key={i} style={{ minWidth: "max-content" }}>
-            <PatternWithCountComponent
-              key={name}
-              name={name}
-              pattern={song.patterns.get(name)}
-            />
-          </Column>
-        ))}
+        {[...song.patterns.values()].map((pattern, i) =>
+          pattern.isMainPattern() ? (
+            <Column key={i} style={{ minWidth: "max-content" }}>
+              <PatternWithCountComponent key={i} pattern={pattern} />
+            </Column>
+          ) : (
+            <></>
+          )
+        )}
       </Columns>
       <Title tag="h3">Song</Title>
       {song.parts.map((part, i) => (

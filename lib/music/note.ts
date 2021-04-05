@@ -42,7 +42,7 @@ const BEAT_LENGTHS = new Map<string, number>([
 const BEAT_GCC = 3 * 8;
 
 /** RegExp pattern to accept all allowed beat values */
-export const BEAT_LENGTHS_RE = `[_.,:;'"]*`;
+export const BEAT_LENGTHS_PATTERN = `[_.,:;'"]*`;
 
 /**
  * Parses beats from a string ignoring all symbols which don't represent beat

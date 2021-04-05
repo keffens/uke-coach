@@ -6,7 +6,7 @@
 {tempo: 120}
 
 {start_of_verse: Verse 1}
-{pattern: verse start |----d-d-|d-d-du-u|}[C.][...]Und sie tanzen einen [C]Tango, {pattern: verse |d-d-d-d-|d-d-du-u|}[C.][...]Jacky Brown und Baby [G7]Miller.
+{pattern: *verse start |----d-d-|d-d-du-u|}[C.][...]Und sie tanzen einen [C]Tango, {pattern: verse |d-d-d-d-|d-d-du-u|}[C.][...]Jacky Brown und Baby [G7]Miller.
 [G7.][...]Und er sagt ihr leise: [G7]"Baby, [G7.][...]wenn ich austrink', machst du [C..]dicht." [F..]
 [C.][...]Dann bestellt er zwei Man[C]hattan, [C7.][...]und dann kommt ein Herr mit [F]Kneifer.
 [F.][...]Jack trink aus und Baby [C]zittert, [G7.][...]doch dann löscht sie schnell das {pattern: tremolo |tttttttt|}[Cm]Licht.
@@ -17,11 +17,11 @@
 [Cm..][..]Kriminal [Fm]Tango [Fm..][..]in der Ta[Cm]verne.
 [Cm..][..]Dunkle [Fm]Gestalten, [Fm..][..]rote La[Cm]terne.
 [Cm..][..]Abend für [C7]Abend [C7..][..]lodert die [Fm]Lunte,
-[Fm..][..]sprühende [D7]Spannung [D7..][..]liegt in der {pattern: |D-------|}[G7]Luft.
+[Fm..][..]sprühende [D7]Spannung [D7..][..]liegt in der {pattern: *single |D-------|}[G7]Luft.
 {end_of_chorus}
 
 {start_of_verse: Verse 2}
-{pattern: verse start}[C.][...]Und sie tanzen einen [C]Tango, {pattern: verse}[C.][...]alle, die davon nichts [G7]ahnen.
+{pattern: *verse start}[C.][...]Und sie tanzen einen [C]Tango, {pattern: verse}[C.][...]alle, die davon nichts [G7]ahnen.
 [G7.][...]Und sie fragen die Ka[G7]pelle: [G7.][...]"Hab'n Sie nicht was Heißes [C..]da?" [F..]
 [C.][...]Denn sie können ja nicht [C]wissen, [C7.][...]was da zwischen Tag und [F]Morgen
 [F.][...]in der nächtlichen Ta[C]verne [G7.][...]bei dem Tango schon ge{pattern: tremolo}[Cm]schah.
@@ -32,11 +32,11 @@
 [Cm..][..]Kriminal [Fm]Tango [Fm..][..]in der Ta[Cm]verne.
 [Cm..][..]Dunkle [Fm]Gestalten, [Fm..][..]rote La[Cm]terne.
 [Cm..][..]Glühende [C7]Blicke, [C7..][..]steigende [Fm]Spannung.
-[Fm..][..]Und in die [D7]Spannung, [D7..][..]da fällt ein {pattern: |D-------|}[G7]Schuss.
+[Fm..][..]Und in die [D7]Spannung, [D7..][..]da fällt ein {pattern: *single}[G7]Schuss.
 {end_of_chorus}
  
 {start_of_verse: Verse 3}
-{pattern: verse start}[C.][...]Und sie tanzen einen [C]Tango, {pattern: verse}[C.][...]Jacky Brown und Baby [G7]Miller.
+{pattern: *verse start}[C.][...]Und sie tanzen einen [C]Tango, {pattern: verse}[C.][...]Jacky Brown und Baby [G7]Miller.
 [G7.][...]Und die Kripo kann nichts [G7]finden, [G7.][...]was daran verdächtig [C..]wär'. [F..]
 [C.][...]Nur der Herr da mit dem [C]Kneifer, [C7.][...]dem der Schuss im Dunkeln [F]galt,
 [F.][...]könnt' vielleicht noch etwas [C]sagen, [G7.][...]doch der Herr, der sagt nichts {pattern: tremolo}[Cm]mehr.
@@ -48,5 +48,5 @@
 [Cm..][..]Dunkle [Fm]Gestalten, [Fm..][..]rote La[Cm]terne.
 [Cm..][..]Abend für [C7]Abend [C7..][..]immer das [Fm]Gleiche,
 [Fm..][..]denn dieser [D7]Tango [G7..][..]geht nie [C]vorbei,
-[G7..][..]geht nie [C]vorbei, [G7..][..]geht nie {pattern: |D-------|}[C]vorbei.
+[G7..][..]geht nie [C]vorbei, [G7..][..]geht nie {pattern: *single}[C]vorbei.
 {end_of_chorus}
