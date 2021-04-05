@@ -8,6 +8,7 @@ export enum StrumType {
   Plugged,
 }
 
+/** Represents a single strum type, stroke, or a set of plugged strings. */
 export class Strum {
   private constructor(
     readonly type: StrumType,

@@ -1,8 +1,4 @@
-import {
-  DEFAULT_TIME_SIGNATURE,
-  KeySignature,
-  TimeSignature,
-} from "./signature";
+import { KeySignature, TimeSignature } from "./signature";
 import { Token, TokenType } from "./token";
 
 function populateMap(tokens: Token[]) {
@@ -53,7 +49,7 @@ export class SongMetadata {
       metadata.get("key") ? KeySignature.parse(metadata.get("key")) : undefined,
       metadata.get("time")
         ? TimeSignature.parse(metadata.get("time"))
-        : DEFAULT_TIME_SIGNATURE,
+        : TimeSignature.DEFAULT,
       parseInt(metadata.get("tempo")) || undefined,
       parseInt(metadata.get("capo")) || undefined
     );
