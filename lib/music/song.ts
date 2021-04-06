@@ -1,13 +1,15 @@
+import { ChordLib } from "./chord_lib";
 import { SongMetadata } from "./metadata";
 import { Pattern } from "./pattern";
 import { SongPart } from "./song_part";
-import { Token, TokenType } from "./token";
+import { Token } from "./token";
 
 export class Song {
   constructor(
     public metadata: SongMetadata,
     public patterns: Map<string, Pattern>,
-    public parts: SongPart[]
+    public parts: SongPart[],
+    public chordLib = new ChordLib()
   ) {}
 
   static fromTokens(env: Token) {

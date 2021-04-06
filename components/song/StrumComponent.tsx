@@ -10,15 +10,16 @@ import styles from "./Song.module.scss";
 
 export function stringHeight(string: number) {
   const f = (string - 1) / 3;
-  const top = 1.25 - 2.75 * f;
+  const top = 1 - 2.25 * f;
   return `${top}em`;
 }
 
 export interface StrumComponentProps {
   strum: Strum;
+  frets?: string[];
 }
 
-export default function StrumComponent({ strum }: StrumComponentProps) {
+export default function StrumComponent({ strum, frets }: StrumComponentProps) {
   // Handle missing strums
   switch (strum.type) {
     case StrumType.Down:
@@ -52,7 +53,7 @@ export default function StrumComponent({ strum }: StrumComponentProps) {
               className={styles.string}
               style={{ top: stringHeight(string) }}
             >
-              ⬤
+              {frets?.[string - 1] ?? "⬤"}
             </div>
           ))}
         </span>

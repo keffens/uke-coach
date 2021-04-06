@@ -1,4 +1,5 @@
 export * from "./bar";
+export * from "./chord_lib";
 export * from "./chord";
 export * from "./metadata";
 export * from "./note";

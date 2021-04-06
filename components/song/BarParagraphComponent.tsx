@@ -4,7 +4,7 @@ import ChordComponent from "./ChordComponent";
 import LyricsComponent from "./LyricsComponent";
 import PatternComponent from "./PatternComponent";
 import SpacedGridRow from "./SpacedGridRow";
-import { Bar, BarParagraph, Pattern } from "../../lib/music";
+import { Bar, BarParagraph, ChordLib, Pattern } from "../../lib/music";
 import styles from "./Song.module.scss";
 
 interface BarComponentProps {
@@ -12,6 +12,7 @@ interface BarComponentProps {
   isFirst: boolean;
   useTab: boolean;
   nextAnacrusis?: string;
+  chordLib?: ChordLib;
 }
 
 function BarComponent({
@@ -19,6 +20,7 @@ function BarComponent({
   isFirst,
   useTab,
   nextAnacrusis,
+  chordLib,
 }: BarComponentProps) {
   if (isFirst && bar.anacrusis) {
     return (
@@ -40,10 +42,10 @@ function BarComponent({
             ))}
           </SpacedGridRow>
           <PatternComponent
-            pattern={bar.pattern}
-            bar={bar.patternIdx}
+            bar={bar}
             useTab={useTab}
             showStringLabels
+            chordLib={chordLib}
           />
           <LyricsComponent
             lyrics={bar.lyrics}
@@ -62,10 +64,10 @@ function BarComponent({
         ))}
       </SpacedGridRow>
       <PatternComponent
-        pattern={bar.pattern}
-        bar={bar.patternIdx}
+        bar={bar}
         useTab={useTab}
         showStringLabels={isFirst}
+        chordLib={chordLib}
       />
       <LyricsComponent
         lyrics={bar.lyrics}
@@ -78,10 +80,12 @@ function BarComponent({
 
 export interface BarParagraphComponentProps {
   paragraph: BarParagraph;
+  chordLib?: ChordLib;
 }
 
 export default function BarParagraphComponent({
   paragraph,
+  chordLib,
 }: BarParagraphComponentProps) {
   const useTab = paragraph.useTab();
   return (
@@ -93,6 +97,7 @@ export default function BarParagraphComponent({
           isFirst={i === 0}
           useTab={useTab}
           nextAnacrusis={paragraph.bars[i + 1]?.anacrusis}
+          chordLib={chordLib}
         />
       ))}
     </Columns>

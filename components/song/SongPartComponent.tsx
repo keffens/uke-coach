@@ -1,13 +1,17 @@
 import { Title } from "bloomer";
 import React from "react";
-import { SongPart } from "../../lib/music";
+import { ChordLib, SongPart } from "../../lib/music";
 import BarParagraphComponent from "./BarParagraphComponent";
 
 export interface SongPartComponentProps {
   part: SongPart;
+  chordLib?: ChordLib;
 }
 
-export default function SongPartComponent({ part }: SongPartComponentProps) {
+export default function SongPartComponent({
+  part,
+  chordLib,
+}: SongPartComponentProps) {
   return (
     <>
       {part.header ? (
@@ -18,7 +22,11 @@ export default function SongPartComponent({ part }: SongPartComponentProps) {
         <div className="mt-5"></div>
       )}
       {part.paragraphs.map((paragraph, i) => (
-        <BarParagraphComponent key={i} paragraph={paragraph} />
+        <BarParagraphComponent
+          key={i}
+          paragraph={paragraph}
+          chordLib={chordLib}
+        />
       ))}
     </>
   );

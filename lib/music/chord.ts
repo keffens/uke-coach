@@ -23,6 +23,7 @@ const CHORD_RE = new RegExp(
 
 const ONLY_BEATS_RE = new RegExp(`^${BEAT_LENGTHS_PATTERN}$`);
 
+/** Represents one chord, independent of the instrument. */
 export class Chord {
   constructor(
     readonly root: Note,
@@ -30,8 +31,10 @@ export class Chord {
     readonly extension: Extension = Extension.None
   ) {}
 
-  // Parses a chord. Returns null for an empty string. Allows trailing dots and
-  // commas but otherwise throws an error if parsing fails.
+  /**
+   * Parses a chord. Allows trailing beat characters. Returns null for only beat
+   * chracters. Throws an error if the chord cannot be parsed.
+   */
   static parse(chord: string): Chord | null {
     if (ONLY_BEATS_RE.exec(chord)) return null;
     const match = CHORD_RE.exec(chord);
@@ -45,12 +48,13 @@ export class Chord {
     );
   }
 
-  toString() {
+  toString(): string {
     if (!this.root) return "";
     return this.root + this.qualifier + this.extension;
   }
 
-  get base() {
+  /** In HTML the chord is diplayed as `base`<sup>`sup`</sup> */
+  get base(): string {
     let base = renderNote(this.root);
     switch (this.qualifier) {
       case Qualifier.Minor:
@@ -63,7 +67,8 @@ export class Chord {
     return base;
   }
 
-  get sup() {
+  /** In HTML the chord is diplayed as `base`<sup>`sup`</sup> */
+  get sup(): string {
     let sup = this.qualifier === Qualifier.Diminished ? "o" : "";
     switch (this.extension) {
       case Extension.Six:

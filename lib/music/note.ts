@@ -19,6 +19,19 @@ export enum Note {
   Bflat = "Bb",
 }
 
+export const NOTE_IDENTITY = new Map<Note, Note>([
+  [Note.Csharp, Note.Dflat],
+  [Note.Dsharp, Note.Eflat],
+  [Note.Fsharp, Note.Gflat],
+  [Note.Gsharp, Note.Aflat],
+  [Note.Asharp, Note.Bflat],
+  [Note.Dflat, Note.Csharp],
+  [Note.Eflat, Note.Dsharp],
+  [Note.Gflat, Note.Fsharp],
+  [Note.Aflat, Note.Gsharp],
+  [Note.Bflat, Note.Asharp],
+]);
+
 /** Renders a note for display on the web using unicode ♯ and ♭. */
 export function renderNote(note: Note | string): string {
   return note.replace("#", "♯").replace("b", "♭");

@@ -17,8 +17,8 @@ export default function PatternWithCountComponent({
       <Title tag="h4" isSize={6} isMarginless>
         {pattern.name}
       </Title>
-      {range(pattern.bars).map((bar) => (
-        <div className={styles.barContainer} key={bar}>
+      {range(pattern.bars).map((idx) => (
+        <div className={styles.barContainer} key={idx}>
           <div className={styles.beatCount}>
             {beats.map((beat) => (
               <span key={beat}>{beat}</span>
@@ -26,8 +26,8 @@ export default function PatternWithCountComponent({
           </div>
           <PatternComponent
             pattern={pattern}
-            bar={bar}
-            showStringLabels={bar === 0}
+            patternIdx={idx}
+            showStringLabels={idx === 0}
           />
         </div>
       ))}

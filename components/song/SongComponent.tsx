@@ -15,19 +15,17 @@ export default function SongComponent({ song }: SongComponentProps) {
       <SongMetadataComponent metadata={song.metadata} />
       <Title tag="h3">Strumming patterns</Title>
       <Columns isMultiline isMobile>
-        {[...song.patterns.values()].map((pattern, i) =>
-          pattern.isMainPattern() ? (
+        {[...song.patterns.values()]
+          .filter((pattern) => pattern.isMainPattern())
+          .map((pattern, i) => (
             <Column key={i} style={{ minWidth: "max-content" }}>
               <PatternWithCountComponent key={i} pattern={pattern} />
             </Column>
-          ) : (
-            <></>
-          )
-        )}
+          ))}
       </Columns>
       <Title tag="h3">Song</Title>
       {song.parts.map((part, i) => (
-        <SongPartComponent key={i} part={part} />
+        <SongPartComponent key={i} part={part} chordLib={song.chordLib} />
       ))}
     </Content>
   );

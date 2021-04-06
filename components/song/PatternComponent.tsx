@@ -1,3 +1,4 @@
+import { Bar, Chord, ChordLib } from "../../lib/music";
 import { Pattern } from "../../lib/music/pattern";
 import { range } from "../../lib/util";
 import styles from "./Song.module.scss";
@@ -53,26 +54,34 @@ function TabLines({ useTab }: TabLinesComponent) {
 }
 
 export interface PatternComponentProps {
-  pattern: Pattern;
-  bar?: number;
+  pattern?: Pattern;
+  patternIdx?: number;
+  bar?: Bar;
   showStringLabels?: boolean;
   useTab?: boolean;
+  chordLib?: ChordLib;
 }
 
 export default function PatternComponent({
   pattern,
+  patternIdx,
   bar,
   showStringLabels,
   useTab,
+  chordLib,
 }: PatternComponentProps) {
+  if (!pattern === !bar) {
+    throw new Error("Either bar or pattern is required for PatternComponent.");
+  }
+  pattern = pattern ?? bar.pattern;
   useTab = useTab || pattern.useTab();
   if (pattern.bars === 0) {
     return <div className={styles.pattern}></div>;
   }
-  bar = (bar ?? 0) % pattern.bars;
+  patternIdx = (patternIdx ?? bar?.patternIdx ?? 0) % pattern.bars;
   const strums = pattern.strums.slice(
-    bar * pattern.strumsPerBar,
-    (bar + 1) * pattern.strumsPerBar
+    patternIdx * pattern.strumsPerBar,
+    (patternIdx + 1) * pattern.strumsPerBar
   );
   return (
     <div className={styles.pattern}>
@@ -80,7 +89,11 @@ export default function PatternComponent({
       {showStringLabels ? <StringLabels useTab={useTab} /> : <></>}
       <span className={styles.barSeperator} />
       {strums.map((s, i) => (
-        <StrumComponent key={`strum-${i}`} strum={s} />
+        <StrumComponent
+          key={`strum-${i}`}
+          strum={s}
+          frets={chordLib?.getStringFrets(bar?.getChordForStrum(i))}
+        />
       ))}
       <span className={styles.barSeperator} />
     </div>

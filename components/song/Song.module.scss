@@ -1,6 +1,6 @@
 @import "../../styles/variables.scss";
 
-$stringColor: $grey-light;
+$stringColor: $grey-lighter;
 $stringWidth: 2px;
 $strumSize: 1.25em;
 $sixColWidth: 1400px;
@@ -128,7 +128,9 @@ $eightColWidth: 1760px;
   position: absolute;
   width: 100%;
   text-align: center;
-  font-size: 40%;
+  font-size: 50%;
+  font-weight: bold;
+  font-family: Poppins;
 }
 
 // Lyrics row.

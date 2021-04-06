@@ -15,6 +15,19 @@ export class Bar {
       this.lyrics = null;
     }
   }
+
+  /** Returns the chord for the i-th chord. */
+  getChordForStrum(strumIdx: number): Chord | null {
+    let beatValue =
+      ((strumIdx + 1) * this.pattern.time.beats) / this.pattern.strumsPerBar;
+    for (let i = 0; i < this.beats.length; i++) {
+      beatValue -= this.beats[i];
+      if (beatValue <= Number.EPSILON) {
+        return this.chords[i];
+      }
+    }
+    return null;
+  }
 }
 
 export class BarParagraph {
