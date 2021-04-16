@@ -33,8 +33,19 @@ export class Bar {
 export class BarParagraph {
   constructor(readonly bars: Bar[]) {}
 
+  /** Returns whether to use a tab notation for this paragraph. */
   useTab(): boolean {
     return this.bars.some((bar) => bar.pattern.useTab());
+  }
+
+  /** Returns the number of ticks per bar. */
+  get ticksPerBar(): number {
+    return this.bars[0]?.pattern.ticksPerBar ?? NaN;
+  }
+
+  /** Returns the number of ticks for the entire paragraph. */
+  get ticks(): number {
+    return this.ticksPerBar * this.bars.length;
   }
 }
 

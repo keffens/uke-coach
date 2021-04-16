@@ -42,6 +42,7 @@ test("fails to parses invalid patterns", () => {
   expect(() => Pattern.parse("|dud|", TWO_TWO)).toThrow();
   expect(() => Pattern.parse("|du|dudu|", TWO_TWO)).toThrow();
   expect(() => Pattern.parse("du|dudu", TWO_TWO)).toThrow();
+  expect(() => Pattern.parse("|1234123412|", TWO_TWO)).toThrow();
 });
 
 test("computes strums per bar", () => {
@@ -51,6 +52,16 @@ test("computes strums per bar", () => {
   expect(Pattern.parse("|d-du-u|", THREE_FOUR).strumsPerBar).toBe(6);
   expect(Pattern.makeEmpty(TWO_TWO, 1, 6).strumsPerBar).toBe(6);
   expect(Pattern.makeEmpty(TWO_TWO, 0, 0).strumsPerBar).toBeNaN();
+});
+
+test("computes strums per beat", () => {
+  expect(Pattern.parse("|d-du|", FOUR_FOUR).strumsPerBeat).toBe(1);
+  expect(Pattern.parse("|d-du|", TWO_TWO).strumsPerBeat).toBe(2);
+  expect(Pattern.parse("|d-du-udu|", FOUR_FOUR).strumsPerBeat).toBe(2);
+  expect(Pattern.parse("|d-du-udu|d-du-udu|", FOUR_FOUR).strumsPerBeat).toBe(2);
+  expect(Pattern.parse("|d-du-u|", THREE_FOUR).strumsPerBeat).toBe(2);
+  expect(Pattern.makeEmpty(TWO_TWO, 1, 6).strumsPerBeat).toBe(3);
+  expect(Pattern.makeEmpty(TWO_TWO, 0, 0).strumsPerBeat).toBeNaN();
 });
 
 test("determines whether to use tabs", () => {

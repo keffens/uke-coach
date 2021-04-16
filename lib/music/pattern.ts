@@ -1,3 +1,4 @@
+import { TICKS_PER_BEAT } from "./note";
 import { TimeSignature } from "./signature";
 import { Strum } from "./strum";
 import { Token, TokenType } from "./token";
@@ -21,6 +22,12 @@ export class Pattern {
       throw new Error(
         `Cannot create pattern with ${this.strumsPerBar} strums and ` +
           `${time.beats} beats per bar.`
+      );
+    }
+    if (TICKS_PER_BEAT % this.strumsPerBeat !== 0) {
+      throw new Error(
+        `The number of strums per beat (${this.strumsPerBeat}) must divide ` +
+          `${TICKS_PER_BEAT}.`
       );
     }
   }
@@ -116,6 +123,14 @@ export class Pattern {
 
   get strumsPerBar(): number {
     return this.strums.length / this.bars;
+  }
+
+  get strumsPerBeat(): number {
+    return this.strumsPerBar / this.time.beats;
+  }
+
+  get ticksPerBar(): number {
+    return this.time.beats * TICKS_PER_BEAT;
   }
 
   /**

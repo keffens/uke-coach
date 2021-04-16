@@ -17,49 +17,73 @@ export function stringHeight(string: number) {
 export interface StrumComponentProps {
   strum: Strum;
   frets?: string[];
+  highlight?: boolean;
 }
 
-export default function StrumComponent({ strum, frets }: StrumComponentProps) {
-  // Handle missing strums
+export default function StrumComponent({
+  strum,
+  frets,
+  highlight,
+}: StrumComponentProps) {
+  let classes = [styles.strum];
+  if (strum.emphasize) classes.push(styles.emStrum);
+  if (highlight) classes.push(styles.highlight);
+
   switch (strum.type) {
     case StrumType.Down:
       return (
-        <FaLongArrowAltDown className={strum.emphasize ? styles.emStrum : ""} />
+        <div className={classes.join(" ")}>
+          <FaLongArrowAltDown />
+        </div>
       );
     case StrumType.Up:
       return (
-        <FaLongArrowAltUp className={strum.emphasize ? styles.emStrum : ""} />
+        <div className={classes.join(" ")}>
+          <FaLongArrowAltUp className={classes.join(" ")} />
+        </div>
       );
     case StrumType.Percursion:
-      return <FaTimes />;
+      return (
+        <div className={classes.join(" ")}>
+          <FaTimes className={classes.join(" ")} />
+        </div>
+      );
     case StrumType.Arpeggio:
       return (
-        <div style={{ transform: "scale(1.2) rotate(-30deg)" }}>
-          <FaLongArrowAltDown />
+        <div className={classes.join(" ")}>
+          <FaLongArrowAltDown
+            style={{ transform: "scale(1.2) rotate(-30deg)" }}
+          />
         </div>
       );
     case StrumType.Tremolo:
       return (
-        <div style={{ transform: "rotate(-90deg) scaleX(0.9) scaleY(-1.1)" }}>
-          <FaExchangeAlt />
+        <div className={classes.join(" ")}>
+          <FaExchangeAlt
+            style={{ transform: "rotate(-90deg) scaleX(0.9) scaleY(-1.1)" }}
+          />
         </div>
       );
     case StrumType.Plugged:
       return (
-        <span className={styles.strum}>
+        <div className={classes.join(" ")}>
           {strum.strings.map((string) => (
             <div
               key={string}
               className={styles.string}
-              style={{ top: stringHeight(string) }}
+              style={{
+                top: stringHeight(string),
+              }}
             >
-              {frets?.[string - 1] ?? "⬤"}
+              {frets?.[string - 1] ?? (
+                <span style={{ fontSize: "80%" }}>⬤</span>
+              )}
             </div>
           ))}
-        </span>
+        </div>
       );
     case StrumType.Pause:
     default:
-      return <span className={styles.strum} />;
+      return <div className={classes.join(" ")} />;
   }
 }

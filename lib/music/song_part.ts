@@ -105,4 +105,19 @@ export class SongPart {
         return null;
     }
   }
+
+  /** Returns the number of bars. */
+  get bars() {
+    return this.paragraphs.map((p) => p.bars.length).reduce((a, b) => a + b, 0);
+  }
+
+  /** Returns the number of beats in all bars. */
+  get allBeats() {
+    return this.bars * this.metadata.time.beats;
+  }
+
+  /** Returns the duration of this song part in milliseconds. */
+  get duration() {
+    return (this.allBeats * 60000) / this.metadata.tempo;
+  }
 }

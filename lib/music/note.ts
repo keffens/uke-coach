@@ -52,7 +52,11 @@ const BEAT_LENGTHS = new Map<string, number>([
   ['"', 1 / 3], // eigth triplet in 4/4
 ]);
 
-const BEAT_GCC = 3 * 8;
+/**
+ * Maximum number of strums or units per beat. Also the least common multiple of
+ * supported note lengths.
+ */
+export const TICKS_PER_BEAT = 24;
 
 /** RegExp pattern to accept all allowed beat values */
 export const BEAT_LENGTHS_PATTERN = `[_.,:;'"]*`;
@@ -79,5 +83,5 @@ export function parseBeats(value: string, beatsInBar = 4): number {
  */
 export function sumBeats(beats: number[]): number {
   const sum = beats.reduce((a, b) => a + b, 0);
-  return Math.round(sum * BEAT_GCC) / BEAT_GCC;
+  return Math.round(sum * TICKS_PER_BEAT) / TICKS_PER_BEAT;
 }

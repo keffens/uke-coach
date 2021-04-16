@@ -101,17 +101,31 @@ $eightColWidth: 1760px;
     position: absolute;
     z-index: -1;
   }
+}
 
-  .strum,
-  svg {
-    display: inline-block;
-    position: relative;
-    height: 1em;
-    width: 1em;
+// Strums
+.strum {
+  display: inline-block;
+  position: relative;
+  height: 1em;
+  width: 1em;
+
+  &.emStrum svg {
+    transform: scale(1.25);
   }
 
-  svg.emStrum {
-    transform: scale(1.25);
+  &.highlight:before {
+    transform: none;
+    position: absolute;
+    content: "";
+    top: -0.2em;
+    bottom: -0.2em;
+    left: -0.2em;
+    right: -0.2em;
+    border-radius: 0.2em;
+    z-index: -2;
+    background-color: $primary;
+    opacity: 0.75;
   }
 }
 

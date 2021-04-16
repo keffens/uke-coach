@@ -13,6 +13,7 @@ interface BarComponentProps {
   useTab: boolean;
   nextAnacrusis?: string;
   chordLib?: ChordLib;
+  highlightTick?: number;
 }
 
 function BarComponent({
@@ -21,6 +22,7 @@ function BarComponent({
   useTab,
   nextAnacrusis,
   chordLib,
+  highlightTick,
 }: BarComponentProps) {
   if (isFirst && bar.anacrusis) {
     return (
@@ -46,6 +48,7 @@ function BarComponent({
             useTab={useTab}
             showStringLabels
             chordLib={chordLib}
+            highlightTick={highlightTick}
           />
           <LyricsComponent
             lyrics={bar.lyrics}
@@ -68,6 +71,7 @@ function BarComponent({
         useTab={useTab}
         showStringLabels={isFirst}
         chordLib={chordLib}
+        highlightTick={highlightTick}
       />
       <LyricsComponent
         lyrics={bar.lyrics}
@@ -81,13 +85,17 @@ function BarComponent({
 export interface BarParagraphComponentProps {
   paragraph: BarParagraph;
   chordLib?: ChordLib;
+  highlightTick?: number;
 }
 
 export default function BarParagraphComponent({
   paragraph,
   chordLib,
+  highlightTick,
 }: BarParagraphComponentProps) {
   const useTab = paragraph.useTab();
+  const highlightInBar = Math.floor(highlightTick / paragraph.ticksPerBar);
+  const tickInBar = highlightTick % paragraph.ticksPerBar;
   return (
     <Columns isMultiline isMobile isMarginless className={styles.barParagraph}>
       {paragraph.bars.map((bar, i) => (
@@ -98,6 +106,7 @@ export default function BarParagraphComponent({
           useTab={useTab}
           nextAnacrusis={paragraph.bars[i + 1]?.anacrusis}
           chordLib={chordLib}
+          highlightTick={highlightInBar === i ? tickInBar : NaN}
         />
       ))}
     </Columns>

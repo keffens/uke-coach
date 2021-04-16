@@ -1,4 +1,4 @@
-import { Bar, Chord, ChordLib } from "../../lib/music";
+import { Bar, ChordLib, TICKS_PER_BEAT } from "../../lib/music";
 import { Pattern } from "../../lib/music/pattern";
 import { range } from "../../lib/util";
 import styles from "./Song.module.scss";
@@ -60,6 +60,7 @@ export interface PatternComponentProps {
   showStringLabels?: boolean;
   useTab?: boolean;
   chordLib?: ChordLib;
+  highlightTick?: number;
 }
 
 export default function PatternComponent({
@@ -69,6 +70,7 @@ export default function PatternComponent({
   showStringLabels,
   useTab,
   chordLib,
+  highlightTick,
 }: PatternComponentProps) {
   if (!pattern === !bar) {
     throw new Error("Either bar or pattern is required for PatternComponent.");
@@ -83,6 +85,9 @@ export default function PatternComponent({
     patternIdx * pattern.strumsPerBar,
     (patternIdx + 1) * pattern.strumsPerBar
   );
+  const highlightStrum = Math.floor(
+    (pattern.strumsPerBeat * (highlightTick ?? NaN)) / TICKS_PER_BEAT
+  );
   return (
     <div className={styles.pattern}>
       <TabLines useTab={useTab} />
@@ -93,6 +98,7 @@ export default function PatternComponent({
           key={`strum-${i}`}
           strum={s}
           frets={chordLib?.getStringFrets(bar?.getChordForStrum(i))}
+          highlight={i === highlightStrum}
         />
       ))}
       <span className={styles.barSeperator} />

@@ -67,12 +67,10 @@ export default function LyricsComponent({
       return <></>;
     }
     return (
-      <div className={styles.lyricsRow}>
-        <LyricsCellComponent
-          nextAnacrusis={nextAnacrusis}
-          isSoloAnacrusis={isSoloAnacrusis}
-        />
-      </div>
+      <LyricsCellComponent
+        nextAnacrusis={nextAnacrusis}
+        isSoloAnacrusis={isSoloAnacrusis}
+      />
     );
   }
   return (
