@@ -81,14 +81,14 @@ export default function SongPartComponent({
   startTime,
   pauseAtTime,
 }: SongPartComponentProps) {
-  if (startTime && pauseAtTime) {
+  if (startTime && !isNaN(pauseAtTime)) {
     throw new Error("Only one of startTime and pauseAtTime may be set");
   }
   const [state, setState] = useState(new State(part));
   state.setSetter(setState);
 
   useEffect(() => {
-    if (pauseAtTime) {
+    if (!isNaN(pauseAtTime)) {
       setState(state.pause(pauseAtTime));
     } else if (!startTime) {
       setState(state.stop());

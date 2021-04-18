@@ -57,7 +57,16 @@ class State {
     this.stopTimeout.clear();
     if (this.paused) return this.play();
     if (!this.playing) return this;
-    const pauseAt = Date.now() - this.start;
+    let pauseAt = Date.now() - this.start;
+    // Adjust time to the beginning of the current bar.
+    let t = pauseAt;
+    for (let part of this.song.parts) {
+      if (t < part.duration) {
+        pauseAt -= t % part.barDuration;
+        break;
+      }
+      t -= part.duration;
+    }
     return this.copy({ start: NaN, pauseAt });
   }
 
@@ -68,7 +77,7 @@ class State {
 
   /** Returns whether the song is paused. */
   get paused(): boolean {
-    return !!this.pauseAt;
+    return !isNaN(this.pauseAt);
   }
 
   /** Returns the start time for the given part if playing. */
