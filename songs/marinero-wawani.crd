@@ -20,8 +20,8 @@ Y [F]así fui comprendiendo con el [G]tiempo lo que soy y [C]lo que fui. [C7]
 Porque en el [F]mar quiero pa[G]sar la vida en[C]tera sin record[Am]ar, que existe un 
 [F]mundo rodeado de fron[G]teras que gobierna el [C]corazón. [C7]
 Porque en el [F]mar quiero vi[G]vir, enveje[C]cerme, perderme y mo[Am]rir.
-[F] Ser un recuerdo que se a[G]leja, {pattern: *single |a-------|}[G]{pattern: *break |--------|}[_]
-como el eco {pattern: base pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
+[F] Ser un recuerdo que se a[G]leja, {pattern: *single |a-------|}[G]{pattern: *break |--------|}[..][..]como el eco
+{pattern: base pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
 {end_of_chorus}
 
 {start_of_verse: Verse 2}
@@ -36,7 +36,7 @@ Porque en el [F]mar quiero pa[G]sar la vida en[C]tera sin record[Am]ar, que exis
 [F]mundo rodeado de fron[G]teras que gobierna el [C]corazón. [C7]
 Porque en el [F]mar quiero vi[G]vir, enveje[C]cerme, perderme y mo[Am]rir. [Am]
 Mirando a[F]nochecer el [F]cielo. Ser un re[Fm]curedo que se a[Fm]leja,
-{pattern: *single}[Fm]{pattern: *break}[_]
-como el eco {pattern: base pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
+{pattern: *single}[Fm]{pattern: *break}[..][..]como el eco
+{pattern: base pattern}[C...]de [.]mi [F..]voz. [G..][C][F..][G..]
 [C][F..][G..] {pattern: *single}[C]
 {end_of_chorus}
