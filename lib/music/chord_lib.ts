@@ -50,7 +50,14 @@ function fretsFromMap(
 
 /** Maps chords to frets, with the option to add custom chords. */
 export class ChordLib {
-  private chordFrets = new Map<string, number[]>();
+  private costumChords = new Map<string, number[]>();
+
+  private constructor(private instrumentChords: Map<string, number[]>) {}
+
+  /** Creates a new chord lib for a ukulele. */
+  static forUkulele(): ChordLib {
+    return new ChordLib(UKULELE_CHORD_FRETS);
+  }
 
   /**
    * Returns the frets for the requested chord if available in the library.
@@ -70,8 +77,8 @@ export class ChordLib {
       ).toString();
 
     return (
-      fretsFromMap(this.chordFrets, chordName, altChordName) ??
-      fretsFromMap(UKULELE_CHORD_FRETS, chordName, altChordName)
+      fretsFromMap(this.costumChords, chordName, altChordName) ??
+      fretsFromMap(this.instrumentChords, chordName, altChordName)
     );
     // TODO: Attempt to generate a chord.
   }
@@ -83,6 +90,6 @@ export class ChordLib {
 
   /** Defines a chord which might overwrite the default chord. */
   defineChord(chord: Chord, frets: number[]): void {
-    this.chordFrets.set(chord.toString(), frets);
+    this.costumChords.set(chord.toString(), frets);
   }
 }

@@ -2,7 +2,7 @@ import { Chord } from "./chord";
 import { ChordLib } from "./chord_lib";
 
 test("gets default chords frets", () => {
-  const chordLib = new ChordLib();
+  const chordLib = ChordLib.forUkulele();
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([0, 0, 0, 3]);
   expect(chordLib.getFrets(Chord.parse("C#"))).toEqual([1, 1, 1, 4]);
   expect(chordLib.getFrets(Chord.parse("Db"))).toEqual([1, 1, 1, 4]);
@@ -11,7 +11,7 @@ test("gets default chords frets", () => {
 });
 
 test("gets default chords string frets", () => {
-  const chordLib = new ChordLib();
+  const chordLib = ChordLib.forUkulele();
   expect(chordLib.getStringFrets(Chord.parse("C"))).toEqual([
     "0",
     "0",
@@ -28,7 +28,7 @@ test("gets default chords string frets", () => {
 });
 
 test("gets custom chords frets", () => {
-  const chordLib = new ChordLib();
+  const chordLib = ChordLib.forUkulele();
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([0, 0, 0, 3]);
   chordLib.defineChord(Chord.parse("C"), [5, 4, 3, 3]);
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([5, 4, 3, 3]);
