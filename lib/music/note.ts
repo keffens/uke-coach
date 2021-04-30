@@ -108,13 +108,21 @@ export type Octave = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 /** Represents a note with an octave. */
 export class PitchedNote {
-  private static MAX_NOTE = 12 * 10 - 1;
-  private static MIN_NOTE = -12;
+  private static MIN_VALUE = -12;
+  private static MAX_VALUE = 12 * 10 - 1;
+
+  static MIN_NOTE = new PitchedNote(PitchedNote.MIN_VALUE, false);
+  static MAX_NOTE = new PitchedNote(PitchedNote.MAX_VALUE, false);
+  static C4 = PitchedNote.fromNote(Note.C, 4);
 
   private constructor(
     private readonly value: number,
     private readonly useFlat: boolean
-  ) {}
+  ) {
+    this.value = Math.floor(this.value);
+    while (this.value > PitchedNote.MAX_VALUE) this.value -= 12;
+    while (this.value < PitchedNote.MIN_VALUE) this.value += 12;
+  }
 
   /**
    * Creates a pitched note from a note and octave value. If useFlat is not
@@ -122,11 +130,11 @@ export class PitchedNote {
    */
   static fromNote(
     note: Note,
-    octave: Octave = 4,
+    octave: number = 4,
     useFlat?: boolean
   ): PitchedNote {
     return new PitchedNote(
-      octave * 12 + NOTE_TO_INT.get(note),
+      Math.floor(octave) * 12 + NOTE_TO_INT.get(note),
       useFlat ?? (isFlat(note) || note === Note.F)
     );
   }
@@ -154,9 +162,25 @@ export class PitchedNote {
     return Math.floor(this.value / 12) as Octave;
   }
 
+  /** Returns the semitone difference this - that. */
+  compare(that: PitchedNote): number {
+    return this.value - that.value;
+  }
+
   /** Returns a string version, like "C4", "Db8", "A#-1". */
   toString(): string {
     return `${this.note}${this.octave}`;
+  }
+
+  /**
+   * Returns the given note with a pitch such that it is 0 to 11 semitones
+   * higher than this, but the result will not be higher than B9.
+   */
+  getNext(note: Note): PitchedNote {
+    if (NOTE_TO_INT.get(note) >= NOTE_TO_INT.get(this.note)) {
+      return PitchedNote.fromNote(note, this.octave);
+    }
+    return PitchedNote.fromNote(note, this.octave + 1);
   }
 
   /**
@@ -165,10 +189,7 @@ export class PitchedNote {
    * or sharp version.
    */
   addSemitones(i: number): PitchedNote {
-    let val = this.value + i;
-    while (val > PitchedNote.MAX_NOTE) val -= 12;
-    while (val < PitchedNote.MIN_NOTE) val += 12;
-    return new PitchedNote(val, this.useFlat);
+    return new PitchedNote(this.value + i, this.useFlat);
   }
 
   /** Like addSemitones but for an array of semitone intervals. */

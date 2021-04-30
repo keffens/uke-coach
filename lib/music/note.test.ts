@@ -62,9 +62,17 @@ test("creates pitched notes", () => {
   expect(aSharpNeg.note).toEqual(Note.Asharp);
   expect(aSharpNeg.octave).toEqual(-1);
 
+  const aNegCapped = PitchedNote.fromNote(Note.A, -2);
+  expect(aNegCapped.note).toEqual(Note.A);
+  expect(aNegCapped.octave).toEqual(-1);
+
   const bFlat9 = PitchedNote.fromNote(Note.Bflat, 9);
   expect(bFlat9.note).toEqual(Note.Bflat);
   expect(bFlat9.octave).toEqual(9);
+
+  const c9Capped = PitchedNote.fromNote(Note.C, 10);
+  expect(c9Capped.note).toEqual(Note.C);
+  expect(c9Capped.octave).toEqual(9);
 
   const gFlatFromFSharp = PitchedNote.fromNote(Note.Fsharp, 4, true);
   expect(gFlatFromFSharp.note).toEqual(Note.Gflat);
@@ -76,6 +84,30 @@ test("converts between strings and pitched notes", () => {
   expect(PitchedNote.parse("A4").toString()).toEqual("A4");
   expect(PitchedNote.parse("C#-1").toString()).toEqual("C#-1");
   expect(PitchedNote.parse("Db9").toString()).toEqual("Db9");
+});
+
+test("pitched note has min and max", () => {
+  expect(PitchedNote.MIN_NOTE.toString()).toEqual("C-1");
+  expect(PitchedNote.MAX_NOTE.toString()).toEqual("B9");
+});
+
+test("gets next higher pitched note", () => {
+  const g = PitchedNote.parse("G4");
+  expect(g.getNext(Note.G)).toEqual(PitchedNote.parse("G4"));
+  expect(g.getNext(Note.B)).toEqual(PitchedNote.parse("B4"));
+  expect(g.getNext(Note.C)).toEqual(PitchedNote.parse("C5"));
+  expect(g.getNext(Note.F)).toEqual(PitchedNote.parse("F5"));
+
+  const gSharp = PitchedNote.parse("G#4");
+  expect(gSharp.getNext(Note.Gsharp)).toEqual(PitchedNote.parse("G#4"));
+  expect(gSharp.getNext(Note.Aflat)).toEqual(PitchedNote.parse("Ab4"));
+  expect(gSharp.getNext(Note.G)).toEqual(PitchedNote.parse("G5"));
+});
+
+test("compares pitched notes", () => {
+  expect(PitchedNote.parse("C4").compare(PitchedNote.parse("A3"))).toEqual(3);
+  expect(PitchedNote.parse("C#3").compare(PitchedNote.parse("Db3"))).toEqual(0);
+  expect(PitchedNote.parse("G5").compare(PitchedNote.parse("C6"))).toEqual(-5);
 });
 
 test("adds semitones to pitched notes", () => {

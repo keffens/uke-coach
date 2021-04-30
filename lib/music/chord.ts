@@ -1,4 +1,10 @@
-import { BEAT_LENGTHS_PATTERN, Note, renderNote } from "./note";
+import {
+  BEAT_LENGTHS_PATTERN,
+  Note,
+  Octave,
+  PitchedNote,
+  renderNote,
+} from "./note";
 
 enum Qualifier {
   Major = "",
@@ -12,6 +18,37 @@ enum Extension {
   Six = "6",
   Seven = "7",
   MajorSeven = "maj7",
+}
+
+function chordIntervals(
+  qualifier: Qualifier,
+  extension: Extension
+): Array<number> {
+  let semitones = [];
+  switch (qualifier) {
+    case Qualifier.Major:
+      semitones = [0, 4, 7];
+      break;
+    case Qualifier.Minor:
+      semitones = [0, 3, 7];
+      break;
+    case Qualifier.Diminished:
+      return extension === Extension.Seven ? [0, 3, 6, 9] : [0, 3, 6];
+    case Qualifier.Augmented:
+      return extension === Extension.Seven ? [0, 4, 8, 10] : [0, 4, 8];
+  }
+  switch (extension) {
+    case Extension.Six:
+      semitones.push(9);
+      break;
+    case Extension.Seven:
+      semitones.push(10);
+      break;
+    case Extension.MajorSeven:
+      semitones.push(11);
+      break;
+  }
+  return semitones;
 }
 
 const CHORD_RE = new RegExp(
@@ -48,6 +85,7 @@ export class Chord {
     );
   }
 
+  /** Returns the string representation of the chord. */
   toString(): string {
     if (!this.root) return "";
     return this.root + this.qualifier + this.extension;
@@ -80,5 +118,12 @@ export class Chord {
         break;
     }
     return sup;
+  }
+
+  /** Returns the notes in this chord. */
+  asPitchedNotes(minNote = PitchedNote.C4): Array<PitchedNote> {
+    return minNote
+      .getNext(this.root)
+      .makeChord(chordIntervals(this.qualifier, this.extension));
   }
 }
