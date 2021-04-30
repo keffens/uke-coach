@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Column, Columns, Content, Title } from "bloomer";
 import PatternWithCountComponent from "./PatternWithCountComponent";
 import PlayerComponent from "./PlayerComponent";
@@ -12,6 +12,7 @@ class State {
   readonly pauseAt = NaN;
   readonly duration: number;
   readonly timeOffsets = new Array<number>();
+  readonly startTimeout = new Timeout();
   readonly stopTimeout = new Timeout();
   private setter?: Dispatch<SetStateAction<State>>;
 
@@ -36,28 +37,38 @@ class State {
     return Object.assign(Object.assign(new State(), this), override);
   }
 
-  /** Returns a new stop state. */
-  stop(): State {
+  /** Stops the playback. */
+  stop(): void {
+    this.startTimeout.clear();
     this.stopTimeout.clear();
-    return this.copy({ start: NaN, pauseAt: NaN });
+    this.setter(this.copy({ start: NaN, pauseAt: NaN }));
   }
 
-  /** Returns a state with the current time as start time. */
-  play(): State {
-    if (this.playing) return this;
-    const start = Date.now() - (this.pauseAt || 0);
-    this.stopTimeout.set(() => {
-      this.setter(this.stop());
-    }, this.duration - (this.pauseAt || 0));
-    return this.copy({ start, pauseAt: NaN });
+  /** Sets the new state when the playback starts. */
+  play(start: number): void {
+    if (this.playing) return;
+    this.startTimeout.set(() => {
+      this.stopTimeout.set(
+        () => this.stop(),
+        this.duration - (this.pauseAt || 0)
+      );
+      start -= this.pauseAt || 0;
+      this.setter(this.copy({ start, pauseAt: NaN }));
+    }, start - Date.now());
+    // Set a new state to trigger an update.
+    this.setter(this.copy({ start: NaN, pauseAt: this.pauseAt }));
   }
 
-  /** Returns a state with the current time as start time. */
-  pause(): State {
+  /** Pauses playback. */
+  pause(): void {
+    if (!this.playing) return;
+    this.startTimeout.clear();
     this.stopTimeout.clear();
-    if (this.paused) return this.play();
-    if (!this.playing) return this;
     let pauseAt = Date.now() - this.start;
+    if (pauseAt <= 0) {
+      this.stop();
+      return;
+    }
     // Adjust time to the beginning of the current bar.
     let t = pauseAt;
     for (let part of this.song.parts) {
@@ -67,12 +78,12 @@ class State {
       }
       t -= part.duration;
     }
-    return this.copy({ start: NaN, pauseAt });
+    this.setter(this.copy({ start: NaN, pauseAt }));
   }
 
   /** Returns whether the song is playing */
   get playing(): boolean {
-    return !!this.start;
+    return !!this.start || this.startTimeout.active;
   }
 
   /** Returns whether the song is paused. */
@@ -113,10 +124,12 @@ export default function SongComponent({ song }: SongComponentProps) {
       </Columns>
       <Title tag="h3">Song</Title>
       <PlayerComponent
+        song={song}
         playing={state.playing}
-        onPlay={() => setState(state.play())}
-        onPause={() => setState(state.pause())}
-        onStop={() => setState(state.stop())}
+        pauseTime={state.pauseAt}
+        onPlay={(startTime) => state.play(startTime)}
+        onPause={() => state.pause()}
+        onStop={() => state.stop()}
       />
       {song.parts.map((part, i) => (
         <SongPartComponent

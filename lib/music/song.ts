@@ -9,7 +9,7 @@ export class Song {
     public metadata: SongMetadata,
     public patterns: Map<string, Pattern>,
     public parts: SongPart[],
-    public chordLib = new ChordLib()
+    public chordLib = ChordLib.forUkulele()
   ) {}
 
   static fromTokens(env: Token) {

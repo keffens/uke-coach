@@ -114,6 +114,7 @@ export class PitchedNote {
   static MIN_NOTE = new PitchedNote(PitchedNote.MIN_VALUE, false);
   static MAX_NOTE = new PitchedNote(PitchedNote.MAX_VALUE, false);
   static C4 = PitchedNote.fromNote(Note.C, 4);
+  static C5 = PitchedNote.fromNote(Note.C, 5);
 
   private constructor(
     private readonly value: number,

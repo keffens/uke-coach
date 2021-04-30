@@ -121,8 +121,18 @@ export class SongPart {
     return (this.allBeats * 60000) / this.metadata.tempo;
   }
 
+  /** Returns the duration of this song part in seconds. */
+  get durationSec(): number {
+    return this.duration / 1000;
+  }
+
   /** Returns the duration of on bar in milliseconds. */
   get barDuration(): number {
     return (this.metadata.time.beats * 60000) / this.metadata.tempo;
+  }
+
+  /** Returns the duration of on bar in seconds. */
+  get barDurationSec(): number {
+    return this.barDuration / 1000;
   }
 }

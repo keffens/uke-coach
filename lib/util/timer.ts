@@ -9,6 +9,11 @@ export class Interval {
 
   clear(): void {
     if (this.id) clearInterval(this.id);
+    this.id = undefined;
+  }
+
+  get active(): boolean {
+    return this.id != null;
   }
 }
 
@@ -23,5 +28,10 @@ export class Timeout {
 
   clear(): void {
     if (this.id) clearTimeout(this.id);
+    this.id = undefined;
+  }
+
+  get active(): boolean {
+    return this.id != null;
   }
 }
