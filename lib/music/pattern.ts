@@ -133,6 +133,13 @@ export class Pattern {
     return this.time.beats * TICKS_PER_BEAT;
   }
 
+  /** Returns the requested strum. Works for all integers. */
+  getStrum(i: number, bar: number = 0): Strum {
+    let idx = (bar * this.strumsPerBar + i) % this.strums.length;
+    if (idx < 0) idx += this.strums.length;
+    return this.strums[idx];
+  }
+
   /**
    * Whether a tab should be used to display the pattern, i.e., the patern uses
    * string sets.

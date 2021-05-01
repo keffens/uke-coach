@@ -23,8 +23,13 @@ const DEFAULT_SAMPLE_URLS = {
 export abstract class Instrument {
   constructor(readonly name: string) {}
 
-  abstract playNote(note: PitchedNote, time: number): void;
-  abstract playChord(chord: Chord, strum: Strum, time: number): void;
+  abstract playNote(note: PitchedNote, time: number, velocity?: number): void;
+  abstract playChord(
+    chord: Chord,
+    strum: Strum,
+    time: number,
+    duration: number
+  ): void;
   abstract playBar(bar: Bar, time: number): void;
 }
 
@@ -40,11 +45,11 @@ export class SamplerInstrument extends Instrument {
     this.sampler = new Tone.Sampler(samplerOptions).toDestination();
   }
 
-  playNote(note: PitchedNote, time: number): void {
-    this.sampler.triggerAttack(note.toString(), time);
+  playNote(note: PitchedNote, time: number, velocity = 1.0): void {
+    this.sampler.triggerAttack(note.toString(), time, velocity);
   }
 
-  playChord(chord: Chord, strum: Strum, time: number): void {
+  playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
     if (strum.type === StrumType.Pause) return;
     for (const note of chord.asPitchedNotes(this.chordBase)) {
       this.playNote(note, time);
@@ -52,10 +57,26 @@ export class SamplerInstrument extends Instrument {
   }
 
   playBar(bar: Bar, time: number) {
+    const strumDuration =
+      Tone.Time("1m").toSeconds() / bar.pattern.strumsPerBar;
+    const strumBeats = 1 / bar.pattern.strumsPerBeat;
     // TODO: Actually play the bar according to the pattern.
-    const chord = bar.chords[0];
-    if (chord) {
-      this.playChord(chord, Strum.down(), time);
+    let chordIdx = 0;
+    let chord = undefined;
+    for (
+      let i = 0, beats = 0;
+      i < bar.pattern.strumsPerBar;
+      i++, beats += strumBeats
+    ) {
+      if (beats + Number.EPSILON >= bar.beats[chordIdx]) {
+        beats -= bar.beats[chordIdx];
+        chordIdx++;
+      }
+      // Keep previous chord if this one is not defined.
+      chord = bar.chords[chordIdx] ?? chord;
+      if (!chord) continue;
+      const strum = bar.pattern.getStrum(i, bar.patternIdx);
+      this.playChord(chord, strum, time + i * strumDuration, strumDuration);
     }
   }
 }
@@ -78,7 +99,52 @@ export class StringInstrument extends SamplerInstrument {
     );
   }
 
-  // TODO: String instruments should overwrite playChord using the chord library.
+  // TODO: String instruments should use the chord library.
+  playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
+    const notes = chord.asPitchedNotes(this.chordBase);
+    let delay = 0;
+    let velocity = strum.emphasize ? 1.0 : 0.7;
+    switch (strum.type) {
+      case StrumType.Pause:
+        return;
+      case StrumType.Down:
+        delay = Math.min(0.02, duration / this.strings.length);
+        break;
+      case StrumType.Up:
+        delay = Math.max(-0.02, -duration / this.strings.length);
+        break;
+      case StrumType.Arpeggio:
+        delay = (2 * duration) / this.strings.length;
+        break;
+      case StrumType.Tremolo:
+        delay = duration / (2 * this.strings.length);
+        this.playStrings(notes, time, delay, 0.5);
+        this.playStrings(notes, time + duration / 2, -delay, 0.5);
+        return;
+      case StrumType.Percursion:
+      case StrumType.Plugged:
+      //TODO: implement.
+    }
+    this.playStrings(notes, time, delay, velocity);
+  }
+
+  private playStrings(
+    notes: Array<PitchedNote>,
+    time: number,
+    delay: number,
+    velocity: number
+  ) {
+    // A negative delay means the bottom note is played first, so we add some
+    // time for the first note.
+    if (delay < 0) time -= delay * notes.length;
+    for (let i = 0; i < notes.length; i++) {
+      this.sampler.triggerAttack(
+        notes[i].toString(),
+        time + delay * i,
+        velocity
+      );
+    }
+  }
 }
 
 /** Standard ukulele. */

@@ -4,7 +4,7 @@ import { Instrument, Ukulele, UkuleleLowG, Woodblock } from "./instruments";
 
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
-  private countInBars = 2;
+  private countInBars = 1;
   private initialized = false;
   private instruments = new Map<string, Instrument>();
   private metronomeInstrument: Instrument;
@@ -137,11 +137,11 @@ class PlayerImpl {
   private playMetronome(time: number, bars = 1): void {
     const beatSec = Tone.Time("4n").toSeconds();
     for (let i = 0; i < bars * this.song.metadata.time.beats; i++) {
+      const isFirst = i % this.song.metadata.time.beats === 0;
       this.metronomeInstrument.playNote(
-        i % this.song.metadata.time.beats === 0
-          ? PitchedNote.C5
-          : PitchedNote.C4,
-        time + i * beatSec
+        isFirst ? PitchedNote.C5 : PitchedNote.C4,
+        time + i * beatSec,
+        isFirst ? 0.8 : 0.2
       );
     }
   }
