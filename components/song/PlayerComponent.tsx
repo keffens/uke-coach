@@ -22,7 +22,10 @@ export default function PlayerComponentProps({
   onPause,
   onStop,
 }: PlayerComponentProps) {
-  const player = new Player(song);
+  useEffect(() => {
+    Player.loadSong(song);
+    return () => Player.stop();
+  }, []);
   return (
     <div className={styles.player}>
       {playing ? (
@@ -30,7 +33,7 @@ export default function PlayerComponentProps({
           isColor="primary"
           className="is-rounded p-4 mx-1"
           onClick={() => {
-            player.stop();
+            Player.stop();
             onPause();
           }}
         >
@@ -41,8 +44,8 @@ export default function PlayerComponentProps({
           isColor="primary"
           className="is-rounded p-4 mx-1"
           onClick={async () => {
-            await player.init();
-            const startTime = player.play(pauseTime);
+            await Player.init();
+            const startTime = Player.play(pauseTime);
             onPlay(startTime);
           }}
         >
@@ -53,7 +56,7 @@ export default function PlayerComponentProps({
         isColor="light"
         className="is-rounded p-4 mx-1"
         onClick={() => {
-          player.stop();
+          Player.stop();
           onStop();
         }}
       >

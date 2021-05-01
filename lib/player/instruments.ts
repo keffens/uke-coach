@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { Chord, ChordLib, PitchedNote, Strum } from "../music";
+import { Bar, Chord, ChordLib, PitchedNote, Strum, StrumType } from "../music";
 
 const DEFAULT_SAMPLE_URLS = {
   A0: "A0.mp3",
@@ -23,8 +23,9 @@ const DEFAULT_SAMPLE_URLS = {
 export abstract class Instrument {
   constructor(readonly name: string) {}
 
-  abstract playNote(note: PitchedNote, time?: number): void;
-  abstract playChord(chord: Chord, strum?: Strum, time?: number): void;
+  abstract playNote(note: PitchedNote, time: number): void;
+  abstract playChord(chord: Chord, strum: Strum, time: number): void;
+  abstract playBar(bar: Bar, time: number): void;
 }
 
 /** Instrument which uses the Tone.js samples to create sound. */
@@ -39,13 +40,22 @@ export class SamplerInstrument extends Instrument {
     this.sampler = new Tone.Sampler(samplerOptions).toDestination();
   }
 
-  playNote(note: PitchedNote, time?: number): void {
+  playNote(note: PitchedNote, time: number): void {
     this.sampler.triggerAttack(note.toString(), time);
   }
 
-  playChord(chord: Chord, strum?: Strum, time?: number): void {
+  playChord(chord: Chord, strum: Strum, time: number): void {
+    if (strum.type === StrumType.Pause) return;
     for (const note of chord.asPitchedNotes(this.chordBase)) {
       this.playNote(note, time);
+    }
+  }
+
+  playBar(bar: Bar, time: number) {
+    // TODO: Actually play the bar according to the pattern.
+    const chord = bar.chords[0];
+    if (chord) {
+      this.playChord(chord, Strum.down(), time);
     }
   }
 }
