@@ -5,11 +5,12 @@ import { Ukulele, UkuleleLowG } from "./string_instruments";
 
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
+  private playing = false;
   private countInBars = 1;
   private initialized = false;
   private instruments = new Map<string, Instrument>();
   private metronomeInstrument: Instrument;
-  private metronome = new Array<Tone.Loop>();
+  private metronomeLoop?: Tone.Loop;
   private events = new Array<number>();
   private song?: Song;
 
@@ -49,10 +50,7 @@ class PlayerImpl {
     this.stop();
     if (!this.song) return;
     console.log("Cleaning up song", this.song.metadata.title);
-    for (const metronome of this.metronome) {
-      metronome.dispose();
-    }
-    this.metronome = [];
+    this.metronomeLoop?.dispose();
     for (const id of this.events) {
       Tone.Transport.clear(id);
     }
@@ -72,9 +70,7 @@ class PlayerImpl {
 
   /** Whether to enable the metronome. */
   set muteMetronome(mute: boolean) {
-    for (const metronome of this.metronome) {
-      metronome.mute = mute;
-    }
+    this.metronomeLoop.mute = mute;
   }
 
   set countIn(bars: number) {
@@ -92,7 +88,8 @@ class PlayerImpl {
    * the playback.
    */
   play(continueAtMs: number = 0): number {
-    if (Tone.Transport.state !== "stopped") return;
+    if (this.playing) return;
+    this.playing = true;
     console.log("starting playback");
     let countInStart = Tone.immediate() + 0.2;
     let dateStart = Date.now() + 200 + this.countInDurationMs;
@@ -106,7 +103,8 @@ class PlayerImpl {
 
   /** Stops the playback. */
   stop(): void {
-    if (Tone.Transport.state !== "stopped") {
+    if (this.playing) {
+      this.playing = false;
       console.log("stopping playback");
       Tone.Transport.stop();
     }
@@ -122,19 +120,13 @@ class PlayerImpl {
   }
 
   private setUpMetronome(): void {
-    let t = 0;
-    for (const part of this.song.parts) {
-      let stop = t + part.bars;
-      this.metronome.push(
-        new Tone.Loop((time) => {
-          this.playMetronome(time);
-        }, "1m")
-          .start(`${t}:0:0`)
-          .stop(`${stop}:0:0`)
-      );
-      t = stop;
-    }
-    Tone.Transport.stop(t);
+    let end = this.song.bars;
+    this.metronomeLoop = new Tone.Loop((time) => {
+      this.playMetronome(time);
+    }, "1m")
+      .start(`0:0:0`)
+      .stop(`${end}:0:0`);
+    Tone.Transport.stop(`${end}:0:0`);
   }
 
   private playMetronome(time: number, bars = 1): void {

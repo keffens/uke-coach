@@ -18,4 +18,9 @@ export class Song {
     const parts = SongPart.fromTokens(env, metadata, patterns);
     return new Song(metadata, patterns, parts);
   }
+
+  /** Returns the number of bars in all parts. */
+  get bars(): number {
+    return this.parts.map((p) => p.bars).reduce((a, b) => a + b, 0);
+  }
 }
