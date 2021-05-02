@@ -23,8 +23,6 @@ class PlayerImpl {
       await Tone.start();
 
       // Initialize instruments.
-      this.instruments.set(Ukulele.NAME, new Ukulele());
-      this.instruments.set(UkuleleLowG.NAME, new UkuleleLowG());
       this.metronomeInstrument = new Woodblock();
 
       await Tone.loaded();
@@ -38,7 +36,7 @@ class PlayerImpl {
   }
 
   /** Loads the specified song and discardsthe previous song. */
-  loadSong(song: Song): void {
+  async loadSong(song: Song): Promise<void> {
     if (this.song === song) return;
     this.cleanup();
     this.song = song;
@@ -48,9 +46,9 @@ class PlayerImpl {
 
   /** Cleans up all scheduled events and loops. */
   cleanup(): void {
+    this.stop();
     if (!this.song) return;
     console.log("Cleaning up song", this.song.metadata.title);
-    this.stop();
     for (const metronome of this.metronome) {
       metronome.dispose();
     }
@@ -94,6 +92,8 @@ class PlayerImpl {
    * the playback.
    */
   play(continueAtMs: number = 0): number {
+    if (Tone.Transport.state !== "stopped") return;
+    console.log("starting playback");
     let countInStart = Tone.immediate() + 0.2;
     let dateStart = Date.now() + 200 + this.countInDurationMs;
     if (continueAtMs > 0) {
@@ -107,11 +107,13 @@ class PlayerImpl {
   /** Stops the playback. */
   stop(): void {
     if (Tone.Transport.state !== "stopped") {
+      console.log("stopping playback");
       Tone.Transport.stop();
     }
   }
 
   private setUpSong(): void {
+    this.instruments.set(Ukulele.NAME, new Ukulele(this.song.chordLib));
     // TODO: Support setting a time signature or at least bpm per part.
     Tone.Transport.timeSignature = this.song.metadata.time.beats;
     Tone.Transport.bpm.value = this.song.metadata.tempo;
