@@ -1,5 +1,5 @@
 import { Chord } from "./chord";
-import { NOTE_IDENTITY } from "./note";
+import { NOTE_IDENTITY, PitchedNote } from "./note";
 
 const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["C", [0, 0, 0, 3]],
@@ -64,7 +64,7 @@ export class ChordLib {
    * If a flat or sharp chord is unknown, returns the corresponding sharp or
    * flat chord if available.
    */
-  getFrets(chord?: Chord): number[] | null {
+  getFrets(chord: Chord | null): number[] | null {
     if (!chord) return null;
     const chordName = chord.toString();
     let altChordName = "";
@@ -84,8 +84,36 @@ export class ChordLib {
   }
 
   /** Same as getFrets but converts the fret numbers to strings. */
-  getStringFrets(chord?: Chord): string[] | null {
+  getStringFrets(chord: Chord | null): string[] | null {
     return this.getFrets(chord)?.map((f) => (f < 0 ? "X" : `${f}`));
+  }
+
+  /**
+   * Returns the notes of the chord, given the strings of the instrument. If a
+   * string is muted, null is returned in its place. If the chord is unknown,
+   * returns null.
+   */
+  getPitchedNotes(
+    chord: Chord | null,
+    strings: Array<PitchedNote>
+  ): Array<PitchedNote | null> | null {
+    const frets = this.getFrets(chord);
+    if (!frets) return null;
+    if (frets.length !== strings.length) {
+      throw new Error(
+        `Failed to determine chord notes, got ${strings.length} strings but ` +
+          `expected ${frets.length}.`
+      );
+    }
+    const notes = [];
+    for (let i = 0; i < frets.length; i++) {
+      if (frets[i] < 0) {
+        notes.push(null);
+      } else {
+        notes.push(strings[i].addSemitones(frets[i]));
+      }
+    }
+    return notes;
   }
 
   /** Defines a chord which might overwrite the default chord. */

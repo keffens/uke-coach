@@ -24,7 +24,7 @@ export default function PlayerComponentProps({
 }: PlayerComponentProps) {
   useEffect(() => {
     Player.loadSong(song);
-    return () => Player.stop();
+    return () => Player.cleanup();
   }, []);
   return (
     <div className={styles.player}>

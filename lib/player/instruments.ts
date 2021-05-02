@@ -99,9 +99,10 @@ export class StringInstrument extends SamplerInstrument {
     );
   }
 
-  // TODO: String instruments should use the chord library.
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
-    const notes = chord.asPitchedNotes(this.chordBase);
+    let notes =
+      this.chordLib.getPitchedNotes(chord, this.strings) ??
+      chord.asPitchedNotes(this.chordBase);
     let delay = 0;
     let velocity = strum.emphasize ? 1.0 : 0.7;
     switch (strum.type) {
@@ -121,10 +122,14 @@ export class StringInstrument extends SamplerInstrument {
         this.playStrings(notes, time, delay, 0.5);
         this.playStrings(notes, time + duration / 2, -delay, 0.5);
         return;
-      case StrumType.Percursion:
       case StrumType.Plugged:
+        notes = notes.filter((_, idx) => strum.strings?.includes(idx));
+        break;
+      case StrumType.Percursion:
       //TODO: implement.
     }
+    // Remove null notes.
+    notes = notes.filter((note) => note);
     this.playStrings(notes, time, delay, velocity);
   }
 
