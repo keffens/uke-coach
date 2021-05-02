@@ -81,6 +81,32 @@ class State {
     this.setter(this.copy({ start: NaN, pauseAt }));
   }
 
+  /** If paused or stopped goes to the previous song part. */
+  goBackward(): void {
+    if (this.playing) return;
+    let t = 0;
+    for (const part of this.song.parts) {
+      if (t + part.duration >= this.pauseAt) {
+        this.setter(this.copy({ start: NaN, pauseAt: t || NaN }));
+        return;
+      }
+      t += part.duration;
+    }
+  }
+
+  /** If paused or stopped goes to the previous song part. */
+  goForward(): void {
+    if (this.playing) return;
+    let t = 0;
+    for (let i = 0; i < this.song.parts.length - 1; i++) {
+      t += this.song.parts[i].duration;
+      if (t > (this.pauseAt || 0)) {
+        this.setter(this.copy({ start: NaN, pauseAt: t }));
+        return;
+      }
+    }
+  }
+
   /** Returns whether the song is playing */
   get playing(): boolean {
     return !!this.start || this.startTimeout.active;
@@ -130,6 +156,8 @@ export default function SongComponent({ song }: SongComponentProps) {
         onPlay={(startTime) => state.play(startTime)}
         onPause={() => state.pause()}
         onStop={() => state.stop()}
+        onGoBackward={() => state.goBackward()}
+        onGoForward={() => state.goForward()}
       />
       {song.parts.map((part, i) => (
         <SongPartComponent

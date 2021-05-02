@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { Button } from "bloomer";
-import { FaPlay, FaPause, FaStop } from "react-icons/fa";
+import {
+  FaPlay,
+  FaPause,
+  FaStepBackward,
+  FaStepForward,
+  FaStop,
+} from "react-icons/fa";
 import styles from "./Song.module.scss";
 import { Song } from "../../lib/music";
 import { Player } from "../../lib/player";
@@ -12,6 +18,8 @@ interface PlayerComponentProps {
   onPlay: (startTime: number) => void;
   onPause: () => void;
   onStop: () => void;
+  onGoBackward: () => void;
+  onGoForward: () => void;
 }
 
 export default function PlayerComponentProps({
@@ -21,6 +29,8 @@ export default function PlayerComponentProps({
   onPlay,
   onPause,
   onStop,
+  onGoBackward,
+  onGoForward,
 }: PlayerComponentProps) {
   useEffect(() => {
     Player.loadSong(song);
@@ -28,6 +38,16 @@ export default function PlayerComponentProps({
   }, []);
   return (
     <div className={styles.player}>
+      <Button
+        isSize="small"
+        className="is-rounded p-2 mx-1"
+        disabled={playing}
+        onClick={() => {
+          onGoBackward();
+        }}
+      >
+        <FaStepBackward />
+      </Button>
       {playing ? (
         <Button
           isColor="primary"
@@ -61,6 +81,16 @@ export default function PlayerComponentProps({
         }}
       >
         <FaStop />
+      </Button>
+      <Button
+        isSize="small"
+        className="is-rounded p-2 mx-1"
+        disabled={playing}
+        onClick={() => {
+          onGoForward();
+        }}
+      >
+        <FaStepForward />
       </Button>
     </div>
   );
