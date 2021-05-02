@@ -1,4 +1,4 @@
-import { BarParagraph, BarParagraphBuilder } from "./bar";
+import { Bar, BarParagraph, BarParagraphBuilder } from "./bar";
 import { PartMetadata, SongMetadata } from "./metadata";
 import { Pattern } from "./pattern";
 import { Token, TokenType } from "./token";
@@ -106,14 +106,19 @@ export class SongPart {
     }
   }
 
+  /** Returns all bars of the parts. */
+  get bars(): Array<Bar> {
+    return this.paragraphs.map((p) => p.bars).reduce((a, b) => a.concat(b), []);
+  }
+
   /** Returns the number of bars. */
-  get bars(): number {
+  get barsLength(): number {
     return this.paragraphs.map((p) => p.bars.length).reduce((a, b) => a + b, 0);
   }
 
   /** Returns the number of beats in all bars. */
   get allBeats(): number {
-    return this.bars * this.metadata.time.beats;
+    return this.barsLength * this.metadata.time.beats;
   }
 
   /** Returns the duration of this song part in milliseconds. */

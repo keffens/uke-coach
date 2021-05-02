@@ -1,3 +1,4 @@
+import { Bar } from "./bar";
 import { ChordLib } from "./chord_lib";
 import { SongMetadata } from "./metadata";
 import { Pattern } from "./pattern";
@@ -19,8 +20,13 @@ export class Song {
     return new Song(metadata, patterns, parts);
   }
 
+  /** Returns all bars of the parts. */
+  get bars(): Array<Bar> {
+    return this.parts.map((p) => p.bars).reduce((a, b) => a.concat(b), []);
+  }
+
   /** Returns the number of bars in all parts. */
-  get bars(): number {
-    return this.parts.map((p) => p.bars).reduce((a, b) => a + b, 0);
+  get barsLength(): number {
+    return this.parts.map((p) => p.barsLength).reduce((a, b) => a + b, 0);
   }
 }

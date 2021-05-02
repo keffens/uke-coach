@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { Column, Columns, Content, Title } from "bloomer";
 import PatternWithCountComponent from "./PatternWithCountComponent";
 import PlayerComponent from "./PlayerComponent";

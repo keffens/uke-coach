@@ -1,7 +1,7 @@
 import * as Tone from "tone";
-import { PitchedNote, Song } from "../music";
+import { Bar, PitchedNote, Song } from "../music";
 import { Instrument, Woodblock } from "./instruments";
-import { Ukulele, UkuleleLowG } from "./string_instruments";
+import { Ukulele } from "./string_instruments";
 
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
@@ -11,7 +11,8 @@ class PlayerImpl {
   private instruments = new Map<string, Instrument>();
   private metronomeInstrument: Instrument;
   private metronomeLoop?: Tone.Loop;
-  private events = new Array<number>();
+  private metronomeIsOn = true;
+  private playback?: Tone.Part;
   private song?: Song;
 
   constructor() {}
@@ -51,10 +52,7 @@ class PlayerImpl {
     if (!this.song) return;
     console.log("Cleaning up song", this.song.metadata.title);
     this.metronomeLoop?.dispose();
-    for (const id of this.events) {
-      Tone.Transport.clear(id);
-    }
-    this.events = [];
+    this.playback?.dispose();
     this.song = undefined;
   }
 
@@ -69,8 +67,15 @@ class PlayerImpl {
   }
 
   /** Whether to enable the metronome. */
-  set muteMetronome(mute: boolean) {
-    this.metronomeLoop.mute = mute;
+  set metronomeEnabled(enable: boolean) {
+    this.metronomeIsOn = enable;
+    if (this.metronomeLoop) {
+      this.metronomeLoop.mute = !enable;
+    }
+  }
+
+  get metronomeEnabled() {
+    return this.metronomeIsOn;
   }
 
   set countIn(bars: number) {
@@ -120,12 +125,13 @@ class PlayerImpl {
   }
 
   private setUpMetronome(): void {
-    let end = this.song.bars;
+    let end = this.song.barsLength;
     this.metronomeLoop = new Tone.Loop((time) => {
       this.playMetronome(time);
     }, "1m")
       .start(`0:0:0`)
       .stop(`${end}:0:0`);
+    this.metronomeLoop.mute = !this.metronomeEnabled;
     Tone.Transport.stop(`${end}:0:0`);
   }
 
@@ -143,20 +149,10 @@ class PlayerImpl {
 
   private setUpPlayback(): void {
     const ukulele = this.getInstrument(Ukulele.NAME);
-    let t = 0;
-    for (const part of this.song.parts) {
-      for (const paragraph of part.paragraphs) {
-        for (let i = 0; i < paragraph.bars.length; i++) {
-          const bar = paragraph.bars[i];
-          this.events.push(
-            Tone.Transport.schedule((time) => {
-              ukulele.playBar(bar, time);
-            }, `${t + i}:0:0`)
-          );
-        }
-        t += paragraph.bars.length;
-      }
-    }
+    this.playback = new Tone.Part(
+      (time, value) => ukulele.playBar(value.bar, time),
+      this.song.bars.map((bar, i) => ({ time: `${i}:0`, bar }))
+    ).start("0:0");
   }
 }
 

@@ -7,7 +7,11 @@ import {
   FaStepForward,
   FaStop,
 } from "react-icons/fa";
+import { GiMetronome } from "react-icons/gi";
 import styles from "./Song.module.scss";
+import IconButton from "../elements/IconButton";
+import SmallIconButton from "../elements/SmallIconButton";
+import ToggleIcon from "../elements/ToggleIcon";
 import { Song } from "../../lib/music";
 import { Player } from "../../lib/player";
 
@@ -38,31 +42,27 @@ export default function PlayerComponentProps({
   }, []);
   return (
     <div className={styles.player}>
-      <Button
-        isSize="small"
-        className="is-rounded p-2 mx-1"
+      <SmallIconButton
         disabled={playing}
         onClick={() => {
           onGoBackward();
         }}
       >
         <FaStepBackward />
-      </Button>
+      </SmallIconButton>
       {playing ? (
-        <Button
+        <IconButton
           isColor="primary"
-          className="is-rounded p-4 mx-1"
           onClick={() => {
             Player.stop();
             onPause();
           }}
         >
           <FaPause />
-        </Button>
+        </IconButton>
       ) : (
-        <Button
+        <IconButton
           isColor="primary"
-          className="is-rounded p-4 mx-1"
           onClick={async () => {
             await Player.init();
             const startTime = Player.play(pauseTime);
@@ -70,28 +70,33 @@ export default function PlayerComponentProps({
           }}
         >
           <FaPlay />
-        </Button>
+        </IconButton>
       )}
-      <Button
+      <IconButton
         isColor="light"
-        className="is-rounded p-4 mx-1"
         onClick={() => {
           Player.stop();
           onStop();
         }}
       >
         <FaStop />
-      </Button>
-      <Button
-        isSize="small"
-        className="is-rounded p-2 mx-1"
+      </IconButton>
+      <SmallIconButton
         disabled={playing}
         onClick={() => {
           onGoForward();
         }}
       >
         <FaStepForward />
-      </Button>
+      </SmallIconButton>
+      <ToggleIcon
+        initialState={Player.metronomeEnabled}
+        onClick={(enable: boolean) => {
+          Player.metronomeEnabled = enable;
+        }}
+      >
+        <GiMetronome />
+      </ToggleIcon>
     </div>
   );
 }
