@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Button } from "bloomer";
 import {
+  FaGuitar,
   FaPlay,
   FaPause,
   FaStepBackward,
@@ -42,6 +43,12 @@ export default function PlayerComponentProps({
   }, []);
   return (
     <div className={styles.player}>
+      <ToggleIcon
+        initialState={Player.playbackEnabled}
+        onClick={(enable: boolean) => (Player.playbackEnabled = enable)}
+      >
+        <FaGuitar />
+      </ToggleIcon>
       <SmallIconButton
         disabled={playing}
         onClick={() => {
@@ -91,9 +98,7 @@ export default function PlayerComponentProps({
       </SmallIconButton>
       <ToggleIcon
         initialState={Player.metronomeEnabled}
-        onClick={(enable: boolean) => {
-          Player.metronomeEnabled = enable;
-        }}
+        onClick={(enable: boolean) => (Player.metronomeEnabled = enable)}
       >
         <GiMetronome />
       </ToggleIcon>

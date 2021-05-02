@@ -17,7 +17,7 @@ export default function ToggleIcon({
   return (
     <Button
       style={{ border: "none" }}
-      className="m-1"
+      className="m-1 p-3"
       onClick={() => {
         setState(!state);
         onClick(!state);

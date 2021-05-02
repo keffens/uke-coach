@@ -13,6 +13,7 @@ class PlayerImpl {
   private metronomeLoop?: Tone.Loop;
   private metronomeIsOn = true;
   private playback?: Tone.Part;
+  private playbackIsOn = true;
   private song?: Song;
 
   constructor() {}
@@ -43,7 +44,11 @@ class PlayerImpl {
     this.cleanup();
     this.song = song;
     console.log("Loading song", this.song.metadata.title);
-    if (this.initialized) this.setUpSong();
+    if (this.initialized) {
+      this.setUpSong();
+      // The extra seems to be necessary when switching pages for some reason.
+      this.stop();
+    }
   }
 
   /** Cleans up all scheduled events and loops. */
@@ -78,6 +83,18 @@ class PlayerImpl {
     return this.metronomeIsOn;
   }
 
+  /** Whether to enable the playback. */
+  set playbackEnabled(enable: boolean) {
+    this.playbackIsOn = enable;
+    if (this.playback) {
+      this.playback.mute = !enable;
+    }
+  }
+
+  get playbackEnabled() {
+    return this.playbackIsOn;
+  }
+
   set countIn(bars: number) {
     this.countInBars = bars;
   }
@@ -108,11 +125,9 @@ class PlayerImpl {
 
   /** Stops the playback. */
   stop(): void {
-    if (this.playing) {
-      this.playing = false;
-      console.log("stopping playback");
-      Tone.Transport.stop();
-    }
+    this.playing = false;
+    console.log("stopping playback");
+    Tone.Transport.stop();
   }
 
   private setUpSong(): void {
@@ -129,10 +144,10 @@ class PlayerImpl {
     this.metronomeLoop = new Tone.Loop((time) => {
       this.playMetronome(time);
     }, "1m")
-      .start(`0:0:0`)
-      .stop(`${end}:0:0`);
+      .start(`0:0`)
+      .stop(`${end}:0`);
     this.metronomeLoop.mute = !this.metronomeEnabled;
-    Tone.Transport.stop(`${end}:0:0`);
+    Tone.Transport.stop(`${end}:0`);
   }
 
   private playMetronome(time: number, bars = 1): void {
