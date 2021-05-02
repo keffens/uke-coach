@@ -1,7 +1,7 @@
 import * as Tone from "tone";
-import { Bar, Chord, ChordLib, PitchedNote, Strum, StrumType } from "../music";
+import { Bar, Chord, PitchedNote, Strum, StrumType } from "../music";
 
-const DEFAULT_SAMPLE_URLS = {
+export const DEFAULT_SAMPLE_URLS = {
   A0: "A0.mp3",
   A1: "A1.mp3",
   A2: "A2.mp3",
@@ -81,101 +81,7 @@ export class SamplerInstrument extends Instrument {
   }
 }
 
-/** Base class for plugged string instruments. */
-export class StringInstrument extends SamplerInstrument {
-  readonly strings: Array<PitchedNote>;
-  constructor(
-    name: string,
-    strings: Array<string>,
-    readonly chordLib: ChordLib,
-    samples: Partial<Tone.SamplerOptions>
-  ) {
-    super(name, samples);
-    this.strings = strings.map((string) => PitchedNote.parse(string));
-    // Set lowest string as chord base.
-    this.chordBase = this.strings.reduce(
-      (lhs, rhs) => (lhs.compare(rhs) < 0 ? lhs : rhs),
-      PitchedNote.MAX_NOTE
-    );
-  }
-
-  playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
-    let notes =
-      this.chordLib.getPitchedNotes(chord, this.strings) ??
-      chord.asPitchedNotes(this.chordBase);
-    let delay = 0;
-    let velocity = strum.emphasize ? 1.0 : 0.7;
-    switch (strum.type) {
-      case StrumType.Pause:
-        return;
-      case StrumType.Down:
-        delay = Math.min(0.02, duration / this.strings.length);
-        break;
-      case StrumType.Up:
-        delay = Math.max(-0.02, -duration / this.strings.length);
-        break;
-      case StrumType.Arpeggio:
-        delay = (2 * duration) / this.strings.length;
-        break;
-      case StrumType.Tremolo:
-        delay = duration / (2 * this.strings.length);
-        this.playStrings(notes, time, delay, 0.5);
-        this.playStrings(notes, time + duration / 2, -delay, 0.5);
-        return;
-      case StrumType.Plugged:
-        notes = notes.filter((_, idx) => strum.strings?.includes(idx));
-        break;
-      case StrumType.Percursion:
-      //TODO: implement.
-    }
-    // Remove null notes.
-    notes = notes.filter((note) => note);
-    this.playStrings(notes, time, delay, velocity);
-  }
-
-  private playStrings(
-    notes: Array<PitchedNote>,
-    time: number,
-    delay: number,
-    velocity: number
-  ) {
-    // A negative delay means the bottom note is played first, so we add some
-    // time for the first note.
-    if (delay < 0) time -= delay * notes.length;
-    for (let i = 0; i < notes.length; i++) {
-      this.sampler.triggerAttack(
-        notes[i].toString(),
-        time + delay * i,
-        velocity
-      );
-    }
-  }
-}
-
-/** Standard ukulele. */
-export class Ukulele extends StringInstrument {
-  static NAME = "ukulele";
-
-  constructor() {
-    super(Ukulele.NAME, ["G4", "C4", "E4", "A4"], ChordLib.forUkulele(), {
-      urls: DEFAULT_SAMPLE_URLS,
-      baseUrl: "/samples/midi-js-soundfonts/acoustic_guitar_nylon/",
-    });
-  }
-}
-
-/** Ukulele with a low G string. */
-export class UkuleleLowG extends StringInstrument {
-  static NAME = "ukulele (low G-string)";
-  constructor() {
-    super(UkuleleLowG.NAME, ["G3", "C4", "E4", "A4"], ChordLib.forUkulele(), {
-      urls: DEFAULT_SAMPLE_URLS,
-      baseUrl: "/samples/midi-js-soundfonts/acoustic_guitar_nylon/",
-    });
-  }
-}
-
-/** Woodblock. */
+/** Woodblock, used as metronome. */
 export class Woodblock extends SamplerInstrument {
   static NAME = "woodblock";
   constructor() {

@@ -1,6 +1,7 @@
 import * as Tone from "tone";
 import { PitchedNote, Song } from "../music";
-import { Instrument, Ukulele, UkuleleLowG, Woodblock } from "./instruments";
+import { Instrument, Woodblock } from "./instruments";
+import { Ukulele, UkuleleLowG } from "./string_instruments";
 
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
