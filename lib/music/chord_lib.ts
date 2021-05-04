@@ -1,5 +1,6 @@
 import { Chord } from "./chord";
 import { NOTE_IDENTITY, Note, PitchedNote } from "./note";
+import { Token, TokenType } from "./token";
 
 const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["C", [0, 0, 0, 3]],
@@ -136,5 +137,18 @@ export class ChordLib {
   /** Defines a chord which might overwrite the default chord. */
   defineChord(chord: Chord, frets: number[]): void {
     this.costumChords.set(chord.toString(), frets);
+  }
+
+  /** Parses a chord from a token and then defines that chord. */
+  parseChord(token: Token) {
+    if (token.type !== TokenType.ChordDefinition) {
+      throw new Error(`Can only parse a chord from a chord token: ${token}`);
+    }
+    this.costumChords.set(
+      token.key,
+      token.value
+        .split(/\s+/)
+        .map((fret) => (fret === "x" ? -1 : parseInt(fret)))
+    );
   }
 }

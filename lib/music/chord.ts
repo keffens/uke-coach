@@ -1,10 +1,4 @@
-import {
-  BEAT_LENGTHS_PATTERN,
-  Note,
-  Octave,
-  PitchedNote,
-  renderNote,
-} from "./note";
+import { BEAT_LENGTHS_PATTERN, Note, PitchedNote, renderNote } from "./note";
 
 enum Qualifier {
   Major = "",

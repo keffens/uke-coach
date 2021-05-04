@@ -1,6 +1,7 @@
 import { Chord } from "./chord";
 import { ChordLib } from "./chord_lib";
 import { Note, PitchedNote, toSharp } from "./note";
+import { Token, TokenType } from "./token";
 
 test("gets default chords frets", () => {
   const chordLib = ChordLib.forUkulele();
@@ -62,6 +63,16 @@ test("gets custom chords frets", () => {
   expect(chordLib.getFrets(Chord.parse("Bm7"))).toEqual([2, 2, 2, 0]);
   chordLib.defineChord(Chord.parse("Bm7"), [2, 2, 2, 2]);
   expect(chordLib.getFrets(Chord.parse("Bm7"))).toEqual([2, 2, 2, 2]);
+});
+
+test("parses custom chord frets", () => {
+  const chordLib = ChordLib.forUkulele();
+  expect(chordLib.getFrets(Chord.parse("C"))).toEqual([0, 0, 0, 3]);
+  chordLib.parseChord(new Token(TokenType.ChordDefinition, "C", "5 4 3 3"));
+  expect(chordLib.getFrets(Chord.parse("C"))).toEqual([5, 4, 3, 3]);
+
+  chordLib.parseChord(new Token(TokenType.ChordDefinition, "C", "12 12 12 x"));
+  expect(chordLib.getFrets(Chord.parse("C"))).toEqual([12, 12, 12, -1]);
 });
 
 function noteSet(notes: Array<PitchedNote | null>): Set<Note> {

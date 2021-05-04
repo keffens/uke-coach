@@ -17,6 +17,7 @@ const KEY_ALIAS = new Map([
   ["eot", "end_of_tab"],
   ["sog", "start_of_grid"],
   ["eog", "end_of_grid"],
+  ["define", "chord"],
 ]);
 
 const TEXT_RE = String.raw`(?:[^\[\]\{\}\\#]|\\\[|\\\]|\\\{|\\\}|\\\\|\\#)+`;
@@ -31,6 +32,10 @@ const FIRST_TOKEN = new RegExp(
 const SPLIT_META = new RegExp(String.raw`^(${KEY_RE})\s*(${TEXT_RE})$`, "u");
 const SPLIT_PATTERN = new RegExp(
   String.raw`^(?:(${TEXT_RE})\s+)?([-.\|\dduxat\(\)]+)$`,
+  "iu"
+);
+const SPLIT_CHORD = new RegExp(
+  String.raw`^([\w*]+)\s+(?:frets\s+)?((?:(x|\d+)\s+)+(x|\d+))$`,
   "iu"
 );
 
@@ -69,6 +74,16 @@ function tokenizeDirective(key: string, value?: string) {
       return new Token(TokenType.Pattern, match[1]?.trim(), match[2]);
     }
     return new Token(TokenType.Pattern, value);
+  }
+  if (key === "chord") {
+    value = value?.trim();
+    const match = value.match(SPLIT_CHORD);
+    if (match) {
+      return new Token(TokenType.ChordDefinition, match[1].trim(), match[2]);
+    }
+    throw new Error(
+      `Found define chord directive with invalid chord: ${value}`
+    );
   }
   return new Token(TokenType.Directive, key, value);
 }

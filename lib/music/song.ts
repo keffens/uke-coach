@@ -10,14 +10,15 @@ export class Song {
     public metadata: SongMetadata,
     public patterns: Map<string, Pattern>,
     public parts: SongPart[],
-    public chordLib = ChordLib.forUkulele()
+    public chordLib: ChordLib
   ) {}
 
   static fromTokens(env: Token) {
     const metadata = SongMetadata.fromTokens(env);
     const patterns = new Map<string, Pattern>();
-    const parts = SongPart.fromTokens(env, metadata, patterns);
-    return new Song(metadata, patterns, parts);
+    const chordLib = ChordLib.forUkulele();
+    const parts = SongPart.fromTokens(env, metadata, patterns, chordLib);
+    return new Song(metadata, patterns, parts, chordLib);
   }
 
   /** Returns all bars of the parts. */

@@ -1,6 +1,7 @@
 export enum TokenType {
   Text,
   Chord,
+  ChordDefinition,
   Metadata,
   Pattern,
   Directive,
