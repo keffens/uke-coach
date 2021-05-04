@@ -18,6 +18,7 @@ enum Extension {
   Six = "6",
   Seven = "7",
   MajorSeven = "maj7",
+  AddNine = "add9",
 }
 
 function chordIntervals(
@@ -47,6 +48,8 @@ function chordIntervals(
     case Extension.MajorSeven:
       semitones.push(11);
       break;
+    case Extension.AddNine:
+      semitones.push(14);
   }
   return semitones;
 }
@@ -115,6 +118,9 @@ export class Chord {
         break;
       case Extension.MajorSeven:
         sup += "M7";
+        break;
+      case Extension.AddNine:
+        sup += "add9";
         break;
     }
     return sup;

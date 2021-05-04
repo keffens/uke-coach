@@ -17,6 +17,8 @@ test("converts between strings and chords", () => {
 
   expect(Chord.parse("Cmaj7").toString()).toEqual("Cmaj7");
   expect(Chord.parse("Ammaj7").toString()).toEqual("Ammaj7");
+
+  expect(Chord.parse("Cadd9").toString()).toEqual("Cadd9");
 });
 
 test("makes the chord's html base", () => {
@@ -28,6 +30,8 @@ test("makes the chord's html base", () => {
   expect(Chord.parse("C6").base).toEqual("C");
   expect(Chord.parse("C7").base).toEqual("C");
   expect(Chord.parse("Cmaj7").base).toEqual("C");
+
+  expect(Chord.parse("Cadd9").base).toEqual("C");
 });
 
 test("makes the chord's html sup", () => {
@@ -40,6 +44,8 @@ test("makes the chord's html sup", () => {
   expect(Chord.parse("C7").sup).toEqual("7");
   expect(Chord.parse("Bdim7").sup).toEqual("o7");
   expect(Chord.parse("Cmaj7").sup).toEqual("M7");
+
+  expect(Chord.parse("Cadd9").sup).toEqual("add9");
 });
 
 test("converts chords to pitched note arrays", () => {
@@ -106,6 +112,12 @@ test("converts chords to pitched note arrays", () => {
       .asPitchedNotes()
       .map((n) => n.toString())
   ).toEqual(["A4", "C5", "E5", "G#5"]);
+
+  expect(
+    Chord.parse("Cadd9")
+      .asPitchedNotes()
+      .map((n) => n.toString())
+  ).toEqual(["C4", "E4", "G4", "D5"]);
 
   expect(
     Chord.parse("C")

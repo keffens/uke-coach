@@ -1,6 +1,6 @@
 import { Chord } from "./chord";
 import { ChordLib } from "./chord_lib";
-import { PitchedNote } from "./note";
+import { Note, PitchedNote, toSharp } from "./note";
 
 test("gets default chords frets", () => {
   const chordLib = ChordLib.forUkulele();
@@ -8,8 +8,14 @@ test("gets default chords frets", () => {
   expect(chordLib.getFrets(Chord.parse("C#"))).toEqual([1, 1, 1, 4]);
   expect(chordLib.getFrets(Chord.parse("Db"))).toEqual([1, 1, 1, 4]);
   expect(chordLib.getFrets(Chord.parse("E"))).toEqual([4, 4, 4, -1]);
-  expect(chordLib.getFrets(Chord.parse("C6"))).toBeNull();
   expect(chordLib.getFrets(null)).toBeNull();
+});
+
+test("gets generated chord frets", () => {
+  const chordLib = ChordLib.forUkulele();
+  expect(chordLib.getFrets(Chord.parse("Cmaj7"))).toEqual([0, 0, 0, 2]);
+  expect(chordLib.getFrets(Chord.parse("Caug"))).toEqual([1, 0, 0, 3]);
+  expect(chordLib.getFrets(Chord.parse("Gdim"))).toEqual([0, 1, 3, 1]);
 });
 
 test("gets default chords string frets", () => {
@@ -26,7 +32,6 @@ test("gets default chords string frets", () => {
     "4",
     "X",
   ]);
-  expect(chordLib.getFrets(Chord.parse("C6"))).toBeNull();
   expect(chordLib.getFrets(null)).toBeNull();
 });
 
@@ -43,17 +48,42 @@ test("gets pitched notes", () => {
       .getPitchedNotes(Chord.parse("E"), strings)
       .map((note) => (note === null ? null : note.toString()))
   ).toEqual(["B4", "E4", "G#4", null]);
-  expect(chordLib.getPitchedNotes(Chord.parse("C6"), strings)).toBeNull();
   expect(chordLib.getPitchedNotes(null, strings)).toBeNull();
 });
 
 test("gets custom chords frets", () => {
   const chordLib = ChordLib.forUkulele();
+  // Overwrite default chord.
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([0, 0, 0, 3]);
   chordLib.defineChord(Chord.parse("C"), [5, 4, 3, 3]);
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([5, 4, 3, 3]);
 
-  expect(chordLib.getFrets(Chord.parse("C6"))).toBeNull();
-  chordLib.defineChord(Chord.parse("C6"), [0, 0, 0, 1]);
-  expect(chordLib.getFrets(Chord.parse("C6"))).toEqual([0, 0, 0, 1]);
+  // Overwrites generated chord.
+  expect(chordLib.getFrets(Chord.parse("Bm7"))).toEqual([2, 2, 2, 0]);
+  chordLib.defineChord(Chord.parse("Bm7"), [2, 2, 2, 2]);
+  expect(chordLib.getFrets(Chord.parse("Bm7"))).toEqual([2, 2, 2, 2]);
+});
+
+function noteSet(notes: Array<PitchedNote | null>): Set<Note> {
+  return new Set<Note>(
+    notes.filter((note) => note).map((note) => toSharp(note.note))
+  );
+}
+
+test("verifies ukulele chord lib", () => {
+  const chordLib = ChordLib.forUkulele();
+  const strings = ["G4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s));
+
+  for (const note of Object.values(Note)) {
+    for (const suffix of ["", "m", "7"]) {
+      const chord = Chord.parse(note + suffix);
+      try {
+        expect(noteSet(chordLib.getPitchedNotes(chord, strings))).toEqual(
+          noteSet(chord.asPitchedNotes())
+        );
+      } catch (e) {
+        throw new Error(`Error in ukulele chord ${chord}:\n${e}`);
+      }
+    }
+  }
 });

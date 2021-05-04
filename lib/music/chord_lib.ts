@@ -1,5 +1,5 @@
 import { Chord } from "./chord";
-import { NOTE_IDENTITY, PitchedNote } from "./note";
+import { NOTE_IDENTITY, Note, PitchedNote } from "./note";
 
 const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["C", [0, 0, 0, 3]],
@@ -9,7 +9,7 @@ const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["Dm", [2, 2, 1, 0]],
   ["D7", [2, 2, 2, 3]],
   ["E", [4, 4, 4, -1]],
-  ["Em", [2, 3, 4, 0]],
+  ["Em", [0, 4, 3, 2]],
   ["E7", [1, 2, 0, 2]],
   ["F", [2, 0, 1, 0]],
   ["Fm", [1, 0, 1, 3]],
@@ -22,7 +22,7 @@ const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["A7", [0, 1, 0, 0]],
   ["B", [4, 3, 2, 2]],
   ["Bm", [4, 2, 2, 2]],
-  ["B7", [2, 1, 2, 2]],
+  ["B7", [2, 3, 2, 2]],
   ["C#", [1, 1, 1, 4]],
   ["C#m", [-1, 4, 4, 4]],
   ["C#7", [1, 1, 1, 2]],
@@ -52,11 +52,14 @@ function fretsFromMap(
 export class ChordLib {
   private costumChords = new Map<string, number[]>();
 
-  private constructor(private instrumentChords: Map<string, number[]>) {}
+  private constructor(
+    private instrumentChords: Map<string, number[]>,
+    private strings: Note[]
+  ) {}
 
   /** Creates a new chord lib for a ukulele. */
   static forUkulele(): ChordLib {
-    return new ChordLib(UKULELE_CHORD_FRETS);
+    return new ChordLib(UKULELE_CHORD_FRETS, [Note.G, Note.C, Note.E, Note.A]);
   }
 
   /**
@@ -76,11 +79,25 @@ export class ChordLib {
         chord.extension
       ).toString();
 
-    return (
+    const frets =
       fretsFromMap(this.costumChords, chordName, altChordName) ??
-      fretsFromMap(this.instrumentChords, chordName, altChordName)
-    );
-    // TODO: Attempt to generate a chord.
+      fretsFromMap(this.instrumentChords, chordName, altChordName);
+    if (frets) return frets;
+
+    // Attempt to generate the chord. We only care not to play wrong notes, for
+    // now there is no attempt to make the chord complete.
+    // TODO: Ensure all notes are present and frets are not too far apart.
+    const chordNotes = chord.asPitchedNotes(PitchedNote.C4);
+    return this.strings.map((string) => {
+      // We make sure the string note is lower than the chord notes.
+      const stringNote = PitchedNote.fromNote(string, 3);
+      let minFret = 12;
+      for (const chordNote of chordNotes) {
+        const fret = chordNote.compare(stringNote) % 12;
+        if (fret < minFret) minFret = fret;
+      }
+      return minFret;
+    });
   }
 
   /** Same as getFrets but converts the fret numbers to strings. */
