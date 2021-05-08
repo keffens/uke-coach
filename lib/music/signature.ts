@@ -39,8 +39,8 @@ export class TimeSignature {
   /** Parses the time signature form a string. */
   static parse(text: string): TimeSignature {
     const match = /^(\d+)\/(\d+)$/.exec(text.trim());
-    const beats = parseInt(match?.[1]);
-    const noteValue = parseInt(match?.[2]);
+    const beats = parseInt(match?.[1] ?? "");
+    const noteValue = parseInt(match?.[2] ?? "");
     if (!beats || beats <= 0 || !noteValue || noteValue <= 0) {
       throw new Error(`Failed to parse time signature from "${text}".`);
     }

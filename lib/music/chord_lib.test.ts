@@ -42,12 +42,12 @@ test("gets pitched notes", () => {
   expect(
     chordLib
       .getPitchedNotes(Chord.parse("C"), strings)
-      .map((note) => note.toString())
+      ?.map((note) => (note === null ? null : note.toString()))
   ).toEqual(["G4", "C4", "E4", "C5"]);
   expect(
     chordLib
       .getPitchedNotes(Chord.parse("E"), strings)
-      .map((note) => (note === null ? null : note.toString()))
+      ?.map((note) => (note === null ? null : note.toString()))
   ).toEqual(["B4", "E4", "G#4", null]);
   expect(chordLib.getPitchedNotes(null, strings)).toBeNull();
 });
@@ -56,12 +56,12 @@ test("gets custom chords frets", () => {
   const chordLib = ChordLib.forUkulele();
   // Overwrite default chord.
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([0, 0, 0, 3]);
-  chordLib.defineChord(Chord.parse("C"), [5, 4, 3, 3]);
+  chordLib.defineChord(Chord.parse("C")!, [5, 4, 3, 3]);
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([5, 4, 3, 3]);
 
   // Overwrites generated chord.
   expect(chordLib.getFrets(Chord.parse("Bm7"))).toEqual([2, 2, 2, 0]);
-  chordLib.defineChord(Chord.parse("Bm7"), [2, 2, 2, 2]);
+  chordLib.defineChord(Chord.parse("Bm7")!, [2, 2, 2, 2]);
   expect(chordLib.getFrets(Chord.parse("Bm7"))).toEqual([2, 2, 2, 2]);
 });
 
@@ -75,9 +75,12 @@ test("parses custom chord frets", () => {
   expect(chordLib.getFrets(Chord.parse("C"))).toEqual([12, 12, 12, -1]);
 });
 
-function noteSet(notes: Array<PitchedNote | null>): Set<Note> {
-  return new Set<Note>(
-    notes.filter((note) => note).map((note) => toSharp(note.note))
+function noteSet(notes: Array<PitchedNote | null> | null): Set<Note | null> {
+  if (!notes) return new Set();
+  return new Set(
+    notes
+      .filter((note) => note)
+      .map((note) => (note ? toSharp(note.note) : null))
   );
 }
 
@@ -90,7 +93,7 @@ test("verifies ukulele chord lib", () => {
       const chord = Chord.parse(note + suffix);
       try {
         expect(noteSet(chordLib.getPitchedNotes(chord, strings))).toEqual(
-          noteSet(chord.asPitchedNotes())
+          noteSet(chord?.asPitchedNotes() ?? null)
         );
       } catch (e) {
         throw new Error(`Error in ukulele chord ${chord}:\n${e}`);

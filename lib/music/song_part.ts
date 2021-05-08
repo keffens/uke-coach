@@ -26,7 +26,7 @@ export class SongPart {
 
   static fromTokens(
     env: Token,
-    fallback: SongMetadata | PartMetadata,
+    parentMetadata: SongMetadata | PartMetadata,
     patterns: Map<string, Pattern>,
     chordLib: ChordLib,
     parts?: SongPart[],
@@ -38,7 +38,7 @@ export class SongPart {
     parts = parts ?? new Array<SongPart>();
     const type = env.key as SongPartType;
     const name = env.value;
-    const metadata = PartMetadata.fromTokens(env, name, fallback);
+    const metadata = PartMetadata.fromTokens(env, parentMetadata, name);
     activePattern = activePattern?.time.equals(metadata.time)
       ? activePattern
       : Pattern.makeDefault(metadata.time);

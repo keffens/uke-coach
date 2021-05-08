@@ -13,6 +13,7 @@ function LyricsCellComponent({
   nextAnacrusis,
   isSoloAnacrusis,
 }: LyricsCellComponentProps) {
+  nextAnacrusis = nextAnacrusis ?? "";
   if (lyric && isSoloAnacrusis) {
     throw new Error("`isSoloAnacrusis` may only be set if `lyric` is empty.");
   }

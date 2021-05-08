@@ -46,7 +46,10 @@ function fretsFromMap(
   chord: string,
   altChord?: string
 ): number[] | null {
-  return fretMap.get(chord) ?? fretMap.get(altChord) ?? null;
+  let frets = fretMap.get(chord);
+  if (frets) return frets;
+  if (!frets && altChord) return fretMap.get(altChord) ?? null;
+  return null;
 }
 
 /** Maps chords to frets, with the option to add custom chords. */
@@ -103,7 +106,7 @@ export class ChordLib {
 
   /** Same as getFrets but converts the fret numbers to strings. */
   getStringFrets(chord: Chord | null): string[] | null {
-    return this.getFrets(chord)?.map((f) => (f < 0 ? "X" : `${f}`));
+    return this.getFrets(chord)?.map((f) => (f < 0 ? "X" : `${f}`)) ?? null;
   }
 
   /**
@@ -141,14 +144,23 @@ export class ChordLib {
 
   /** Parses a chord from a token and then defines that chord. */
   parseChord(token: Token) {
-    if (token.type !== TokenType.ChordDefinition) {
-      throw new Error(`Can only parse a chord from a chord token: ${token}`);
+    if (
+      token.type !== TokenType.ChordDefinition ||
+      !token.key ||
+      !token.value
+    ) {
+      throw new Error("Failed to parse chord from token");
+    }
+    const frets = token.value.split(/\s+/);
+    if (frets.length !== this.strings.length) {
+      throw new Error(
+        `Wrong number of frets in defined chord: expected ` +
+          `${this.strings.length}, got ${frets.length}`
+      );
     }
     this.costumChords.set(
       token.key,
-      token.value
-        .split(/\s+/)
-        .map((fret) => (fret === "x" ? -1 : parseInt(fret)))
+      frets.map((fret) => (fret === "x" ? -1 : parseInt(fret)))
     );
   }
 }

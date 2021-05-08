@@ -1,6 +1,7 @@
 import { Chord } from "./chord";
 import { parseBeats, sumBeats } from "./note";
 import { Pattern } from "./pattern";
+import { assert } from "../util";
 
 export class Bar {
   constructor(
@@ -8,11 +9,11 @@ export class Bar {
     public beats: number[],
     public pattern: Pattern,
     public patternIdx = 0,
-    public lyrics: string[] = null,
-    public anacrusis: string = null
+    public lyrics: string[] = [],
+    public anacrusis: string = ""
   ) {
     if (this.lyrics.every((l) => !l)) {
-      this.lyrics = null;
+      this.lyrics = [];
     }
   }
 
@@ -54,15 +55,14 @@ export class BarParagraphBuilder {
   private _bars = new Array<Bar>();
   private _beats = new Array<number>();
   private _patternIdx = 0;
-  private _chords = new Array<Chord>();
+  private _chords = new Array<Chord | null>();
   private _lyrics = new Array<string>();
-  private _anacrusis: string = null;
+  private _anacrusis: string = "";
 
-  constructor(private _pattern?: Pattern) {}
+  constructor(private _pattern: Pattern | null = null) {}
 
   addLyrics(value: string) {
     if (!value.trim()) return;
-    this.requirePattern();
     if (value.match(/\w$/)) {
       value += "-";
     }
@@ -85,7 +85,7 @@ export class BarParagraphBuilder {
   }
 
   addChord(value: string) {
-    this.requirePattern();
+    assert(this._pattern, "Expected pattern to be set");
     this.closeFullChord();
     const chord = Chord.parse(value);
     const beat = parseBeats(value, this._pattern.time.beats);
@@ -140,6 +140,7 @@ export class BarParagraphBuilder {
   private closeFullChord() {
     const sum = sumBeats(this._beats);
     if (sum === 0) return true;
+    assert(this._pattern, "Expected pattern to be set");
     if (sum < this._pattern.time.beats) return false;
     if (sum > this._pattern.time.beats) {
       throw new Error(`Beats add up to more than one bar: ${sum}`);
@@ -158,13 +159,7 @@ export class BarParagraphBuilder {
     this._beats = [];
     this._patternIdx++;
     this._lyrics = [];
-    this._anacrusis = null;
+    this._anacrusis = "";
     return true;
-  }
-
-  private requirePattern() {
-    if (!this._pattern) {
-      throw new Error("Expected pattern before lyrics or chords.");
-    }
   }
 }

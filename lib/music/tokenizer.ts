@@ -54,7 +54,7 @@ function tokenizeDirective(key: string, value?: string) {
     return new Token(TokenType.EndEnv, key.replace(/^end_of_/, ""));
   }
   if (key === "meta") {
-    const match = value.match(SPLIT_META);
+    const match = value?.match(SPLIT_META);
     if (!match) {
       throw new Error(`Invalid meta directive with value "${value}".`);
     }
@@ -65,19 +65,17 @@ function tokenizeDirective(key: string, value?: string) {
     return new Token(TokenType.Metadata, key, value?.trim());
   }
   if (key === "pattern") {
-    value = value?.trim();
     if (!value) {
       throw new Error("Found pattern directive without pattern or name.");
     }
     const match = value.match(SPLIT_PATTERN);
     if (match) {
-      return new Token(TokenType.Pattern, match[1]?.trim(), match[2]);
+      return new Token(TokenType.Pattern, match[1].trim(), match[2]);
     }
     return new Token(TokenType.Pattern, value);
   }
   if (key === "chord") {
-    value = value?.trim();
-    const match = value.match(SPLIT_CHORD);
+    const match = value?.match(SPLIT_CHORD);
     if (match) {
       return new Token(TokenType.ChordDefinition, match[1].trim(), match[2]);
     }

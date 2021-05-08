@@ -2,7 +2,7 @@ import { Chord } from "../../lib/music";
 import styles from "./Song.module.scss";
 
 export interface ChordComponentProps {
-  chord?: Chord;
+  chord?: Chord | null;
 }
 
 export default function ChordComponent({ chord }: ChordComponentProps) {

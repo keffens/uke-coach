@@ -75,7 +75,7 @@ export default function PatternComponent({
   if (!pattern === !bar) {
     throw new Error("Either bar or pattern is required for PatternComponent.");
   }
-  pattern = pattern ?? bar.pattern;
+  pattern = pattern ?? bar!.pattern;
   useTab = useTab || pattern.useTab();
   if (pattern.bars === 0) {
     return <div className={styles.pattern}></div>;
@@ -97,7 +97,7 @@ export default function PatternComponent({
         <StrumComponent
           key={`strum-${i}`}
           strum={s}
-          frets={chordLib?.getStringFrets(bar?.getChordForStrum(i))}
+          frets={chordLib?.getStringFrets(bar?.getChordForStrum(i) ?? null)}
           highlight={i === highlightStrum}
         />
       ))}

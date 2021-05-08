@@ -93,6 +93,7 @@ export default function BarParagraphComponent({
   chordLib,
   highlightTick,
 }: BarParagraphComponentProps) {
+  highlightTick = highlightTick ?? NaN;
   const useTab = paragraph.useTab();
   const highlightInBar = Math.floor(highlightTick / paragraph.ticksPerBar);
   const tickInBar = highlightTick % paragraph.ticksPerBar;

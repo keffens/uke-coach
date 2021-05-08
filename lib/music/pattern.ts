@@ -9,7 +9,7 @@ export class Pattern {
     readonly time: TimeSignature,
     readonly strums: Strum[],
     readonly bars = 1,
-    readonly name?: string
+    readonly name = ""
   ) {
     if (bars === 0 && strums.length === 0) return;
     if (strums.length % bars !== 0) {
@@ -97,7 +97,7 @@ export class Pattern {
         `Cannot create Pattern from token with type ${token.type}.`
       );
     }
-    let pattern: Pattern;
+    let pattern: Pattern | undefined;
     if (!token.value) {
       pattern = patterns.get(token.key);
       if (!pattern) {

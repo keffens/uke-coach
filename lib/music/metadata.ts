@@ -17,18 +17,18 @@ function populateMap(tokens: Token[]) {
 export class SongMetadata {
   constructor(
     public title: string,
-    public sorttitle?: string,
-    public subtitle?: string,
-    public artist?: string,
-    public composer?: string,
-    public lyricist?: string,
-    public copyright?: string,
-    public album?: string,
-    public year?: number,
-    public key?: KeySignature,
-    public time?: TimeSignature,
-    public tempo?: number,
-    public capo?: number
+    public sorttitle = "",
+    public subtitle = "",
+    public artist = "",
+    public composer = "",
+    public lyricist = "",
+    public copyright = "",
+    public album = "",
+    public year = NaN,
+    public key: KeySignature | null = null,
+    public time = TimeSignature.DEFAULT,
+    public tempo = NaN,
+    public capo = 0
   ) {}
 
   static fromTokens(env: Token) {
@@ -37,7 +37,7 @@ export class SongMetadata {
       throw new Error("The song metadata does not have a title.");
     }
     return new SongMetadata(
-      metadata.get("title"),
+      metadata.get("title")!,
       metadata.get("sorttitle"),
       metadata.get("subtitle"),
       metadata.get("artist"),
@@ -45,42 +45,43 @@ export class SongMetadata {
       metadata.get("lyricist"),
       metadata.get("copyright"),
       metadata.get("album"),
-      parseInt(metadata.get("year")) || undefined,
-      metadata.get("key") ? KeySignature.parse(metadata.get("key")) : undefined,
+      parseInt(metadata.get("year") ?? "") || undefined,
+      metadata.get("key") ? KeySignature.parse(metadata.get("key")!) : null,
       metadata.get("time")
-        ? TimeSignature.parse(metadata.get("time"))
+        ? TimeSignature.parse(metadata.get("time")!)
         : TimeSignature.DEFAULT,
-      parseInt(metadata.get("tempo")) || undefined,
-      parseInt(metadata.get("capo")) || undefined
+      parseInt(metadata.get("tempo") ?? "") || undefined,
+      parseInt(metadata.get("capo") ?? "") || undefined
     );
   }
 }
 
 export class PartMetadata {
   constructor(
-    public name?: string,
-    public key?: KeySignature,
-    public time?: TimeSignature,
-    public tempo?: number,
-    public capo?: number
+    public tempo: number,
+    public time: TimeSignature,
+    public name = "",
+    public key: KeySignature | null = null
   ) {}
 
   static fromTokens(
     env: Token,
-    name?: string,
-    fallback?: SongMetadata | PartMetadata
+    parentMetadata: SongMetadata | PartMetadata,
+    name = ""
   ) {
     const metadata = populateMap(env.children);
+    const tempo =
+      parseInt(metadata.get("tempo") ?? "") || parentMetadata?.tempo;
+    if (!tempo || tempo < 0) {
+      throw new Error("The song part requires a tempo.");
+    }
     return new PartMetadata(
+      tempo,
+      parentMetadata.time,
       name,
       metadata.get("key")
-        ? KeySignature.parse(metadata.get("key"))
-        : fallback?.key,
-      metadata.get("time")
-        ? TimeSignature.parse(metadata.get("time"))
-        : fallback?.time,
-      parseInt(metadata.get("tempo")) || fallback?.tempo,
-      parseInt(metadata.get("capo")) || fallback?.capo
+        ? KeySignature.parse(metadata.get("key")!)
+        : parentMetadata?.key
     );
   }
 }

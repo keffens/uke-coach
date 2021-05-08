@@ -15,6 +15,7 @@ export enum TokenType {
 export const NONEMPTY_TOKENS = new Set([
   TokenType.Text,
   TokenType.Chord,
+  TokenType.ChordDefinition,
   TokenType.Metadata,
   TokenType.Directive,
   TokenType.StartEnv,
@@ -24,8 +25,8 @@ export const NONEMPTY_TOKENS = new Set([
 export class Token {
   constructor(
     readonly type: TokenType,
-    readonly key?: string,
-    readonly value?: string,
-    readonly children?: Token[]
+    readonly key: string = "",
+    readonly value: string = "",
+    readonly children: Token[] = []
   ) {}
 }

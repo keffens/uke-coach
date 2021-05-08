@@ -8,7 +8,7 @@ class State {
   readonly playing = false;
   readonly paragraph = NaN;
   readonly tick = NaN;
-  readonly tickDuration: number;
+  readonly tickDuration = NaN;
   readonly tickInterval = new Interval();
   readonly pendingTimeout = new Timeout();
   private setter?: Dispatch<SetStateAction<State>>;
@@ -59,10 +59,10 @@ class State {
     if (isNaN(t)) return [NaN, NaN];
     let tick = Math.floor(t / this.tickDuration);
     let paragraph = 0;
-    while (tick >= this.part.paragraphs[paragraph].ticks) {
-      tick -= this.part.paragraphs[paragraph].ticks;
+    while (tick >= this.part!.paragraphs[paragraph].ticks) {
+      tick -= this.part!.paragraphs[paragraph].ticks;
       paragraph++;
-      if (paragraph >= this.part.paragraphs.length) return [NaN, NaN];
+      if (paragraph >= this.part!.paragraphs.length) return [NaN, NaN];
     }
     return [tick, paragraph];
   }
@@ -81,6 +81,7 @@ export default function SongPartComponent({
   startTime,
   pauseAtTime,
 }: SongPartComponentProps) {
+  pauseAtTime = pauseAtTime ?? NaN;
   if (startTime && !isNaN(pauseAtTime)) {
     throw new Error("Only one of startTime and pauseAtTime may be set");
   }
@@ -88,6 +89,7 @@ export default function SongPartComponent({
   state.setSetter(setState);
 
   useEffect(() => {
+    pauseAtTime = pauseAtTime ?? NaN;
     if (!isNaN(pauseAtTime)) {
       setState(state.pause(pauseAtTime));
     } else if (!startTime) {

@@ -43,13 +43,13 @@ function isFlat(note: Note) {
 
 /** Converts a sharp note to a flat note if possible. */
 export function toFlat(note: Note): Note {
-  if (isSharp(note)) return NOTE_IDENTITY.get(note);
+  if (isSharp(note)) return NOTE_IDENTITY.get(note)!;
   return note;
 }
 
 /** Converts a flat note to a sharp note if possible. */
 export function toSharp(note: Note): Note {
-  if (isFlat(note)) return NOTE_IDENTITY.get(note);
+  if (isFlat(note)) return NOTE_IDENTITY.get(note)!;
   return note;
 }
 
@@ -135,7 +135,7 @@ export class PitchedNote {
     useFlat?: boolean
   ): PitchedNote {
     return new PitchedNote(
-      Math.floor(octave) * 12 + NOTE_TO_INT.get(note),
+      Math.floor(octave) * 12 + NOTE_TO_INT.get(note)!,
       useFlat ?? (isFlat(note) || note === Note.F)
     );
   }
@@ -153,7 +153,7 @@ export class PitchedNote {
 
   /** Returns the note. */
   get note(): Note {
-    const note = INT_TO_NOTE.get(((this.value % 12) + 12) % 12);
+    const note = INT_TO_NOTE.get(((this.value % 12) + 12) % 12)!;
     if (this.useFlat) return toFlat(note);
     return note;
   }
@@ -178,7 +178,7 @@ export class PitchedNote {
    * higher than this, but the result will not be higher than B9.
    */
   getNext(note: Note): PitchedNote {
-    if (NOTE_TO_INT.get(note) >= NOTE_TO_INT.get(this.note)) {
+    if (NOTE_TO_INT.get(note)! >= NOTE_TO_INT.get(this.note)!) {
       return PitchedNote.fromNote(note, this.octave);
     }
     return PitchedNote.fromNote(note, this.octave + 1);

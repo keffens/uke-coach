@@ -19,7 +19,7 @@ class StringPercurion extends SamplerInstrument {
 
 /** Base class for plugged string instruments. */
 export class StringInstrument extends SamplerInstrument {
-  private static percursion?: StringPercurion;
+  private static percursion: StringPercurion;
   readonly strings: Array<PitchedNote>;
   constructor(
     name: string,
@@ -69,23 +69,23 @@ export class StringInstrument extends SamplerInstrument {
         notes = notes.filter((_, idx) => strum.strings?.includes(idx + 1));
         break;
     }
-    // Remove null notes.
-    notes = notes.filter((note) => note);
     this.playStrings(notes, time, delay, velocity);
   }
 
   private playStrings(
-    notes: Array<PitchedNote>,
+    notes: Array<PitchedNote | null>,
     time: number,
     delay: number,
     velocity: number
   ) {
+    // Remove null notes.
+    notes = notes.filter((note) => note);
     // A negative delay means the bottom note is played first, so we add some
     // time for the first note.
     if (delay < 0) time -= delay * notes.length;
     for (let i = 0; i < notes.length; i++) {
       this.sampler.triggerAttack(
-        notes[i].toString(),
+        notes[i]!.toString(),
         time + delay * i,
         velocity
       );

@@ -10,11 +10,11 @@ import { Timeout } from "../../lib/util";
 class State {
   readonly start = NaN;
   readonly pauseAt = NaN;
-  readonly duration: number;
+  readonly duration = NaN;
   readonly timeOffsets = new Array<number>();
   readonly startTimeout = new Timeout();
   readonly stopTimeout = new Timeout();
-  private setter?: Dispatch<SetStateAction<State>>;
+  private setter: Dispatch<SetStateAction<State>> | null = null;
 
   /** Creates a stopped state. */
   constructor(readonly song?: Song) {
@@ -41,7 +41,7 @@ class State {
   stop(): void {
     this.startTimeout.clear();
     this.stopTimeout.clear();
-    this.setter(this.copy({ start: NaN, pauseAt: NaN }));
+    this.setter!(this.copy({ start: NaN, pauseAt: NaN }));
   }
 
   /** Sets the new state when the playback starts. */
@@ -53,10 +53,10 @@ class State {
         this.duration - (this.pauseAt || 0)
       );
       start -= this.pauseAt || 0;
-      this.setter(this.copy({ start, pauseAt: NaN }));
+      this.setter!(this.copy({ start, pauseAt: NaN }));
     }, start - Date.now());
     // Set a new state to trigger an update.
-    this.setter(this.copy({ start: NaN, pauseAt: this.pauseAt }));
+    this.setter!(this.copy({ start: NaN, pauseAt: this.pauseAt }));
   }
 
   /** Pauses playback. */
@@ -71,23 +71,23 @@ class State {
     }
     // Adjust time to the beginning of the current bar.
     let t = pauseAt;
-    for (let part of this.song.parts) {
+    for (let part of this.song!.parts) {
       if (t < part.duration) {
         pauseAt -= t % part.barDuration;
         break;
       }
       t -= part.duration;
     }
-    this.setter(this.copy({ start: NaN, pauseAt }));
+    this.setter!(this.copy({ start: NaN, pauseAt }));
   }
 
   /** If paused or stopped goes to the previous song part. */
   goBackward(): void {
     if (this.playing) return;
     let t = 0;
-    for (const part of this.song.parts) {
+    for (const part of this.song!.parts) {
       if (t + part.duration >= this.pauseAt) {
-        this.setter(this.copy({ start: NaN, pauseAt: t || NaN }));
+        this.setter!(this.copy({ start: NaN, pauseAt: t || NaN }));
         return;
       }
       t += part.duration;
@@ -98,10 +98,10 @@ class State {
   goForward(): void {
     if (this.playing) return;
     let t = 0;
-    for (let i = 0; i < this.song.parts.length - 1; i++) {
-      t += this.song.parts[i].duration;
+    for (let i = 0; i < this.song!.parts.length - 1; i++) {
+      t += this.song!.parts[i].duration;
       if (t > (this.pauseAt || 0)) {
-        this.setter(this.copy({ start: NaN, pauseAt: t }));
+        this.setter!(this.copy({ start: NaN, pauseAt: t }));
         return;
       }
     }

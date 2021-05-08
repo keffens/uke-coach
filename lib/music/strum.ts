@@ -13,7 +13,7 @@ export class Strum {
   private constructor(
     readonly type: StrumType,
     readonly emphasize = false,
-    readonly strings?: number[]
+    readonly strings: number[] = []
   ) {}
 
   /** Creates a pause. */

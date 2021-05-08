@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { Bar, PitchedNote, Song } from "../music";
+import { PitchedNote, Song } from "../music";
 import { Instrument, Woodblock } from "./instruments";
 import { Ukulele } from "./string_instruments";
 
@@ -9,12 +9,12 @@ class PlayerImpl {
   private countInBars = 1;
   private initialized = false;
   private instruments = new Map<string, Instrument>();
-  private metronomeInstrument: Instrument;
-  private metronomeLoop?: Tone.Loop;
+  private metronomeInstrument: Instrument | null = null;
+  private metronomeLoop: Tone.Loop | null = null;
   private metronomeIsOn = true;
-  private playback?: Tone.Part;
+  private playback: Tone.Part | null = null;
   private playbackIsOn = true;
-  private song?: Song;
+  private song: Song | null = null;
 
   constructor() {}
 
@@ -25,7 +25,7 @@ class PlayerImpl {
       // tone.js must be started from a user action.
       await Tone.start();
 
-      // Initialize instruments.
+      // Initialize metronome instrument.
       this.metronomeInstrument = new Woodblock();
 
       await Tone.loaded();
@@ -58,7 +58,7 @@ class PlayerImpl {
     console.log("Cleaning up song", this.song.metadata.title);
     this.metronomeLoop?.dispose();
     this.playback?.dispose();
-    this.song = undefined;
+    this.song = null;
   }
 
   /** Returns the count-in time in seconds. */
@@ -110,7 +110,7 @@ class PlayerImpl {
    * the playback.
    */
   play(continueAtMs: number = 0): number {
-    if (this.playing) return;
+    if (this.playing) return NaN;
     this.playing = true;
     console.log("starting playback");
     let countInStart = Tone.immediate() + 0.2;
@@ -131,16 +131,17 @@ class PlayerImpl {
   }
 
   private setUpSong(): void {
-    this.instruments.set(Ukulele.NAME, new Ukulele(this.song.chordLib));
-    // TODO: Support setting a time signature or at least bpm per part.
-    Tone.Transport.timeSignature = this.song.metadata.time.beats;
-    Tone.Transport.bpm.value = this.song.metadata.tempo;
+    this.instruments.set(Ukulele.NAME, new Ukulele(this.song!.chordLib));
+    // TODO: Support setting the bpm per part. Setting might not even the
+    //       real problem but rather resetting when loading a new song.
+    Tone.Transport.timeSignature = this.song!.metadata.time.beats;
+    Tone.Transport.bpm.value = this.song!.metadata.tempo;
     this.setUpMetronome();
     this.setUpPlayback();
   }
 
   private setUpMetronome(): void {
-    let end = this.song.barsLength;
+    let end = this.song!.barsLength;
     this.metronomeLoop = new Tone.Loop((time) => {
       this.playMetronome(time);
     }, "1m")
@@ -152,9 +153,9 @@ class PlayerImpl {
 
   private playMetronome(time: number, bars = 1): void {
     const beatSec = Tone.Time("4n").toSeconds();
-    for (let i = 0; i < bars * this.song.metadata.time.beats; i++) {
-      const isFirst = i % this.song.metadata.time.beats === 0;
-      this.metronomeInstrument.playNote(
+    for (let i = 0; i < bars * this.song!.metadata.time.beats; i++) {
+      const isFirst = i % this.song!.metadata.time.beats === 0;
+      this.metronomeInstrument!.playNote(
         isFirst ? PitchedNote.C5 : PitchedNote.C4,
         time + i * beatSec,
         isFirst ? 0.8 : 0.2
@@ -163,10 +164,10 @@ class PlayerImpl {
   }
 
   private setUpPlayback(): void {
-    const ukulele = this.getInstrument(Ukulele.NAME);
+    const ukulele = this.getInstrument(Ukulele.NAME)!;
     this.playback = new Tone.Part(
       (time, value) => ukulele.playBar(value.bar, time),
-      this.song.bars.map((bar, i) => ({ time: `${i}:0`, bar }))
+      this.song!.bars.map((bar, i) => ({ time: `${i}:0`, bar }))
     ).start("0:0");
   }
 }

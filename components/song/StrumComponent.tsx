@@ -16,7 +16,7 @@ export function stringHeight(string: number) {
 
 export interface StrumComponentProps {
   strum: Strum;
-  frets?: string[];
+  frets?: string[] | null;
   highlight?: boolean;
 }
 
