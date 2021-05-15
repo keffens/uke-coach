@@ -20,7 +20,7 @@ interface MetadataColumnProps {
 }
 
 function MetadataColumn({ name, value }: MetadataColumnProps) {
-  if (value == null) {
+  if (!value) {
     return <></>;
   }
   return (

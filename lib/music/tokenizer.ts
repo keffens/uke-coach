@@ -70,7 +70,7 @@ function tokenizeDirective(key: string, value?: string) {
     }
     const match = value.match(SPLIT_PATTERN);
     if (match) {
-      return new Token(TokenType.Pattern, match[1].trim(), match[2]);
+      return new Token(TokenType.Pattern, match[1]?.trim(), match[2]);
     }
     return new Token(TokenType.Pattern, value);
   }
@@ -84,6 +84,77 @@ function tokenizeDirective(key: string, value?: string) {
     );
   }
   return new Token(TokenType.Directive, key, value);
+}
+
+function addDirective(
+  stack: Token[],
+  activeTokens: Token[],
+  token: Token
+): Token[] {
+  switch (token.type) {
+    case TokenType.StartEnv:
+      activeTokens.push(token);
+      stack.push(token);
+      activeTokens = token.children;
+      break;
+    case TokenType.EndEnv:
+      if (stack.length <= 1) {
+        throw new Error(
+          `end_of_${token.key} directive does not have an opening directive.`
+        );
+      }
+      stack.pop();
+      activeTokens = stack[stack.length - 1].children;
+      if (activeTokens[activeTokens.length - 1].key !== token.key) {
+        throw new Error(
+          `Closing environment end_of_${token.key} does not match opening ` +
+            `environment start_of_${activeTokens[activeTokens.length - 1].key}.`
+        );
+      }
+      break;
+    default:
+      activeTokens.push(token);
+  }
+  return activeTokens;
+}
+
+function parseLine(
+  stack: Token[],
+  activeTokens: Token[],
+  line: string,
+  index: number
+): Token[] {
+  let pos = 0;
+  while (pos < line.length) {
+    const match = line.slice(pos).match(FIRST_TOKEN);
+    try {
+      if (!match) {
+        throw new Error("Failed to parse song file");
+      }
+      if (match[1]) {
+        activeTokens.push(
+          new Token(TokenType.Text, /*key=*/ undefined, match[1])
+        );
+      } else if (match[2]) {
+        activeTokens.push(
+          new Token(TokenType.Chord, /*key=*/ undefined, match[2])
+        );
+      } else if (match[3]) {
+        const token = tokenizeDirective(match[3], match[4]);
+        activeTokens = addDirective(stack, activeTokens, token);
+      } else if (match[5]) {
+        activeTokens.push(
+          new Token(TokenType.FileComment, /*key=*/ undefined, match[5])
+        );
+      }
+    } catch (e) {
+      throw new Error(
+        e.message + `; at line ${index + 1}, position ${pos + 1}`
+      );
+    }
+    pos += match[0].length || 1;
+  }
+  return activeTokens;
 }
 
 export function tokenize(content: string): Token {
@@ -103,63 +174,7 @@ export function tokenize(content: string): Token {
       }
       continue;
     }
-    let pos = 0;
-    while (pos < line.length) {
-      const match = line.slice(pos).match(FIRST_TOKEN);
-      if (!match) {
-        throw new Error(
-          `Failed to parse song file at line ${i + 1}, ` +
-            `position ${pos + 1}:\n${line}`
-        );
-      }
-      pos += match[0].length || 1;
-      if (match[1]) {
-        activeTokens.push(
-          new Token(TokenType.Text, /*key=*/ undefined, match[1])
-        );
-      } else if (match[2]) {
-        activeTokens.push(
-          new Token(TokenType.Chord, /*key=*/ undefined, match[2])
-        );
-      } else if (match[3]) {
-        const token = tokenizeDirective(match[3], match[4]);
-        switch (token.type) {
-          case TokenType.StartEnv:
-            activeTokens.push(token);
-            stack.push(token);
-            activeTokens = token.children;
-            break;
-          case TokenType.EndEnv:
-            if (stack.length <= 1) {
-              throw new Error(
-                `end_of_${
-                  token.key
-                } directive does not have an opening directive at line ${
-                  i + 1
-                }.`
-              );
-            }
-            stack.pop();
-            activeTokens = stack[stack.length - 1].children;
-            if (activeTokens[activeTokens.length - 1].key !== token.key) {
-              throw new Error(
-                `Closing environment end_of_${
-                  token.key
-                } does not match opening environment start_of_${
-                  activeTokens[activeTokens.length - 1].key
-                } at line ${i + 1}.`
-              );
-            }
-            break;
-          default:
-            activeTokens.push(token);
-        }
-      } else if (match[5]) {
-        activeTokens.push(
-          new Token(TokenType.FileComment, /*key=*/ undefined, match[5])
-        );
-      }
-    }
+    activeTokens = parseLine(stack, activeTokens, line, i);
     if (
       activeTokens.length &&
       NONEMPTY_TOKENS.has(activeTokens[activeTokens.length - 1].type)
