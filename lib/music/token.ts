@@ -7,8 +7,6 @@ export enum TokenType {
   Directive,
   StartEnv,
   EndEnv,
-  StartTab,
-  EndTab,
   TabLine,
   FileComment,
   LineBreak,

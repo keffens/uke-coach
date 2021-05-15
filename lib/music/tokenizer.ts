@@ -34,21 +34,19 @@ const SPLIT_PATTERN = new RegExp(
   String.raw`^(?:(${TEXT_RE})\s+)?([-.\|\dduxat\(\)]+)$`,
   "iu"
 );
-const SPLIT_CHORD = new RegExp(
-  String.raw`^([\w*]+)\s+(?:frets\s+)?((?:(x|\d+)\s+)+(x|\d+))$`,
-  "iu"
-);
+const TAB_LINE = /^(?:[-.\|\d]|\(\d+\))+$/i;
+const SPLIT_CHORD = /^([\w*]+)\s+(?:frets\s+)?((?:(x|\d+)\s+)+(x|\d+))$/iu;
+
+function back<T>(list: Array<T>): T {
+  return list[list.length - 1];
+}
 
 function tokenizeDirective(key: string, value?: string) {
   key = KEY_ALIAS.get(key) ?? key;
   value = value?.trim();
   if (key.startsWith("start_of_")) {
-    return new Token(
-      TokenType.StartEnv,
-      key.replace(/^start_of_/, ""),
-      value,
-      []
-    );
+    key = key.replace(/^start_of_/, "");
+    return new Token(TokenType.StartEnv, key, value, []);
   }
   if (key.startsWith("end_of_")) {
     return new Token(TokenType.EndEnv, key.replace(/^end_of_/, ""));
@@ -86,16 +84,12 @@ function tokenizeDirective(key: string, value?: string) {
   return new Token(TokenType.Directive, key, value);
 }
 
-function addDirective(
-  stack: Token[],
-  activeTokens: Token[],
-  token: Token
-): Token[] {
+function addDirective(stack: Token[], token: Token): void {
+  const children = back(stack).children;
   switch (token.type) {
     case TokenType.StartEnv:
-      activeTokens.push(token);
+      children.push(token);
       stack.push(token);
-      activeTokens = token.children;
       break;
     case TokenType.EndEnv:
       if (stack.length <= 1) {
@@ -104,46 +98,36 @@ function addDirective(
         );
       }
       stack.pop();
-      activeTokens = stack[stack.length - 1].children;
-      if (activeTokens[activeTokens.length - 1].key !== token.key) {
+      const startEnv = back(back(stack).children);
+      if (startEnv.key !== token.key) {
         throw new Error(
           `Closing environment end_of_${token.key} does not match opening ` +
-            `environment start_of_${activeTokens[activeTokens.length - 1].key}.`
+            `environment start_of_${startEnv.key}.`
         );
       }
       break;
     default:
-      activeTokens.push(token);
+      children.push(token);
   }
-  return activeTokens;
 }
 
-function parseLine(
-  stack: Token[],
-  activeTokens: Token[],
-  line: string,
-  index: number
-): Token[] {
-  let pos = 0;
+function parseLine(stack: Token[], line: string, index: number, pos = 0): void {
   while (pos < line.length) {
+    const children = back(stack).children;
     const match = line.slice(pos).match(FIRST_TOKEN);
     try {
       if (!match) {
         throw new Error("Failed to parse song file");
       }
       if (match[1]) {
-        activeTokens.push(
-          new Token(TokenType.Text, /*key=*/ undefined, match[1])
-        );
+        children.push(new Token(TokenType.Text, /*key=*/ undefined, match[1]));
       } else if (match[2]) {
-        activeTokens.push(
-          new Token(TokenType.Chord, /*key=*/ undefined, match[2])
-        );
+        children.push(new Token(TokenType.Chord, /*key=*/ undefined, match[2]));
       } else if (match[3]) {
         const token = tokenizeDirective(match[3], match[4]);
-        activeTokens = addDirective(stack, activeTokens, token);
+        addDirective(stack, token);
       } else if (match[5]) {
-        activeTokens.push(
+        children.push(
           new Token(TokenType.FileComment, /*key=*/ undefined, match[5])
         );
       }
@@ -154,32 +138,57 @@ function parseLine(
     }
     pos += match[0].length || 1;
   }
-  return activeTokens;
+}
+
+function parseTabLine(stack: Token[], line: string, index: number): void {
+  const tabParent = back(stack);
+  if (line.trim().match(TAB_LINE)) {
+    tabParent.children.push(
+      new Token(TokenType.TabLine, /*key=*/ undefined, line.trim())
+    );
+    return;
+  }
+  const match = line.match(FIRST_TOKEN);
+  if (match && match[3]) {
+    const token = tokenizeDirective(match[3], match[4]);
+    if (token.type === TokenType.EndEnv) {
+      // For closing environment fall back to parsing lines and handle possible
+      // errors inside parseLine.
+      parseLine(stack, line, index);
+      return;
+    }
+  }
+  throw new Error(`Failed to read line of tab: ${index + 1}`);
 }
 
 export function tokenize(content: string): Token {
   const stack = new Array<Token>();
   stack.push(new Token(TokenType.StartEnv, undefined, undefined, []));
-  let activeTokens = stack[0].children;
+  let activeToken = back(stack);
   const lines = content.split(/\r?\n/);
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (!line.trim().length) {
       if (
-        activeTokens.length &&
-        activeTokens[activeTokens.length - 1].type != TokenType.Paragraph
+        activeToken.children.length &&
+        back(activeToken.children).type != TokenType.Paragraph
       ) {
-        activeTokens.push(new Token(TokenType.Paragraph));
+        activeToken.children.push(new Token(TokenType.Paragraph));
       }
       continue;
     }
-    activeTokens = parseLine(stack, activeTokens, line, i);
+    if (activeToken.key === "tab") {
+      parseTabLine(stack, line, i);
+    } else {
+      parseLine(stack, line, i);
+    }
+    activeToken = back(stack);
     if (
-      activeTokens.length &&
-      NONEMPTY_TOKENS.has(activeTokens[activeTokens.length - 1].type)
+      activeToken.children.length &&
+      NONEMPTY_TOKENS.has(back(activeToken.children).type)
     ) {
-      activeTokens.push(new Token(TokenType.LineBreak));
+      activeToken.children.push(new Token(TokenType.LineBreak));
     }
   }
   if (stack.length !== 1) {
