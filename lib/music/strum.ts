@@ -6,6 +6,7 @@ export enum StrumType {
   Arpeggio,
   Tremolo,
   Plugged,
+  Tab,
 }
 
 /** Represents a single strum type, stroke, or a set of plugged strings. */
@@ -13,7 +14,8 @@ export class Strum {
   private constructor(
     readonly type: StrumType,
     readonly emphasize = false,
-    readonly strings: number[] = []
+    readonly strings: number[] = [],
+    readonly frets: number[] = []
   ) {}
 
   /** Creates a pause. */
@@ -55,6 +57,15 @@ export class Strum {
     strings.sort((a, b) => a - b);
     strings = strings.filter((s, i) => s !== strings[i + 1]);
     return new Strum(StrumType.Plugged, false, strings);
+  }
+
+  /** Creates one beat in a tab. */
+  static tab(frets: number[]): Strum {
+    if (!frets.length) {
+      throw new Error("Tabs require a frets set.");
+    }
+    if (frets.every((fret) => fret < 0)) return Strum.pause();
+    return new Strum(StrumType.Tab, false, [], frets);
   }
 
   /**
@@ -107,8 +118,11 @@ export class Strum {
     );
   }
 
-  /** Converts the strum to its string representation. */
-  toString() {
+  /**
+   * Converts the strum to its string representation. For tabs, requires the
+   * string to be set.
+   */
+  toString(string?: number): string {
     switch (this.type) {
       case StrumType.Pause:
         return "-";
@@ -126,6 +140,14 @@ export class Strum {
         return this.strings.length === 1
           ? `${this.strings[0]}`
           : `(${this.strings.join("")})`;
+      case StrumType.Tab:
+        const fret = this.frets[string ?? -1];
+        if (fret == null) {
+          throw new Error(`Invalid string selection: ${string}`);
+        }
+        if (fret < 0) return "-";
+        if (fret <= 9) return `${fret}`;
+        return `(${fret})`;
       default:
         throw new Error(`Unknown strum StrumType: "${this.type}"`);
     }

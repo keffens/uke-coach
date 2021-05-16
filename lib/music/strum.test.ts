@@ -24,15 +24,30 @@ test("parsing strums fails for invalid patterns", () => {
 });
 
 test("converts strums to strings", () => {
-  expect(Strum.pause().toString()).toBe("-");
-  expect(Strum.down().toString()).toBe("d");
-  expect(Strum.down(/*emphasize=*/ true).toString()).toBe("D");
-  expect(Strum.up().toString()).toBe("u");
-  expect(Strum.up(/*emphasize=*/ true).toString()).toBe("U");
-  expect(Strum.percursion().toString()).toBe("x");
-  expect(Strum.arpeggio().toString()).toBe("a");
-  expect(Strum.tremolo().toString()).toBe("t");
-  expect(Strum.plugged([1]).toString()).toBe("1");
-  expect(Strum.plugged([2, 4, 3]).toString()).toBe("(234)");
-  expect(Strum.plugged([1, 5, 1, 5, 3, 1]).toString()).toBe("(135)");
+  expect(Strum.pause().toString()).toEqual("-");
+  expect(Strum.down().toString()).toEqual("d");
+  expect(Strum.down(/*emphasize=*/ true).toString()).toEqual("D");
+  expect(Strum.up().toString()).toEqual("u");
+  expect(Strum.up(/*emphasize=*/ true).toString()).toEqual("U");
+  expect(Strum.percursion().toString()).toEqual("x");
+  expect(Strum.arpeggio().toString()).toEqual("a");
+  expect(Strum.tremolo().toString()).toEqual("t");
+  expect(Strum.plugged([1]).toString()).toEqual("1");
+  expect(Strum.plugged([2, 4, 3]).toString()).toEqual("(234)");
+  expect(Strum.plugged([1, 5, 1, 5, 3, 1]).toString()).toEqual("(135)");
+});
+
+test("converts tabs to string", () => {
+  let tab = Strum.tab([-1, 0, 5, 10]);
+  expect(tab.toString(0)).toEqual("-");
+  expect(tab.toString(1)).toEqual("0");
+  expect(tab.toString(2)).toEqual("5");
+  expect(tab.toString(3)).toEqual("(10)");
+
+  expect(() => tab.toString()).toThrow();
+  expect(() => tab.toString(5)).toThrow();
+
+  let pause = Strum.tab([-1, -1]);
+  expect(pause.toString(0)).toEqual("-");
+  expect(pause.toString(1)).toEqual("-");
 });
