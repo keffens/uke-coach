@@ -1,5 +1,5 @@
 import { SONG_METADATA_KEYS } from "./metadata";
-import { NONEMPTY_TOKENS, Token, TokenType } from "./token";
+import { ADD_LINEBREAK_AFTER, Token, TokenType } from "./token";
 
 const KEY_ALIAS = new Map([
   ["t", "title"],
@@ -34,7 +34,7 @@ const SPLIT_PATTERN = new RegExp(
   String.raw`^(?:(${TEXT_RE})\s+)?([-.\|\dduxat\(\)]+)$`,
   "iu"
 );
-const TAB_LINE = /^(?:[-.\|\d]|\(\d+\))+$/i;
+const TAB_LINE = /^(?:[-.\|\d ]|\(\d+\))+$/i;
 const SPLIT_CHORD = /^([\w*]+)\s+(?:frets\s+)?((?:(x|\d+)\s+)+(x|\d+))$/iu;
 
 function back<T>(list: Array<T>): T {
@@ -141,6 +141,8 @@ function parseLine(stack: Token[], line: string, index: number, pos = 0): void {
 }
 
 function parseTabLine(stack: Token[], line: string, index: number): void {
+  line = line.trim();
+  if (!line.trim()) return;
   const tabParent = back(stack);
   if (line.trim().match(TAB_LINE)) {
     tabParent.children.push(
@@ -163,7 +165,7 @@ function parseTabLine(stack: Token[], line: string, index: number): void {
 
 export function tokenize(content: string): Token {
   const stack = new Array<Token>();
-  stack.push(new Token(TokenType.StartEnv, undefined, undefined, []));
+  stack.push(new Token(TokenType.StartEnv, "song", undefined, []));
   let activeToken = back(stack);
   const lines = content.split(/\r?\n/);
 
@@ -186,17 +188,16 @@ export function tokenize(content: string): Token {
     activeToken = back(stack);
     if (
       activeToken.children.length &&
-      NONEMPTY_TOKENS.has(back(activeToken.children).type)
+      ADD_LINEBREAK_AFTER.has(back(activeToken.children).type)
     ) {
       activeToken.children.push(new Token(TokenType.LineBreak));
     }
+  }
+  if (back(activeToken.children).type === TokenType.Paragraph) {
+    activeToken.children.pop();
   }
   if (stack.length !== 1) {
     throw new Error("File has unclosed environments.");
   }
   return stack[0];
-}
-
-export class TokenEnvironment {
-  constructor(readonly startToken: Token, readonly tokens: Token[]) {}
 }
