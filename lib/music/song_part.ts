@@ -6,6 +6,7 @@ import { Token, TokenType } from "./token";
 
 export enum SongPartType {
   None = "",
+  Song = "song",
   Chorus = "chorus",
   Verse = "verse",
   Bridge = "bridge",
@@ -62,6 +63,9 @@ export class SongPart {
               activePattern
             );
             builder = new BarParagraphBuilder(activePattern);
+          } else if (token.key === "tab") {
+            activePattern = Pattern.fromToken(token, metadata.time, patterns);
+            builder.switchPattern(activePattern);
           } else {
             console.log("Ignoring environment:", token);
           }

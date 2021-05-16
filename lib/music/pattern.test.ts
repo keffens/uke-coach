@@ -137,3 +137,30 @@ test("fails for invalid calls to token conversion", () => {
   expect(() => Pattern.fromToken(readA, TWO_TWO, patterns)).toThrow();
   expect(() => Pattern.fromToken(readB, FOUR_FOUR, patterns)).toThrow();
 });
+
+test("prases tab", () => {
+  const tab = Pattern.parseTab(["|1-3-|--24|", " ----|4---"], TWO_TWO);
+  expect(tab.toString(0)).toEqual("|1-3-|--24|");
+  expect(tab.toString(1)).toEqual("|----|4---|");
+  expect(tab.strumsPerBar).toEqual(4);
+  expect(tab.strumsPerBeat).toEqual(2);
+  expect(tab.useTab()).toEqual(true);
+});
+
+test("prases tab from token", () => {
+  const patterns = new Map<string, Pattern>();
+  const tab = Pattern.fromToken(
+    new Token(TokenType.StartEnv, "tab", undefined, [
+      new Token(TokenType.TabLine, undefined, "|1-2-|"),
+      new Token(TokenType.TabLine, undefined, "|-3-4|"),
+    ]),
+    FOUR_FOUR,
+    patterns
+  );
+  // Internally, we start with the lowest string.
+  expect(tab.toString(0)).toEqual("|-3-4|");
+  expect(tab.toString(1)).toEqual("|1-2-|");
+  expect(tab.strumsPerBar).toEqual(4);
+  expect(tab.strumsPerBeat).toEqual(1);
+  expect(tab.useTab()).toEqual(true);
+});

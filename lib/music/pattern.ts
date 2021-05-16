@@ -3,6 +3,78 @@ import { TimeSignature } from "./signature";
 import { Strum } from "./strum";
 import { Token, TokenType } from "./token";
 
+/**
+ * Verifies that each bar has the same number of sturms. For tabs allows severl
+ * lines.
+ */
+class StrumsPerBar {
+  strumsPerBar = -1;
+  bars = -1;
+  barCounter = 0;
+
+  constructor(readonly name: string) {}
+
+  endBar(strums: number): void {
+    this.barCounter++;
+    if (this.strumsPerBar < 0) {
+      this.strumsPerBar = strums;
+    } else if (this.barCounter * this.strumsPerBar !== strums) {
+      throw new Error(
+        "The pattern does have the same number of strums in each bar: " +
+          `expected: ${this.strumsPerBar}, got: ${strums / this.barCounter}\n` +
+          this.name
+      );
+    }
+  }
+
+  endLine(strums: number): void {
+    if (this.barCounter * this.strumsPerBar !== strums) {
+      // We have to close the last bar.
+      this.endBar(strums);
+    }
+    if (this.bars < 0) {
+      this.bars = this.barCounter;
+    } else if (this.bars !== this.barCounter) {
+      throw new Error(
+        "Inconsistent number of bars in each line: " +
+          `expected: ${this.bars}, got: ${this.barCounter}\n${this.name}`
+      );
+    }
+    this.barCounter = 0;
+  }
+}
+
+function getPattern(
+  key: string,
+  patterns: Map<string, Pattern>,
+  time: TimeSignature
+): Pattern {
+  const pattern = patterns.get(key);
+  if (!pattern) {
+    throw new Error(`Unknown pattern name "${key}".`);
+  }
+  if (!pattern.time.equals(time)) {
+    throw new Error(
+      "Cannot load pattern with mismatching time signature: " +
+        `${time.toString()} vs. ${pattern.time.toString()}`
+    );
+  }
+  return pattern;
+}
+
+function setPattern(
+  key: string,
+  pattern: Pattern,
+  patterns: Map<string, Pattern>
+): void {
+  if (key) {
+    if (patterns.has(key)) {
+      throw new Error(`Redefinition of pattern "${key}".`);
+    }
+    patterns.set(key, pattern);
+  }
+}
+
 /** Represents a strumming pattern over a specified number of bars. */
 export class Pattern {
   private constructor(
@@ -57,21 +129,12 @@ export class Pattern {
   static parse(pattern: string, time: TimeSignature, name?: string): Pattern {
     const strums = new Array<Strum>();
     let pos = 0;
-    let bars = 1;
-    let spb = 0;
+    const strumsPerBar = new StrumsPerBar(pattern);
     while (pos < pattern.length) {
       if (pattern[pos] === "|") {
         // Verify the number of strums per bar is consistent.
-        if (pos !== 0 && bars === 1) {
-          spb = strums.length;
-        } else if (spb * bars !== strums.length) {
-          throw new Error(
-            `String pattern ${pattern} does have the same number of strums ` +
-              `in each bar.`
-          );
-        }
-        if (pos !== 0 && pos !== pattern.length - 1) {
-          bars++;
+        if (pos !== 0) {
+          strumsPerBar.endBar(strums.length);
         }
         pos++;
         continue;
@@ -80,45 +143,67 @@ export class Pattern {
       [strum, pos] = Strum.parse(pattern, pos);
       strums.push(strum);
     }
-    if (!strums.length) {
-      bars = 0;
-    }
-    return new Pattern(time, strums, bars, name);
+    strumsPerBar.endLine(strums.length);
+    return new Pattern(time, strums, strumsPerBar.bars, name);
   }
 
-  /** Parses a pattern from a Pattern token. */
+  /** Parses a pattern from tab lines. Expects the lowest line first. */
+  static parseTab(
+    lines: string[],
+    time: TimeSignature,
+    name?: string
+  ): Pattern {
+    lines = lines.map((line) => line.trim());
+    const strumsPerBar = new StrumsPerBar(lines.join("\n"));
+    const stringFrets = new Array<Array<number>>();
+    for (const line of lines) {
+      const frets = [];
+      for (let i = 0; i < line.length; i++) {
+        if (line[i] === "|") {
+          if (i !== 0) {
+            strumsPerBar.endBar(frets.length);
+          }
+        } else if (line[i] === "-") {
+          frets.push(-1);
+        } else if (line[i] >= "0" && line[i] <= "9") {
+          frets.push(parseInt(line[i]));
+        } else if (line[i] === "(") {
+          // TODO:
+        } else if (line[i] !== " ") {
+          throw new Error(`Invalid character in tab: ${line[i]}`);
+        }
+      }
+      strumsPerBar.endLine(frets.length);
+      stringFrets.push(frets);
+    }
+    const strums = [];
+    for (let i = 0; i < stringFrets[0].length; i++) {
+      strums.push(Strum.tab(stringFrets.map((frets) => frets[i])));
+    }
+    return new Pattern(time, strums, strumsPerBar.bars, name);
+  }
+
+  /** Parses a pattern from a Pattern or Tab token. */
   static fromToken(
     token: Token,
     time: TimeSignature,
     patterns: Map<string, Pattern>
   ): Pattern {
-    if (token.type !== TokenType.Pattern) {
-      throw new Error(
-        `Cannot create Pattern from token with type ${token.type}.`
-      );
-    }
-    let pattern: Pattern | undefined;
-    if (!token.value) {
-      pattern = patterns.get(token.key);
-      if (!pattern) {
-        throw new Error(`Unknown pattern name "${token.key}".`);
+    if (token.type === TokenType.Pattern) {
+      if (!token.value) {
+        return getPattern(token.key, patterns, time);
       }
-      if (!pattern.time.equals(time)) {
-        throw new Error(
-          "Cannot load pattern with mismatching time signature: " +
-            `${time.toString()} vs. ${pattern.time.toString()}`
-        );
-      }
+      const pattern = Pattern.parse(token.value, time, token.key);
+      setPattern(token.key, pattern, patterns);
       return pattern;
     }
-    pattern = Pattern.parse(token.value, time, token.key);
-    if (token.key) {
-      if (patterns.has(token.key)) {
-        throw new Error(`Redefinition of pattern "${token.key}".`);
-      }
-      patterns.set(token.key, pattern);
+    if (token.type === TokenType.StartEnv && token.key === "tab") {
+      const lines = token.children.map((line) => line.value).reverse();
+      const pattern = Pattern.parseTab(lines, time, token.key);
+      setPattern(token.key, pattern, patterns);
+      return pattern;
     }
-    return pattern;
+    throw new Error(`Cannot create Pattern from token "${token.toString()}".`);
   }
 
   get strumsPerBar(): number {
@@ -145,7 +230,7 @@ export class Pattern {
    * string sets.
    */
   useTab(): boolean {
-    return this.strums.some((s) => s.strings?.length);
+    return this.strums.some((s) => s.strings.length || s.frets.length);
   }
 
   /**
@@ -156,12 +241,18 @@ export class Pattern {
     return !!this.name && !this.name.startsWith("*");
   }
 
-  /** Returns the string representation of the pattern, e.g., |d-du-udu|. */
-  toString(): string {
+  /**
+   * Returns the string representation of the pattern, e.g., |d-du-udu|. The
+   * string selection is required for tabs.
+   */
+  toString(string?: number): string {
     if (this.bars === 0) return "";
     return (
       this.strums
-        .map((s, i) => (i % this.strumsPerBar === 0 ? "|" : "") + s.toString())
+        .map(
+          (s, i) =>
+            (i % this.strumsPerBar === 0 ? "|" : "") + s.toString(string)
+        )
         .join("") + "|"
     );
   }

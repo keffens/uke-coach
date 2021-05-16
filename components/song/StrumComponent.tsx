@@ -82,6 +82,22 @@ export default function StrumComponent({
           ))}
         </div>
       );
+    case StrumType.Tab:
+      return (
+        <div className={classes.join(" ")}>
+          {strum.frets.map((fret, string) => (
+            <div
+              key={string}
+              className={styles.string}
+              style={{
+                top: stringHeight(string + 1),
+              }}
+            >
+              {fret < 0 ? "" : fret}
+            </div>
+          ))}
+        </div>
+      );
     case StrumType.Pause:
     default:
       return <div className={classes.join(" ")} />;
