@@ -139,9 +139,11 @@ test("fails for invalid calls to token conversion", () => {
 });
 
 test("prases tab", () => {
-  const tab = Pattern.parseTab(["|1-3-|--24|", " ----|4---"], TWO_TWO);
-  expect(tab.toString(0)).toEqual("|1-3-|--24|");
-  expect(tab.toString(1)).toEqual("|----|4---|");
+  const tab = Pattern.parseTab(["|0-3-|--24|", " ---- | 4--(11)"], TWO_TWO);
+  expect(tab.strums[0]).toEqual(Strum.tab([0, -1]));
+  expect(tab.strums[7]).toEqual(Strum.tab([4, 11]));
+  expect(tab.toString(0)).toEqual("|0-3-|--24|");
+  expect(tab.toString(1)).toEqual("|----|4--(11)|");
   expect(tab.strumsPerBar).toEqual(4);
   expect(tab.strumsPerBeat).toEqual(2);
   expect(tab.useTab()).toEqual(true);

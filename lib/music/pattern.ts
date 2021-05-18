@@ -75,6 +75,28 @@ function setPattern(
   }
 }
 
+function praseFret(line: string, pos: number, frets: number[]): number {
+  if (line[pos] === "-") {
+    frets.push(-1);
+  } else if (line[pos] >= "0" && line[pos] <= "9") {
+    frets.push(parseInt(line[pos]));
+  } else if (line[pos] === "(") {
+    const end = line.indexOf(")", pos);
+    if (end < 0) {
+      throw new Error("Missing closing parenthesis");
+    }
+    const fret = parseInt(line.slice(pos + 1, end));
+    if (isNaN(fret)) {
+      throw new Error(`Failed to parse fret from ${line.slice(pos + 1, end)}`);
+    }
+    frets.push(fret);
+    return end + 1;
+  } else {
+    throw new Error(`Invalid character in tab: ${line[pos]}`);
+  }
+  return pos + 1;
+}
+
 /** Represents a strumming pattern over a specified number of bars. */
 export class Pattern {
   private constructor(
@@ -153,25 +175,21 @@ export class Pattern {
     time: TimeSignature,
     name?: string
   ): Pattern {
-    lines = lines.map((line) => line.trim());
+    lines = lines.map((line) => line.replace(/ /g, ""));
     const strumsPerBar = new StrumsPerBar(lines.join("\n"));
     const stringFrets = new Array<Array<number>>();
     for (const line of lines) {
-      const frets = [];
-      for (let i = 0; i < line.length; i++) {
-        if (line[i] === "|") {
-          if (i !== 0) {
+      const frets = new Array<number>();
+      let pos = 0;
+      while (pos < line.length) {
+        if (line[pos] === "|") {
+          if (pos !== 0) {
             strumsPerBar.endBar(frets.length);
           }
-        } else if (line[i] === "-") {
-          frets.push(-1);
-        } else if (line[i] >= "0" && line[i] <= "9") {
-          frets.push(parseInt(line[i]));
-        } else if (line[i] === "(") {
-          // TODO:
-        } else if (line[i] !== " ") {
-          throw new Error(`Invalid character in tab: ${line[i]}`);
+          pos++;
+          continue;
         }
+        pos = praseFret(line, pos, frets);
       }
       strumsPerBar.endLine(frets.length);
       stringFrets.push(frets);
@@ -200,7 +218,7 @@ export class Pattern {
     if (token.type === TokenType.StartEnv && token.key === "tab") {
       const lines = token.children.map((line) => line.value).reverse();
       const pattern = Pattern.parseTab(lines, time, token.key);
-      setPattern(token.key, pattern, patterns);
+      setPattern(token.value, pattern, patterns);
       return pattern;
     }
     throw new Error(`Cannot create Pattern from token "${token.toString()}".`);

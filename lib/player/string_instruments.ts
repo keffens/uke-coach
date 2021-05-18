@@ -68,6 +68,11 @@ export class StringInstrument extends SamplerInstrument {
       case StrumType.Plugged:
         notes = notes.filter((_, idx) => strum.strings?.includes(idx + 1));
         break;
+      case StrumType.Tab:
+        notes = strum.frets.map((fret, i) =>
+          fret < 0 ? null : this.strings[i].addSemitones(fret)
+        );
+        break;
     }
     this.playStrings(notes, time, delay, velocity);
   }
