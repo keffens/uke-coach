@@ -217,7 +217,7 @@ export class Pattern {
     }
     if (token.type === TokenType.StartEnv && token.key === "tab") {
       const lines = token.children.map((line) => line.value).reverse();
-      const pattern = Pattern.parseTab(lines, time, token.key);
+      const pattern = Pattern.parseTab(lines, time, token.value);
       setPattern(token.value, pattern, patterns);
       return pattern;
     }
