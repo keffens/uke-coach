@@ -1,5 +1,6 @@
 import { Chord } from "./chord";
-import { NOTE_IDENTITY, Note, PitchedNote } from "./note";
+import { getTuning, InstrumentType } from "./instrument_type";
+import { NOTE_IDENTITY, PitchedNote } from "./note";
 import { Token, TokenType } from "./token";
 
 const UKULELE_CHORD_FRETS = new Map<string, number[]>([
@@ -41,6 +42,9 @@ const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["A#7", [1, 2, 1, 1]],
 ]);
 
+// TODO: Populate guiatar chords.
+const GUITAR_CHORD_FRETS = new Map<string, number[]>();
+
 function fretsFromMap(
   fretMap: Map<string, number[]>,
   chord: string,
@@ -58,12 +62,31 @@ export class ChordLib {
 
   private constructor(
     private instrumentChords: Map<string, number[]>,
-    private strings: Note[]
+    readonly tuning: PitchedNote[]
   ) {}
 
   /** Creates a new chord lib for a ukulele. */
   static forUkulele(): ChordLib {
-    return new ChordLib(UKULELE_CHORD_FRETS, [Note.G, Note.C, Note.E, Note.A]);
+    return ChordLib.for(InstrumentType.Ukulele);
+  }
+
+  /** Creates a new chord lib for a guitar. */
+  static forGuitar(): ChordLib {
+    return ChordLib.for(InstrumentType.Guitar);
+  }
+
+  /** Creates a new chord lib for an instrument. */
+  static for(instrument: InstrumentType, tuning?: PitchedNote[]): ChordLib {
+    let chords = new Map();
+    switch (instrument) {
+      case InstrumentType.Ukulele:
+      case InstrumentType.UkuleleLowG:
+        chords = UKULELE_CHORD_FRETS;
+        break;
+      case InstrumentType.Guitar:
+        chords = GUITAR_CHORD_FRETS;
+    }
+    return new ChordLib(chords, tuning ?? getTuning(instrument));
   }
 
   /**
@@ -92,9 +115,9 @@ export class ChordLib {
     // now there is no attempt to make the chord complete.
     // TODO: Ensure all notes are present and frets are not too far apart.
     const chordNotes = chord.asPitchedNotes(PitchedNote.C4);
-    return this.strings.map((string) => {
+    return this.tuning.map((s) => {
       // We make sure the string note is lower than the chord notes.
-      const stringNote = PitchedNote.fromNote(string, 3);
+      const stringNote = PitchedNote.fromNote(s.note, 3);
       let minFret = 12;
       for (const chordNote of chordNotes) {
         const fret = chordNote.compare(stringNote) % 12;
@@ -152,10 +175,10 @@ export class ChordLib {
       throw new Error("Failed to parse chord from token");
     }
     const frets = token.value.split(/\s+/);
-    if (frets.length !== this.strings.length) {
+    if (frets.length !== this.tuning.length) {
       throw new Error(
         `Wrong number of frets in defined chord: expected ` +
-          `${this.strings.length}, got ${frets.length}`
+          `${this.tuning.length}, got ${frets.length}`
       );
     }
     this.costumChords.set(

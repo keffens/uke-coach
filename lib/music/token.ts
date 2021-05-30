@@ -4,6 +4,7 @@ export enum TokenType {
   ChordDefinition,
   Metadata,
   Pattern,
+  Instrument,
   Directive,
   StartEnv,
   EndEnv,
@@ -40,6 +41,8 @@ export class Token {
       case TokenType.Metadata:
         return `{${this.key}: ${this.value}}\n`;
       case TokenType.Pattern:
+        return `{pattern: ${this.key} ${this.value}}`;
+      case TokenType.Instrument:
         return `{pattern: ${this.key} ${this.value}}`;
       case TokenType.Directive:
         return `{${this.key}: ${this.value}}`;

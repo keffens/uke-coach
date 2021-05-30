@@ -1,5 +1,6 @@
 import { Chord } from "./chord";
 import { ChordLib } from "./chord_lib";
+import { getTuning, InstrumentType } from "./instrument_type";
 import { Note, PitchedNote, toSharp } from "./note";
 import { Token, TokenType } from "./token";
 
@@ -86,7 +87,7 @@ function noteSet(notes: Array<PitchedNote | null> | null): Set<Note | null> {
 
 test("verifies ukulele chord lib", () => {
   const chordLib = ChordLib.forUkulele();
-  const strings = ["G4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s));
+  const strings = getTuning(InstrumentType.Ukulele);
 
   for (const note of Object.values(Note)) {
     for (const suffix of ["", "m", "7"]) {
