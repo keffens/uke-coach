@@ -1,6 +1,7 @@
 /** Wrapper class for a setInterval and clearInterval. */
 export class Interval {
-  private id?: NodeJS.Timeout;
+  // Node uses `NodeJS.Timeout` while jest expects `number`.
+  private id?: ReturnType<typeof setInterval>;
 
   set(fn: () => void, interval: number): void {
     this.clear();
@@ -19,7 +20,8 @@ export class Interval {
 
 /** Wrapper class for a setTimeout and clearTimeout. */
 export class Timeout {
-  private id?: NodeJS.Timeout;
+  // Node uses `NodeJS.Timeout` while jest expects `number`.
+  private id?: ReturnType<typeof setTimeout>;
 
   set(fn: () => void, timeout: number): void {
     this.clear();

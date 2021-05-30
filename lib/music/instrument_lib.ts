@@ -25,6 +25,7 @@ export class Instrument {
     this.sound = sound ?? getDefaultSound(type);
   }
 
+  /** Returns the tuning of the instrument. */
   get tuning(): PitchedNote[] {
     return this.chordLib.tuning;
   }
@@ -36,7 +37,7 @@ export class InstrumentLib {
   private instruments = new Map<string, Instrument>();
 
   /**
-   * Add an instrument. The first added instrument is chosen as default
+   * Adds an instrument. The first added instrument is chosen as default
    * instrument.
    */
   addInstrument(
