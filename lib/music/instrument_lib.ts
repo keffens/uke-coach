@@ -47,11 +47,15 @@ export class InstrumentLib {
     tuning?: PitchedNote[]
   ): void {
     if (!this.defaultInstrument) this.defaultInstrument = name;
+    assert(
+      !this.instruments.get(name),
+      `An instrument with name "${name}" already exists`
+    );
     this.instruments.set(name, new Instrument(name, type, sound, tuning));
   }
 
   /** Creates a ukulele as default instrument if no instrument exists. */
-  createDefaultIfEmpty() {
+  addDefaultIfEmpty(): void {
     if (this.defaultInstrument) return;
     this.addInstrument("ukulele", InstrumentType.Ukulele);
   }
