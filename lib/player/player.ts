@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { PitchedNote, Song } from "../music";
-import { Instrument, Woodblock } from "./instruments";
+import { InstrumentPlayer, Woodblock } from "./instruments";
 import { Ukulele } from "./string_instruments";
 
 /** Connects to the audio interface and initializes instruments. */
@@ -8,15 +8,13 @@ class PlayerImpl {
   private playing = false;
   private countInBars = 1;
   private initialized = false;
-  private instruments = new Map<string, Instrument>();
-  private metronomeInstrument: Instrument | null = null;
+  private instruments = new Map<string, InstrumentPlayer>();
+  private metronomeInstrument: InstrumentPlayer | null = null;
   private metronomeLoop: Tone.Loop | null = null;
   private metronomeIsOn = true;
   private playback: Tone.Part | null = null;
   private playbackIsOn = true;
   private song: Song | null = null;
-
-  constructor() {}
 
   /** Initializes the player. Must be called from a user action. */
   async init(): Promise<void> {
@@ -100,7 +98,7 @@ class PlayerImpl {
   }
 
   /** Returns an instrument by name. */
-  getInstrument(name: string): Instrument | null {
+  getInstrument(name: string): InstrumentPlayer | null {
     return this.instruments.get(name) ?? null;
   }
 

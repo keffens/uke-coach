@@ -1,6 +1,7 @@
 export * from "./bar";
 export * from "./chord_lib";
 export * from "./chord";
+export * from "./instrument";
 export * from "./instrument_lib";
 export * from "./instrument_type";
 export * from "./metadata";

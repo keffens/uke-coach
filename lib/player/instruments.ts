@@ -20,7 +20,7 @@ export const DEFAULT_SAMPLE_URLS = {
 };
 
 /** Base class for all instruments. */
-export abstract class Instrument {
+export abstract class InstrumentPlayer {
   constructor(readonly name: string) {}
 
   abstract playNote(note: PitchedNote, time: number, velocity?: number): void;
@@ -34,7 +34,7 @@ export abstract class Instrument {
 }
 
 /** Instrument which uses the Tone.js samples to create sound. */
-export class SamplerInstrument extends Instrument {
+export class SamplerInstrument extends InstrumentPlayer {
   readonly sampler: Tone.Sampler;
   constructor(
     name: string,
@@ -63,15 +63,13 @@ export class SamplerInstrument extends Instrument {
     // TODO: Actually play the bar according to the pattern.
     let chordIdx = 0;
     let chord = undefined;
-    for (
-      let i = 0, beats = 0;
-      i < bar.pattern.strumsPerBar;
-      i++, beats += strumBeats
-    ) {
+    let beats = 0;
+    for (let i = 0; i < bar.pattern.strumsPerBar; i++) {
       if (beats + Number.EPSILON >= bar.beats[chordIdx]) {
         beats -= bar.beats[chordIdx];
         chordIdx++;
       }
+      beats += strumBeats;
       // Keep previous chord if this one is not defined.
       chord = bar.chords[chordIdx] ?? chord;
       if (!chord) continue;
