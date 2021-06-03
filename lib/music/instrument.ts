@@ -2,9 +2,8 @@ import { assert, escapeRegExp } from "../util";
 import { ChordLib } from "./chord_lib";
 import { getDefaultSound, InstrumentType, SoundType } from "./instrument_type";
 import { PitchedNote, PITCHED_NOTE_PATTERN } from "./note";
+import { Token, TokenType } from "./token";
 
-// TODO: escape instrument types for regex
-// https://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
 export const INSTRUMENT_RE = new RegExp(
   String.raw`^(\w[-\(\) \w]*)\s+` +
     String.raw`(${Object.values(InstrumentType)
@@ -41,6 +40,7 @@ export class Instrument {
     return this.chordLib.tuning;
   }
 
+  /** Parses an instrument from a string. */
   static parse(text: string): Instrument {
     const match = text.match(INSTRUMENT_RE);
     assert(match, `Failed to parse instrument from string "${text}"`);
@@ -55,5 +55,14 @@ export class Instrument {
         .map((s) => PitchedNote.parse(s));
     }
     return new Instrument(name, type, sound, tuning);
+  }
+
+  /** Parses and instrument from a token. */
+  static fromToken(token: Token): Instrument {
+    assert(
+      token.type === TokenType.Instrument,
+      `Expected token of type Instrument, got ${token.type}`
+    );
+    return Instrument.parse(token.value);
   }
 }

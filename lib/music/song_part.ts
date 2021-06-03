@@ -91,7 +91,7 @@ export class SongPart {
           builder.newParagraph();
           break;
         case TokenType.Instrument:
-          instrumentLib.addInstrument(Instrument.parse(token.value));
+          instrumentLib.addInstrument(Instrument.fromToken(token));
           break;
         case TokenType.Metadata:
           break;

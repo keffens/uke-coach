@@ -59,3 +59,13 @@ test("converts tab environment to string", () => {
     ]).toString()
   ).toEqual("{start_of_tab}\n" + "|1-2-|\n" + "|-3-4|\n" + "{end_of_tab}\n");
 });
+
+test("makes error message", () => {
+  const token = new Token(TokenType.Directive, "key", "value", [], 10, 2);
+  expect(token.errorMsg("hi")).toEqual(
+    'Line 10, pos 2, token "{key: value}": hi'
+  );
+  expect(token.error("hi")).toEqual(
+    new Error('Line 10, pos 2, token "{key: value}": hi')
+  );
+});

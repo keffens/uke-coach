@@ -2,6 +2,7 @@ import { ChordLib } from "./chord_lib";
 import { Instrument } from "./instrument";
 import { InstrumentType, SoundType, getTuning } from "./instrument_type";
 import { PitchedNote } from "./note";
+import { Token, TokenType } from "./token";
 
 test("creates default instrument", () => {
   const uke = new Instrument("uke", InstrumentType.Ukulele);
@@ -55,4 +56,12 @@ test("prases instruments", () => {
       ["D3", "G3", "B3", "E4"].map((s) => PitchedNote.parse(s))
     )
   );
+});
+
+test("parses instrument from token", () => {
+  expect(
+    Instrument.fromToken(
+      new Token(TokenType.Instrument, undefined, "rythm (uke) ukulele")
+    )
+  ).toEqual(new Instrument("rythm (uke)", InstrumentType.Ukulele));
 });

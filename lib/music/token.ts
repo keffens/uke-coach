@@ -26,11 +26,13 @@ export class Token {
     readonly type: TokenType,
     readonly key: string = "",
     readonly value: string = "",
-    readonly children: Token[] = []
+    readonly children: Token[] = [],
+    readonly line: number = -1,
+    readonly pos: number = -1
   ) {}
 
   /** Converts a token to its string representation */
-  toString(): string {
+  toString(includeChildren = true): string {
     switch (this.type) {
       case TokenType.Text:
         return this.value;
@@ -47,13 +49,16 @@ export class Token {
       case TokenType.Directive:
         return `{${this.key}: ${this.value}}`;
       case TokenType.StartEnv:
-        const inner = this.children.map((child) => child.toString()).join("");
-        if (this.key === "song") return inner;
-        return (
-          `{start_of_${this.key}${this.value ? ": " + this.value : ""}}\n` +
-          inner +
-          `{end_of_${this.key}}\n`
-        );
+        if (includeChildren) {
+          const inner = this.children.map((child) => child.toString()).join("");
+          if (this.key === "song") return inner;
+          return (
+            `{start_of_${this.key}${this.value ? ": " + this.value : ""}}\n` +
+            inner +
+            `{end_of_${this.key}}\n`
+          );
+        }
+        return `{start_of_${this.key}${this.value ? ": " + this.value : ""}}\n`;
       case TokenType.TabLine:
         return `${this.value}\n`;
       case TokenType.FileComment:
@@ -66,5 +71,17 @@ export class Token {
       default:
         throw new Error(`Unexpected token type: ${this.type}`);
     }
+  }
+
+  /** Returns the error message augmented with token, line, and position. */
+  errorMsg(msg: string): string {
+    return (
+      `Line ${this.line}, pos ${this.pos}, token "${this.toString()}": ` + msg
+    );
+  }
+
+  /** Returns an error which includes the token with line and position. */
+  error(msg: string): Error {
+    return new Error(this.errorMsg(msg));
   }
 }
