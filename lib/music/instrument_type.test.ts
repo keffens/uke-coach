@@ -1,13 +1,13 @@
 import {
   InstrumentType,
   getTuning,
-  equivToDefaultTuning,
+  compatibleWithDefaultTuning,
 } from "./instrument_type";
 import { PitchedNote } from "./note";
 
 test("non-custom instruments have a tuning", () => {
   for (const instrument of Object.values(InstrumentType)) {
-    if (instrument !== InstrumentType.Custom) {
+    if (instrument !== InstrumentType.CustomStrings) {
       expect(getTuning(instrument).length).toBeGreaterThan(0);
     }
   }
@@ -15,37 +15,37 @@ test("non-custom instruments have a tuning", () => {
 
 test("compares to default tunings", () => {
   expect(
-    equivToDefaultTuning(
+    compatibleWithDefaultTuning(
       InstrumentType.Ukulele,
       getTuning(InstrumentType.UkuleleLowG)
     )
   ).toEqual(true);
   expect(
-    equivToDefaultTuning(
+    compatibleWithDefaultTuning(
       InstrumentType.Ukulele,
       ["G4", "C5", "E2", "A7"].map((s) => PitchedNote.parse(s))
     )
   ).toEqual(true);
   expect(
-    equivToDefaultTuning(
+    compatibleWithDefaultTuning(
       InstrumentType.Guitar,
       ["E4", "A4", "D4", "G4", "B4", "E4"].map((s) => PitchedNote.parse(s))
     )
   ).toEqual(true);
   expect(
-    equivToDefaultTuning(
+    compatibleWithDefaultTuning(
       InstrumentType.Ukulele,
       ["G4", "C4", "D4", "A4"].map((s) => PitchedNote.parse(s))
     )
   ).toEqual(false);
   expect(
-    equivToDefaultTuning(
+    compatibleWithDefaultTuning(
       InstrumentType.Ukulele,
       ["G4", "C4", "E4"].map((s) => PitchedNote.parse(s))
     )
   ).toEqual(false);
   expect(
-    equivToDefaultTuning(
+    compatibleWithDefaultTuning(
       InstrumentType.Ukulele,
       ["G4", "C4", "E4", "A4", "A4"].map((s) => PitchedNote.parse(s))
     )

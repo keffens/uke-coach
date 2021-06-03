@@ -64,6 +64,10 @@ export enum Scale {
   Minor = "m",
 }
 
+/** RegExp pattern to parse a pitched note. */
+export const PITCHED_NOTE_PATTERN =
+  String.raw`(?:${Object.values(Note).join("|")})` + String.raw`(?:-1|\d)?`;
+
 const PARSE_NOTE_RE = new RegExp(
   String.raw`^(${Object.values(Note).join("|")})(-1|\d)?$`
 );

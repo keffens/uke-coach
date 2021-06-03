@@ -1,5 +1,10 @@
+import { assert } from "../util";
 import { Chord } from "./chord";
-import { getTuning, InstrumentType } from "./instrument_type";
+import {
+  compatibleWithDefaultTuning,
+  getTuning,
+  InstrumentType,
+} from "./instrument_type";
 import { NOTE_IDENTITY, PitchedNote } from "./note";
 import { Token, TokenType } from "./token";
 
@@ -77,7 +82,17 @@ export class ChordLib {
 
   /** Creates a new chord lib for an instrument. */
   static for(instrument: InstrumentType, tuning?: PitchedNote[]): ChordLib {
+    // TODO: Only load default chords if the tuning is compatible
     let chords = new Map();
+    if (instrument === InstrumentType.CustomStrings) {
+      assert(tuning, "Custom strings instrument requires a tuning");
+    } else {
+      assert(
+        !tuning || compatibleWithDefaultTuning(instrument, tuning),
+        `Instrument "${instrument}" is not compatible with tuning ` +
+          tuning?.map((s) => s.toString()).join(", ")
+      );
+    }
     switch (instrument) {
       case InstrumentType.Ukulele:
       case InstrumentType.UkuleleLowG:

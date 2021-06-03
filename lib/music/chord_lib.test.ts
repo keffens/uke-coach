@@ -102,3 +102,38 @@ test("verifies ukulele chord lib", () => {
     }
   }
 });
+
+test("creates chord libs", () => {
+  expect(ChordLib.for(InstrumentType.Ukulele)).toEqual(ChordLib.forUkulele());
+  expect(ChordLib.for(InstrumentType.Guitar)).toEqual(ChordLib.forGuitar());
+
+  expect(
+    ChordLib.for(InstrumentType.UkuleleLowG).getFrets(Chord.parse("E"))
+  ).toEqual(ChordLib.forUkulele().getFrets(Chord.parse("E")));
+  expect(
+    ChordLib.for(
+      InstrumentType.Ukulele,
+      ["G2", "C3", "E3", "A5"].map((s) => PitchedNote.parse(s))
+    ).getFrets(Chord.parse("E"))
+  ).toEqual(ChordLib.forUkulele().getFrets(Chord.parse("E")));
+
+  expect(() =>
+    ChordLib.for(
+      InstrumentType.Ukulele,
+      ["F4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s))
+    )
+  ).toThrow();
+
+  expect(() =>
+    ChordLib.for(
+      InstrumentType.CustomStrings,
+      ["F4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s))
+    )
+  ).not.toThrow();
+  expect(() =>
+    ChordLib.for(
+      InstrumentType.Ukulele,
+      ["F4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s))
+    )
+  ).toThrow();
+});

@@ -6,7 +6,7 @@ export enum InstrumentType {
   Ukulele = "ukulele",
   UkuleleLowG = "ukulele (low G-string)",
   Guitar = "guitar",
-  Custom = "",
+  CustomStrings = "custom-strings",
 }
 
 const TUNING = new Map<InstrumentType, PitchedNote[]>([
@@ -37,7 +37,7 @@ export function getTuning(instrument: InstrumentType): PitchedNote[] {
  * Returns whether the tuning is equal to the default tuning except for octave
  * switches.
  */
-export function equivToDefaultTuning(
+export function compatibleWithDefaultTuning(
   instrument: InstrumentType,
   tuning: PitchedNote[]
 ): boolean {
