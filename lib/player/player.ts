@@ -1,7 +1,7 @@
 import * as Tone from "tone";
 import { PitchedNote, Song } from "../music";
 import { InstrumentPlayer, Woodblock } from "./instruments";
-import { Ukulele } from "./string_instruments";
+import { StringInstrument } from "./string_instrument";
 
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
@@ -129,7 +129,9 @@ class PlayerImpl {
   }
 
   private setUpSong(): void {
-    this.instruments.set(Ukulele.NAME, new Ukulele(this.song!.chordLib));
+    for (const instrument of this.song!.instrumentLib.instruments) {
+      this.instruments.set(instrument.name, new StringInstrument(instrument));
+    }
     // TODO: Support setting the bpm per part. Setting might not even the
     //       real problem but rather resetting when loading a new song.
     Tone.Transport.timeSignature = this.song!.metadata.time.beats;
@@ -162,7 +164,9 @@ class PlayerImpl {
   }
 
   private setUpPlayback(): void {
-    const ukulele = this.getInstrument(Ukulele.NAME)!;
+    const ukulele = this.getInstrument(
+      this.song!.instrumentLib.getDefault().name
+    )!;
     this.playback = new Tone.Part(
       (time, value) => ukulele.playBar(value.bar, time),
       this.song!.bars.map((bar, i) => ({ time: `${i}:0`, bar }))

@@ -43,7 +43,7 @@ export class Token {
       case TokenType.Pattern:
         return `{pattern: ${this.key} ${this.value}}`;
       case TokenType.Instrument:
-        return `{pattern: ${this.key} ${this.value}}`;
+        return `{instrument: ${this.value}}\n`;
       case TokenType.Directive:
         return `{${this.key}: ${this.value}}`;
       case TokenType.StartEnv:

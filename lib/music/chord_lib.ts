@@ -85,7 +85,7 @@ export class ChordLib {
     // TODO: Only load default chords if the tuning is compatible
     let chords = new Map();
     if (instrument === InstrumentType.CustomStrings) {
-      assert(tuning, "Custom strings instrument requires a tuning");
+      assert(tuning, "Custom string instrument requires a tuning");
     } else {
       assert(
         !tuning || compatibleWithDefaultTuning(instrument, tuning),
@@ -152,15 +152,12 @@ export class ChordLib {
    * string is muted, null is returned in its place. If the chord is unknown,
    * returns null.
    */
-  getPitchedNotes(
-    chord: Chord | null,
-    strings: Array<PitchedNote>
-  ): Array<PitchedNote | null> | null {
+  getPitchedNotes(chord: Chord | null): Array<PitchedNote | null> | null {
     const frets = this.getFrets(chord);
     if (!frets) return null;
-    if (frets.length !== strings.length) {
+    if (frets.length !== this.tuning.length) {
       throw new Error(
-        `Failed to determine chord notes, got ${strings.length} strings but ` +
+        `Failed to determine chord notes, got ${this.tuning.length} strings but ` +
           `expected ${frets.length}.`
       );
     }
@@ -169,7 +166,7 @@ export class ChordLib {
       if (frets[i] < 0) {
         notes.push(null);
       } else {
-        notes.push(strings[i].addSemitones(frets[i]));
+        notes.push(this.tuning[i].addSemitones(frets[i]));
       }
     }
     return notes;

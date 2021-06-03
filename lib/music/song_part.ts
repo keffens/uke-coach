@@ -1,5 +1,6 @@
 import { Bar, BarParagraph, BarParagraphBuilder } from "./bar";
-import { ChordLib } from "./chord_lib";
+import { Instrument } from "./instrument";
+import { InstrumentLib } from "./instrument_lib";
 import { PartMetadata, SongMetadata } from "./metadata";
 import { Pattern } from "./pattern";
 import { Token, TokenType } from "./token";
@@ -29,7 +30,7 @@ export class SongPart {
     env: Token,
     parentMetadata: SongMetadata | PartMetadata,
     patterns: Map<string, Pattern>,
-    chordLib: ChordLib,
+    instrumentLib: InstrumentLib,
     parts?: SongPart[],
     activePattern?: Pattern
   ): SongPart[] {
@@ -58,7 +59,7 @@ export class SongPart {
               token,
               metadata,
               patterns,
-              chordLib,
+              instrumentLib,
               parts,
               activePattern
             );
@@ -78,7 +79,7 @@ export class SongPart {
           builder.addChord(token.value);
           break;
         case TokenType.ChordDefinition:
-          chordLib.parseChord(token);
+          instrumentLib.getDefault().chordLib.parseChord(token);
           break;
         case TokenType.Text:
           builder.addLyrics(token.value);
@@ -88,6 +89,9 @@ export class SongPart {
           break;
         case TokenType.Paragraph:
           builder.newParagraph();
+          break;
+        case TokenType.Instrument:
+          instrumentLib.addInstrument(Instrument.parse(token.value));
           break;
         case TokenType.Metadata:
           break;

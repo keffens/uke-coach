@@ -12,6 +12,9 @@ test("converts tokens to strings", () => {
   expect(
     new Token(TokenType.Pattern, "island", "|d-ud-udu|").toString()
   ).toEqual("{pattern: island |d-ud-udu|}");
+  expect(
+    new Token(TokenType.Instrument, "key", "lead ukulele").toString()
+  ).toEqual("{instrument: lead ukulele}\n");
   expect(new Token(TokenType.Directive, "key", "value").toString()).toEqual(
     "{key: value}"
   );

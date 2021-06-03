@@ -1,6 +1,6 @@
 import { Chord } from "./chord";
 import { ChordLib } from "./chord_lib";
-import { getTuning, InstrumentType } from "./instrument_type";
+import { InstrumentType } from "./instrument_type";
 import { Note, PitchedNote, toSharp } from "./note";
 import { Token, TokenType } from "./token";
 
@@ -39,18 +39,17 @@ test("gets default chords string frets", () => {
 
 test("gets pitched notes", () => {
   const chordLib = ChordLib.forUkulele();
-  const strings = ["G4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s));
   expect(
     chordLib
-      .getPitchedNotes(Chord.parse("C"), strings)
+      .getPitchedNotes(Chord.parse("C"))
       ?.map((note) => (note === null ? null : note.toString()))
   ).toEqual(["G4", "C4", "E4", "C5"]);
   expect(
     chordLib
-      .getPitchedNotes(Chord.parse("E"), strings)
+      .getPitchedNotes(Chord.parse("E"))
       ?.map((note) => (note === null ? null : note.toString()))
   ).toEqual(["B4", "E4", "G#4", null]);
-  expect(chordLib.getPitchedNotes(null, strings)).toBeNull();
+  expect(chordLib.getPitchedNotes(null)).toBeNull();
 });
 
 test("gets custom chords frets", () => {
@@ -87,13 +86,12 @@ function noteSet(notes: Array<PitchedNote | null> | null): Set<Note | null> {
 
 test("verifies ukulele chord lib", () => {
   const chordLib = ChordLib.forUkulele();
-  const strings = getTuning(InstrumentType.Ukulele);
 
   for (const note of Object.values(Note)) {
     for (const suffix of ["", "m", "7"]) {
       const chord = Chord.parse(note + suffix);
       try {
-        expect(noteSet(chordLib.getPitchedNotes(chord, strings))).toEqual(
+        expect(noteSet(chordLib.getPitchedNotes(chord))).toEqual(
           noteSet(chord?.asPitchedNotes() ?? null)
         );
       } catch (e) {
@@ -123,17 +121,11 @@ test("creates chord libs", () => {
       ["F4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s))
     )
   ).toThrow();
-
   expect(() =>
     ChordLib.for(
       InstrumentType.CustomStrings,
       ["F4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s))
     )
   ).not.toThrow();
-  expect(() =>
-    ChordLib.for(
-      InstrumentType.Ukulele,
-      ["F4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s))
-    )
-  ).toThrow();
+  expect(() => ChordLib.for(InstrumentType.CustomStrings)).toThrow();
 });

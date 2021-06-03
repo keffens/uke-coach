@@ -5,6 +5,7 @@ test("tokenizes and converts back to string", () => {
     "{title: Caótica Belleza}",
     "{artist: Esteman}",
     "",
+    "{instrument: electric uke ukulele electric}",
     "{pattern: single plugged |1234----|}# Great pattern",
     "",
     "{start_of_verse: Verse 1}",

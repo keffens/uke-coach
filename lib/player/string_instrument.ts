@@ -1,6 +1,34 @@
 import * as Tone from "tone";
 import { DEFAULT_SAMPLE_URLS, SamplerInstrument } from "./instruments";
-import { Chord, ChordLib, PitchedNote, Strum, StrumType } from "../music";
+import {
+  Chord,
+  Instrument,
+  PitchedNote,
+  SoundType,
+  Strum,
+  StrumType,
+} from "../music";
+
+function makeSamplerOptions(sound: SoundType): Partial<Tone.SamplerOptions> {
+  let baseUrl;
+  switch (sound) {
+    case SoundType.Bass:
+      baseUrl = "/samples/midi-js-soundfonts/electric_bass_pick/";
+      break;
+    case SoundType.Electric:
+      baseUrl = "/samples/midi-js-soundfonts/electric_guitar_clean/";
+      break;
+    case SoundType.Nylon:
+      baseUrl = "/samples/midi-js-soundfonts/acoustic_guitar_nylon/";
+      break;
+    case SoundType.Steel:
+      baseUrl = "/samples/midi-js-soundfonts/acoustic_guitar_steel/";
+      break;
+    default:
+      throw new Error(`There are no samples for sound "${sound}"`);
+  }
+  return { baseUrl, urls: DEFAULT_SAMPLE_URLS };
+}
 
 /** Timpani, used as percursion strum. */
 class StringPercurion extends SamplerInstrument {
@@ -20,17 +48,11 @@ class StringPercurion extends SamplerInstrument {
 /** Base class for plugged string instruments. */
 export class StringInstrument extends SamplerInstrument {
   private static percursion: StringPercurion;
-  readonly strings: Array<PitchedNote>;
-  constructor(
-    name: string,
-    strings: Array<string>,
-    readonly chordLib: ChordLib,
-    samples: Partial<Tone.SamplerOptions>
-  ) {
-    super(name, samples);
-    this.strings = strings.map((string) => PitchedNote.parse(string));
+  constructor(readonly instrument: Instrument) {
+    super(instrument.name, makeSamplerOptions(instrument.sound));
+    console.log("creating instrument player", instrument);
     // Set lowest string as chord base.
-    this.chordBase = this.strings.reduce(
+    this.chordBase = this.tuning.reduce(
       (lhs, rhs) => (lhs.compare(rhs) < 0 ? lhs : rhs),
       PitchedNote.MAX_NOTE
     );
@@ -39,9 +61,14 @@ export class StringInstrument extends SamplerInstrument {
     }
   }
 
+  /** Returns the tuning of this instrument. */
+  get tuning(): PitchedNote[] {
+    return this.instrument.chordLib.tuning;
+  }
+
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
     let notes =
-      this.chordLib.getPitchedNotes(chord, this.strings) ??
+      this.instrument.chordLib.getPitchedNotes(chord) ??
       chord.asPitchedNotes(this.chordBase);
     let delay = 0;
     let velocity = strum.emphasize ? 1.0 : 0.7;
@@ -52,16 +79,16 @@ export class StringInstrument extends SamplerInstrument {
         StringInstrument.percursion.playNote(this.chordBase, time, velocity);
         return;
       case StrumType.Down:
-        delay = Math.min(0.02, duration / this.strings.length);
+        delay = Math.min(0.02, duration / this.tuning.length);
         break;
       case StrumType.Up:
-        delay = Math.max(-0.02, -duration / this.strings.length);
+        delay = Math.max(-0.02, -duration / this.tuning.length);
         break;
       case StrumType.Arpeggio:
-        delay = (2 * duration) / this.strings.length;
+        delay = (2 * duration) / this.tuning.length;
         break;
       case StrumType.Tremolo:
-        delay = duration / (2 * this.strings.length);
+        delay = duration / (2 * this.tuning.length);
         this.playStrings(notes, time, delay, 0.5);
         this.playStrings(notes, time + duration / 2, -delay, 0.5);
         return;
@@ -70,7 +97,7 @@ export class StringInstrument extends SamplerInstrument {
         break;
       case StrumType.Tab:
         notes = strum.frets.map((fret, i) =>
-          fret < 0 ? null : this.strings[i].addSemitones(fret)
+          fret < 0 ? null : this.tuning[i].addSemitones(fret)
         );
         break;
     }
@@ -95,38 +122,5 @@ export class StringInstrument extends SamplerInstrument {
         velocity
       );
     }
-  }
-}
-
-/** Standard ukulele. */
-export class Ukulele extends StringInstrument {
-  static NAME = "ukulele";
-
-  constructor(chordLib?: ChordLib) {
-    super(
-      Ukulele.NAME,
-      ["G4", "C4", "E4", "A4"],
-      chordLib ? chordLib : ChordLib.forUkulele(),
-      {
-        urls: DEFAULT_SAMPLE_URLS,
-        baseUrl: "/samples/midi-js-soundfonts/acoustic_guitar_nylon/",
-      }
-    );
-  }
-}
-
-/** Ukulele with a low G string. */
-export class UkuleleLowG extends StringInstrument {
-  static NAME = "ukulele (low G-string)";
-  constructor(chordLib?: ChordLib) {
-    super(
-      UkuleleLowG.NAME,
-      ["G3", "C4", "E4", "A4"],
-      chordLib ? chordLib : ChordLib.forUkulele(),
-      {
-        urls: DEFAULT_SAMPLE_URLS,
-        baseUrl: "/samples/midi-js-soundfonts/acoustic_guitar_nylon/",
-      }
-    );
   }
 }

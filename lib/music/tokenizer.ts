@@ -1,3 +1,4 @@
+import { assert } from "../util";
 import { SONG_METADATA_KEYS } from "./metadata";
 import { ADD_LINEBREAK_AFTER, Token, TokenType } from "./token";
 
@@ -80,6 +81,10 @@ function tokenizeDirective(key: string, value?: string) {
     throw new Error(
       `Found define chord directive with invalid chord: ${value}`
     );
+  }
+  if (key === "instrument") {
+    // TODO: Consider splitting the name here already.
+    return new Token(TokenType.Instrument, undefined, value);
   }
   return new Token(TokenType.Directive, key, value);
 }
