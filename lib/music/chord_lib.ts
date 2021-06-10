@@ -5,8 +5,10 @@ import {
   getTuning,
   InstrumentType,
 } from "./instrument_type";
-import { NOTE_IDENTITY, PitchedNote } from "./note";
+import { NOTE_IDENTITY, PitchedNote, toSharp } from "./note";
 import { Token, TokenType } from "./token";
+
+type ChordInput = Chord | string;
 
 const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["C", [0, 0, 0, 3]],
@@ -50,6 +52,18 @@ const UKULELE_CHORD_FRETS = new Map<string, number[]>([
 // TODO: Populate guiatar chords.
 const GUITAR_CHORD_FRETS = new Map<string, number[]>();
 
+function toString(chord: ChordInput): string {
+  if (chord instanceof Chord) return chord.toString();
+  return chord;
+}
+
+function toChord(chord: ChordInput): Chord {
+  if (chord instanceof Chord) return chord;
+  const parsedChord = Chord.parse(chord);
+  assert(parsedChord, `Failed to parse "${chord}" as Chord`);
+  return parsedChord;
+}
+
 function fretsFromMap(
   fretMap: Map<string, number[]>,
   chord: string,
@@ -82,7 +96,6 @@ export class ChordLib {
 
   /** Creates a new chord lib for an instrument. */
   static for(instrument: InstrumentType, tuning?: PitchedNote[]): ChordLib {
-    // TODO: Only load default chords if the tuning is compatible
     let chords = new Map();
     if (instrument === InstrumentType.CustomStrings) {
       assert(tuning, "Custom string instrument requires a tuning");
@@ -109,8 +122,9 @@ export class ChordLib {
    * If a flat or sharp chord is unknown, returns the corresponding sharp or
    * flat chord if available.
    */
-  getFrets(chord: Chord | null): number[] | null {
+  getFrets(chord: ChordInput | null): number[] | null {
     if (!chord) return null;
+    chord = toChord(chord);
     const chordName = chord.toString();
     let altChordName = "";
     const altRoot = NOTE_IDENTITY.get(chord.root);
@@ -143,7 +157,7 @@ export class ChordLib {
   }
 
   /** Same as getFrets but converts the fret numbers to strings. */
-  getStringFrets(chord: Chord | null): string[] | null {
+  getStringFrets(chord: ChordInput | null): string[] | null {
     return this.getFrets(chord)?.map((f) => (f < 0 ? "X" : `${f}`)) ?? null;
   }
 
@@ -152,50 +166,80 @@ export class ChordLib {
    * string is muted, null is returned in its place. If the chord is unknown,
    * returns null.
    */
-  getPitchedNotes(chord: Chord | null): Array<PitchedNote | null> | null {
+  getPitchedNotes(chord: ChordInput | null): Array<PitchedNote | null> | null {
     const frets = this.getFrets(chord);
     if (!frets) return null;
-    if (frets.length !== this.tuning.length) {
-      throw new Error(
-        `Failed to determine chord notes, got ${this.tuning.length} strings but ` +
-          `expected ${frets.length}.`
-      );
+    return this.toPitchedNotes(frets);
+  }
+
+  /** Returns true if this custom chord has been defined. */
+  hasCustomChord(chord: ChordInput): boolean {
+    return !!this.costumChords.get(toString(chord));
+  }
+
+  /** Defines a custom chord which overwrites an existing chord. */
+  defineChord(chord: ChordInput, frets: number[]): void {
+    assert(
+      this.isCompatibleChord(chord, frets),
+      `Got invalid frets (${frets.join(" ")}) for chord ${chord}; ` +
+        `tuning: ${this.tuning.map((s) => s.toString()).join(" ")}`
+    );
+    this.costumChords.set(toString(chord), frets);
+  }
+
+  /**
+   * Defines a custom chord if it is compatible and does not as custom chord.
+   * Returns true if the chord was added.
+   */
+  defineChordIfCompatible(chord: ChordInput, frets: number[]): boolean {
+    if (!this.isCompatibleChord(chord, frets) || this.hasCustomChord(chord)) {
+      return false;
     }
-    const notes = [];
-    for (let i = 0; i < frets.length; i++) {
-      if (frets[i] < 0) {
-        notes.push(null);
-      } else {
-        notes.push(this.tuning[i].addSemitones(frets[i]));
+    this.costumChords.set(toString(chord), frets);
+    return true;
+  }
+
+  /**
+   * Parses a chord from a token and then defines that chord. Returns the frets
+   * of the chord.
+   */
+  parseChord(token: Token): number[] {
+    try {
+      const chord = Chord.parse(token.key);
+      assert(
+        token.type === TokenType.ChordDefinition && chord && token.value,
+        "Failed to parse chord from token"
+      );
+      const frets = token.value
+        .split(/\s+/)
+        .map((f) => (f === "x" ? -1 : parseInt(f)));
+      this.defineChord(chord, frets);
+      return frets;
+    } catch (e) {
+      throw token.error(e.message);
+    }
+  }
+
+  private toPitchedNotes(frets: number[]): Array<PitchedNote | null> {
+    return frets.map((f, i) => (f < 0 ? null : this.tuning[i].addSemitones(f)));
+  }
+
+  /**
+   * Returns true if the frets are a valid chord for this instrument. Verifies
+   * no wrong notes are implied by the frets, but does not verify all notes are
+   * present.
+   */
+  private isCompatibleChord(chord: ChordInput, frets: number[]): boolean {
+    if (this.tuning.length !== frets.length) return false;
+    const chordNotes = toChord(chord)
+      .asPitchedNotes()
+      .map((n) => toSharp(n.note));
+    const fretNotes = this.toPitchedNotes(frets);
+    for (const fretNote of fretNotes) {
+      if (fretNote && !chordNotes.includes(toSharp(fretNote.note))) {
+        return false;
       }
     }
-    return notes;
-  }
-
-  /** Defines a chord which might overwrite the default chord. */
-  defineChord(chord: Chord, frets: number[]): void {
-    this.costumChords.set(chord.toString(), frets);
-  }
-
-  /** Parses a chord from a token and then defines that chord. */
-  parseChord(token: Token) {
-    if (
-      token.type !== TokenType.ChordDefinition ||
-      !token.key ||
-      !token.value
-    ) {
-      throw new Error("Failed to parse chord from token");
-    }
-    const frets = token.value.split(/\s+/);
-    if (frets.length !== this.tuning.length) {
-      throw new Error(
-        `Wrong number of frets in defined chord: expected ` +
-          `${this.tuning.length}, got ${frets.length}`
-      );
-    }
-    this.costumChords.set(
-      token.key,
-      frets.map((fret) => (fret === "x" ? -1 : parseInt(fret)))
-    );
+    return true;
   }
 }
