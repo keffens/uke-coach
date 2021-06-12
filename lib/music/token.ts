@@ -8,6 +8,7 @@ export enum TokenType {
   Directive,
   StartEnv,
   EndEnv,
+  TabEnv,
   TabLine,
   FileComment,
   LineBreak,
@@ -48,6 +49,7 @@ export class Token {
         return `{instrument: ${this.value}}\n`;
       case TokenType.Directive:
         return `{${this.key}: ${this.value}}`;
+      case TokenType.TabEnv:
       case TokenType.StartEnv:
         if (includeChildren) {
           const inner = this.children.map((child) => child.toString()).join("");

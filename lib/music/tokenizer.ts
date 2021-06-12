@@ -1,4 +1,3 @@
-import { assert } from "../util";
 import { SONG_METADATA_KEYS } from "./metadata";
 import { ADD_LINEBREAK_AFTER, Token, TokenType } from "./token";
 
@@ -52,7 +51,8 @@ function tokenizeDirective(
   value = value?.trim();
   if (key.startsWith("start_of_")) {
     key = key.replace(/^start_of_/, "");
-    return new Token(TokenType.StartEnv, key, value, [], lineNr, pos);
+    const tokenType = key === "tab" ? TokenType.TabEnv : TokenType.StartEnv;
+    return new Token(tokenType, key, value, [], lineNr, pos);
   }
   if (key.startsWith("end_of_")) {
     return new Token(
@@ -139,6 +139,7 @@ function tokenizeDirective(
 function addDirective(stack: Token[], token: Token): void {
   const children = back(stack).children;
   switch (token.type) {
+    case TokenType.TabEnv:
     case TokenType.StartEnv:
       children.push(token);
       stack.push(token);

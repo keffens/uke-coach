@@ -65,9 +65,9 @@ function getPattern(
 function setPattern(
   key: string,
   pattern: Pattern,
-  patterns: Map<string, Pattern>
+  patterns?: Map<string, Pattern>
 ): void {
-  if (key) {
+  if (key && patterns) {
     if (patterns.has(key)) {
       throw new Error(`Redefinition of pattern "${key}".`);
     }
@@ -202,26 +202,28 @@ export class Pattern {
   }
 
   /** Parses a pattern from a Pattern or Tab token. */
+  // TODO: Remove `patterns` argument once it's no longer in use. The pattern
+  //       maps are handled through the InstrumentLib in future.
   static fromToken(
     token: Token,
     time: TimeSignature,
-    patterns: Map<string, Pattern>
+    patterns?: Map<string, Pattern>
   ): Pattern {
     if (token.type === TokenType.Pattern) {
-      if (!token.value) {
+      if (!token.value && patterns) {
         return getPattern(token.key, patterns, time);
       }
       const pattern = Pattern.parse(token.value, time, token.key);
       setPattern(token.key, pattern, patterns);
       return pattern;
     }
-    if (token.type === TokenType.StartEnv && token.key === "tab") {
+    if (token.type === TokenType.TabEnv) {
       const lines = token.children.map((line) => line.value).reverse();
       const pattern = Pattern.parseTab(lines, time, token.value);
       setPattern(token.value, pattern, patterns);
       return pattern;
     }
-    throw new Error(`Cannot create Pattern from token "${token.toString()}".`);
+    throw token.error("expected pattern or tab token");
   }
 
   get strumsPerBar(): number {

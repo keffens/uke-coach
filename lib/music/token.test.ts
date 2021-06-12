@@ -53,7 +53,7 @@ test("converts verse environment to string", () => {
 
 test("converts tab environment to string", () => {
   expect(
-    new Token(TokenType.StartEnv, "tab", undefined, [
+    new Token(TokenType.TabEnv, "tab", undefined, [
       new Token(TokenType.TabLine, undefined, "|1-2-|"),
       new Token(TokenType.TabLine, undefined, "|-3-4|"),
     ]).toString()

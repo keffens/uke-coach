@@ -152,7 +152,7 @@ test("prases tab", () => {
 test("prases tab from token", () => {
   const patterns = new Map<string, Pattern>();
   const tab = Pattern.fromToken(
-    new Token(TokenType.StartEnv, "tab", undefined, [
+    new Token(TokenType.TabEnv, "tab", undefined, [
       new Token(TokenType.TabLine, undefined, "|1-2-|"),
       new Token(TokenType.TabLine, undefined, "|-3-4|"),
     ]),
