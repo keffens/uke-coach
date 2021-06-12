@@ -2,6 +2,8 @@ import { assert, escapeRegExp } from "../util";
 import { ChordLib } from "./chord_lib";
 import { getDefaultSound, InstrumentType, SoundType } from "./instrument_type";
 import { PitchedNote, PITCHED_NOTE_PATTERN } from "./note";
+import { Pattern } from "./pattern";
+import { StrumType } from "./strum";
 import { Token, TokenType } from "./token";
 
 export const INSTRUMENT_RE = new RegExp(
@@ -20,6 +22,8 @@ export const INSTRUMENT_RE = new RegExp(
 export class Instrument {
   readonly chordLib: ChordLib;
   readonly sound: SoundType;
+  private patterns = new Map<string, Pattern>();
+  private activePatternVar: Pattern | null = null;
 
   constructor(
     readonly name: string,
@@ -38,6 +42,12 @@ export class Instrument {
   /** Returns the tuning of the instrument. */
   get tuning(): PitchedNote[] {
     return this.chordLib.tuning;
+  }
+
+  /** Returns the active pattern. */
+  get activePattern(): Pattern {
+    assert(this.activePatternVar, `No pattern set for instrument ${this.name}`);
+    return this.activePatternVar;
   }
 
   /** Parses an instrument from a string. */
@@ -63,6 +73,74 @@ export class Instrument {
       token.type === TokenType.Instrument,
       `Expected token of type Instrument, got ${token.type}`
     );
-    return Instrument.parse(token.value);
+    try {
+      return Instrument.parse(token.value);
+    } catch (e) {
+      throw token.error(e.message);
+    }
+  }
+
+  /**
+   * Adds a pattern if it is a named pattern, possibly overwriting previous
+   * definitions of the pattern.
+   */
+  setPattern(pattern: Pattern): void {
+    assert(
+      this.isCompatiblePattern(pattern),
+      `Pattern ${pattern.toString()} is not compatible with instrument ` +
+        this.name
+    );
+    this.activePatternVar = pattern;
+    if (!pattern.name) return;
+    this.patterns.set(pattern.name, pattern);
+  }
+
+  /**
+   * Adds the given pattern if it is compatible and not yet in the pattern list.
+   * Returns true if the pattern was added.
+   */
+  setFallbackPattern(pattern: Pattern): boolean {
+    if (
+      pattern.name &&
+      !this.patterns.has(pattern.name) &&
+      this.isCompatiblePattern(pattern)
+    ) {
+      this.activePatternVar = pattern;
+      this.patterns.set(pattern.name, pattern);
+      return true;
+    }
+    return false;
+  }
+
+  /** Sets the active pattern. */
+  setActivePattern(name: string): void {
+    assert(
+      this.patterns.has(name),
+      `Pattern "${name}" not defined for instrument ${this.name}`
+    );
+    this.activePatternVar = this.patterns.get(name)!;
+  }
+
+  /** Sets the active pattern if it is defined. Returns true if successful. */
+  setActivePatternIfDefined(name: string): boolean {
+    if (this.patterns.has(name)) {
+      this.activePatternVar = this.patterns.get(name)!;
+      return true;
+    }
+    return false;
+  }
+
+  private isCompatiblePattern(pattern: Pattern): boolean {
+    for (const strum of pattern.strums) {
+      if (
+        (strum.type === StrumType.Plugged &&
+          strum.strings.some((s) => s > this.tuning.length)) ||
+        (strum.type === StrumType.Tab &&
+          strum.frets.length !== this.tuning.length)
+      ) {
+        return false;
+      }
+    }
+    return true;
   }
 }

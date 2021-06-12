@@ -2,6 +2,8 @@ import { ChordLib } from "./chord_lib";
 import { Instrument } from "./instrument";
 import { InstrumentType, SoundType, getTuning } from "./instrument_type";
 import { PitchedNote } from "./note";
+import { Pattern } from "./pattern";
+import { TimeSignature } from "./signature";
 import { Token, TokenType } from "./token";
 
 test("creates default instrument", () => {
@@ -64,4 +66,71 @@ test("parses instrument from token", () => {
       new Token(TokenType.Instrument, undefined, "rythm (uke) ukulele")
     )
   ).toEqual(new Instrument("rythm (uke)", InstrumentType.Ukulele));
+});
+
+test("adds patterns and select active pattern", () => {
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const island = Pattern.parse("|d-du-udu|", TimeSignature.DEFAULT, "island");
+  const noname = Pattern.parse("|dudu|", TimeSignature.DEFAULT, "");
+
+  expect(() => uke.activePattern).toThrow();
+  expect(() => uke.setActivePattern("island")).toThrow();
+
+  uke.setPattern(island);
+  expect(uke.activePattern).toBe(island);
+
+  uke.setPattern(noname);
+  expect(uke.activePattern).toBe(noname);
+
+  uke.setActivePattern("island");
+  expect(uke.activePattern).toBe(island);
+
+  expect(() => uke.setActivePattern("")).toThrow();
+});
+
+test("selects active pattern if defined", () => {
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const island = Pattern.parse("|d-du-udu|", TimeSignature.DEFAULT, "island");
+  const noname = Pattern.parse("|dudu|", TimeSignature.DEFAULT, "");
+
+  expect(uke.setActivePatternIfDefined("island")).toEqual(false);
+  expect(() => uke.activePattern).toThrow();
+
+  uke.setPattern(island);
+  uke.setPattern(noname);
+  expect(uke.activePattern).toBe(noname);
+
+  expect(uke.setActivePatternIfDefined("island")).toEqual(true);
+  expect(uke.activePattern).toBe(island);
+});
+
+test("fails to add incompatible patterns", () => {
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  expect(() =>
+    uke.setPattern(Pattern.parse("|2345|", TimeSignature.DEFAULT, "foo"))
+  ).toThrow();
+
+  expect(() =>
+    uke.setPattern(
+      Pattern.parseTab(["----", "1-1-"], TimeSignature.DEFAULT, "bar")
+    )
+  ).toThrow();
+});
+
+test("adds fallback pattern if possible", () => {
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const island = Pattern.parse("|d-du-udu|", TimeSignature.DEFAULT, "island");
+  const island2 = Pattern.parse("|dudu|", TimeSignature.DEFAULT, "island");
+
+  expect(uke.setFallbackPattern(island)).toEqual(true);
+  expect(uke.activePattern).toBe(island);
+
+  expect(
+    uke.setFallbackPattern(
+      Pattern.parse("|2345|", TimeSignature.DEFAULT, "foo")
+    )
+  ).toEqual(false);
+
+  expect(uke.setFallbackPattern(island2)).toEqual(false);
+  expect(uke.activePattern).toBe(island);
 });
