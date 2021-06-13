@@ -1,3 +1,4 @@
+import { assert } from "../util";
 import { Bar, BarParagraph, BarParagraphBuilder } from "./bar";
 import { Instrument } from "./instrument";
 import { InstrumentLib } from "./instrument_lib";
@@ -72,6 +73,7 @@ export class SongPart {
           }
           break;
         case TokenType.Pattern:
+        case TokenType.TabEnv:
           activePattern = Pattern.fromToken(token, metadata.time, patterns);
           builder.switchPattern(activePattern);
           break;

@@ -163,7 +163,7 @@ export default function SongComponent({ song }: SongComponentProps) {
         <SongPartComponent
           key={i}
           part={part}
-          chordLib={song.chordLib}
+          chordLib={song.instrumentLib.getDefault().chordLib}
           startTime={state.getStart(i)}
           pauseAtTime={state.getPauseAt(i)}
         />

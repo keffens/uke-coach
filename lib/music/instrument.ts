@@ -99,7 +99,7 @@ export class Instrument {
    * Adds the given pattern if it is compatible and not yet in the pattern list.
    * Returns true if the pattern was added.
    */
-  setFallbackPattern(pattern: Pattern): boolean {
+  setPatternIfCompatible(pattern: Pattern): boolean {
     if (
       pattern.name &&
       !this.patterns.has(pattern.name) &&

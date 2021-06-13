@@ -122,15 +122,15 @@ test("adds fallback pattern if possible", () => {
   const island = Pattern.parse("|d-du-udu|", TimeSignature.DEFAULT, "island");
   const island2 = Pattern.parse("|dudu|", TimeSignature.DEFAULT, "island");
 
-  expect(uke.setFallbackPattern(island)).toEqual(true);
+  expect(uke.setPatternIfCompatible(island)).toEqual(true);
   expect(uke.activePattern).toBe(island);
 
   expect(
-    uke.setFallbackPattern(
+    uke.setPatternIfCompatible(
       Pattern.parse("|2345|", TimeSignature.DEFAULT, "foo")
     )
   ).toEqual(false);
 
-  expect(uke.setFallbackPattern(island2)).toEqual(false);
+  expect(uke.setPatternIfCompatible(island2)).toEqual(false);
   expect(uke.activePattern).toBe(island);
 });

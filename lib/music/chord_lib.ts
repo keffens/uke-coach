@@ -200,10 +200,10 @@ export class ChordLib {
   }
 
   /**
-   * Parses a chord from a token and then defines that chord. Returns the frets
-   * of the chord.
+   * Parses a chord from a token and then defines that chord. Returns true if
+   * the chord was added (always return true if assertCompatible is set).
    */
-  parseChord(token: Token): number[] {
+  parseChord(token: Token, assertCompatible = true): boolean {
     try {
       const chord = Chord.parse(token.key);
       assert(
@@ -213,8 +213,11 @@ export class ChordLib {
       const frets = token.value
         .split(/\s+/)
         .map((f) => (f === "x" ? -1 : parseInt(f)));
-      this.defineChord(chord, frets);
-      return frets;
+      if (assertCompatible) {
+        this.defineChord(chord, frets);
+        return true;
+      }
+      return this.defineChordIfCompatible(chord, frets);
     } catch (e) {
       throw token.error(e.message);
     }
