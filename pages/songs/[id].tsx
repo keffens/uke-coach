@@ -4,6 +4,7 @@ import { join } from "path";
 import Layout from "../../components/Layout";
 import SongComponent from "../../components/song/SongComponent";
 import { Song, tokenize } from "../../lib/music";
+import { assert } from "../../lib/util";
 
 const SONGS_DIR = join(process.cwd(), "songs");
 
@@ -22,6 +23,7 @@ export default function SongPage({ songCrd }: SongPageProps) {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  assert(context.params, "context.params not defined");
   const song = fs.readFileSync(
     join(SONGS_DIR, `${context.params.id}.crd`),
     "utf8"

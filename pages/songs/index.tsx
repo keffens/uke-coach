@@ -10,8 +10,8 @@ const SONGS_DIR = join(process.cwd(), "songs");
 interface SongRowProps {
   id: string;
   title: string;
-  artist?: string;
-  sorttitle?: string;
+  artist: string | null;
+  sorttitle: string | null;
 }
 
 function SongRow({ id, title, artist }: SongRowProps) {
@@ -47,20 +47,18 @@ export const getStaticProps: GetStaticProps = async () => {
   const songs = fs
     .readdirSync(SONGS_DIR)
     .filter((file) => file.endsWith(".crd"))
-    .map(
-      (file): SongRowProps => {
-        const metadata = SongMetadata.fromTokens(
-          tokenize(fs.readFileSync(join(SONGS_DIR, file), "utf8"))
-        );
-        return {
-          id: file.replace(/\.crd$/, ""),
-          title: metadata.title,
-          // Optional fields must be null or they cannot be serialized by JSON.
-          artist: metadata.artist || null,
-          sorttitle: metadata.sorttitle || null,
-        };
-      }
-    )
+    .map((file): SongRowProps => {
+      const metadata = SongMetadata.fromTokens(
+        tokenize(fs.readFileSync(join(SONGS_DIR, file), "utf8"))
+      );
+      return {
+        id: file.replace(/\.crd$/, ""),
+        title: metadata.title,
+        // Optional fields must be null or they cannot be serialized by JSON.
+        artist: metadata.artist || null,
+        sorttitle: metadata.sorttitle || null,
+      };
+    })
     .sort((lhs, rhs) => {
       const titleComp = (lhs.sorttitle || lhs.title).localeCompare(
         rhs.sorttitle || rhs.title

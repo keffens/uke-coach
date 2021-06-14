@@ -164,10 +164,10 @@ class PlayerImpl {
 
   private setUpPlayback(): void {
     assert(this.playback.length === 0, "Expected playback to be empty");
-    for (let i = 0; i < this.instruments.length; i++) {
+    for (let idx = 0; idx < this.instruments.length; idx++) {
       this.playback.push(
         new Tone.Part(
-          (time, value) => this.instruments[i].playBar(value.bar, time, i),
+          (time, value) => this.instruments[idx].playBar(value.bar, time, idx),
           this.song!.bars.map((bar, i) => ({ time: `${i}:0`, bar }))
         ).start("0:0")
       );
