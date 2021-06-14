@@ -91,8 +91,9 @@ export class Instrument {
         this.name
     );
     this.activePatternVar = pattern;
-    if (!pattern.name) return;
-    this.patterns.set(pattern.name, pattern);
+    if (pattern.name) {
+      this.patterns.set(pattern.name, pattern);
+    }
   }
 
   /**
@@ -100,13 +101,11 @@ export class Instrument {
    * Returns true if the pattern was added.
    */
   setPatternIfCompatible(pattern: Pattern): boolean {
-    if (
-      pattern.name &&
-      !this.patterns.has(pattern.name) &&
-      this.isCompatiblePattern(pattern)
-    ) {
+    if (!this.patterns.has(pattern.name) && this.isCompatiblePattern(pattern)) {
       this.activePatternVar = pattern;
-      this.patterns.set(pattern.name, pattern);
+      if (pattern.name) {
+        this.patterns.set(pattern.name, pattern);
+      }
       return true;
     }
     return false;
