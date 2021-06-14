@@ -1,5 +1,6 @@
 import * as Tone from "tone";
 import { PitchedNote, Song } from "../music";
+import { assert } from "../util";
 import { InstrumentPlayer, Woodblock } from "./instruments";
 import { StringInstrument } from "./string_instrument";
 
@@ -8,11 +9,11 @@ class PlayerImpl {
   private playing = false;
   private countInBars = 1;
   private initialized = false;
-  private instruments = new Map<string, InstrumentPlayer>();
+  private instruments = new Array<InstrumentPlayer>();
   private metronomeInstrument: InstrumentPlayer | null = null;
   private metronomeLoop: Tone.Loop | null = null;
   private metronomeIsOn = true;
-  private playback: Tone.Part | null = null;
+  private playback = new Array<Tone.Part>();
   private playbackIsOn = true;
   private song: Song | null = null;
 
@@ -55,7 +56,10 @@ class PlayerImpl {
     if (!this.song) return;
     console.log("Cleaning up song", this.song.metadata.title);
     this.metronomeLoop?.dispose();
-    this.playback?.dispose();
+    for (const pb of this.playback) {
+      pb.dispose();
+    }
+    this.playback = [];
     this.song = null;
   }
 
@@ -84,8 +88,8 @@ class PlayerImpl {
   /** Whether to enable the playback. */
   set playbackEnabled(enable: boolean) {
     this.playbackIsOn = enable;
-    if (this.playback) {
-      this.playback.mute = !enable;
+    for (const pb of this.playback) {
+      pb.mute = !enable;
     }
   }
 
@@ -95,11 +99,6 @@ class PlayerImpl {
 
   set countIn(bars: number) {
     this.countInBars = bars;
-  }
-
-  /** Returns an instrument by name. */
-  getInstrument(name: string): InstrumentPlayer | null {
-    return this.instruments.get(name) ?? null;
   }
 
   /**
@@ -130,7 +129,7 @@ class PlayerImpl {
 
   private setUpSong(): void {
     for (const instrument of this.song!.instrumentLib.instruments) {
-      this.instruments.set(instrument.name, new StringInstrument(instrument));
+      this.instruments.push(new StringInstrument(instrument));
     }
     // TODO: Support setting the bpm per part. Setting might not even the
     //       real problem but rather resetting when loading a new song.
@@ -164,13 +163,15 @@ class PlayerImpl {
   }
 
   private setUpPlayback(): void {
-    const ukulele = this.getInstrument(
-      this.song!.instrumentLib.getDefault().name
-    )!;
-    this.playback = new Tone.Part(
-      (time, value) => ukulele.playBar(value.bar, time),
-      this.song!.bars.map((bar, i) => ({ time: `${i}:0`, bar }))
-    ).start("0:0");
+    assert(this.playback.length === 0, "Expected playback to be empty");
+    for (let i = 0; i < this.instruments.length; i++) {
+      this.playback.push(
+        new Tone.Part(
+          (time, value) => this.instruments[i].playBar(value.bar, time, i),
+          this.song!.bars.map((bar, i) => ({ time: `${i}:0`, bar }))
+        ).start("0:0")
+      );
+    }
   }
 }
 

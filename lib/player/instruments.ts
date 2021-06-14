@@ -57,10 +57,10 @@ export class SamplerInstrument extends InstrumentPlayer {
   }
 
   playBar(bar: Bar, time: number, instrumentIdx = 0) {
+    console.log(`Playing bar ${bar.patterns.join(" ")} of ${this.name}`);
     const strumDuration =
       Tone.Time("1m").toSeconds() / bar.patterns[instrumentIdx].strumsPerBar;
     const strumBeats = 1 / bar.patterns[instrumentIdx].strumsPerBeat;
-    // TODO: Actually play the bar according to the pattern.
     let chordIdx = 0;
     let chord = undefined;
     let beats = 0;

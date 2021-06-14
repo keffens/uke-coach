@@ -5,7 +5,7 @@
 {tempo: 158}
 
 {instrument: rythm ukulele}
-{instrument: lead ukulele}
+{instrument: lead ukulele steel}
 
 {chord: Cadd9 frets 0 2 0 3}
 
@@ -67,7 +67,7 @@
 {end_of_chorus}
 
 {start_of_verse: Verse 2}
-{pattern: *single slow |a-------|}
+{pattern: *single slow |a---------------|}
 [D..][......]Wenn man so will, bist [Am]du meine Chill-out Area, meine [C]Feiertage in jedem Jahr, meine [Em]Süßwarenabteilung im Supermarkt,
 {pattern: verse}
 [D.][.......]die Lösung wenn mal was hakt, so [Am]wertvoll, dass man es sich gerne auf[C]spart, und so schön, dass man {pattern: *single strum}{pattern: *pre-intro-strum}[Em]nie darauf verzichten mag.
@@ -81,10 +81,17 @@
 {end_of_chorus}
 
 {start_of_verse: Instrumental}
-{pattern: chorus}
-{pattern: *lead-pause} # TODO: add instrumental solo 
+{pattern: verse}
+{start_of_instrument: lead}
+{start_of_tab: *instrumental}
+|5---------------|0-------------2-|3-------------2-|----------------|5-----20--------|7---------------|7---------------|2---------------|
+|----------------|----------------|----------------|0---------------|----------------|------53--------|------------0-3-|------------753-|
+|----------------|----------------|----------------|----------------|----------------|----------------|----------------|----------------|
+|----------------|----------------|----------------|----------------|----------------|----------------|----------------|----------------|
+{end_of_tab}
+{end_of_instrument}
 [D][Am][C][Em]
-[D][Am][C]{pattern: *pre-intro}[Em]
+[D][Am][C]{pattern: *single strum}[Em]
 {end_of_verse}
 
 {start_of_chorus: Chorus}

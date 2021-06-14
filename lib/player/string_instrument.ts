@@ -45,6 +45,10 @@ class StringPercurion extends SamplerInstrument {
   }
 }
 
+function pluggedVelocity(notes: Array<PitchedNote | null>) {
+  return 1.2 - notes.filter((n) => n).length * 0.2;
+}
+
 /** Base class for plugged string instruments. */
 export class StringInstrument extends SamplerInstrument {
   private static percursion: StringPercurion;
@@ -71,7 +75,7 @@ export class StringInstrument extends SamplerInstrument {
       this.instrument.chordLib.getPitchedNotes(chord) ??
       chord.asPitchedNotes(this.chordBase);
     let delay = 0;
-    let velocity = strum.emphasize ? 1.0 : 0.7;
+    let velocity = strum.emphasize ? 0.8 : 0.6;
     switch (strum.type) {
       case StrumType.Pause:
         return;
@@ -94,11 +98,13 @@ export class StringInstrument extends SamplerInstrument {
         return;
       case StrumType.Plugged:
         notes = notes.filter((_, idx) => strum.strings?.includes(idx + 1));
+        velocity = pluggedVelocity(notes);
         break;
       case StrumType.Tab:
         notes = strum.frets.map((fret, i) =>
           fret < 0 ? null : this.tuning[i].addSemitones(fret)
         );
+        velocity = pluggedVelocity(notes);
         break;
     }
     this.playStrings(notes, time, delay, velocity);
