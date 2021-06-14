@@ -1,9 +1,6 @@
-import { assert } from "../util";
 import { Bar, BarParagraph, BarParagraphBuilder } from "./bar";
-import { Instrument } from "./instrument";
 import { InstrumentLib } from "./instrument_lib";
 import { PartMetadata, SongMetadata } from "./metadata";
-import { Pattern } from "./pattern";
 import { Token, TokenType } from "./token";
 
 export enum SongPartType {
@@ -30,10 +27,8 @@ export class SongPart {
   static fromTokens(
     env: Token,
     parentMetadata: SongMetadata | PartMetadata,
-    patterns: Map<string, Pattern>,
     instrumentLib: InstrumentLib,
-    parts?: SongPart[],
-    activePattern?: Pattern
+    parts?: SongPart[]
   ): SongPart[] {
     if (!isSongPartType(env.key)) {
       throw new Error(`"${env.key}" is not a valid song part type.`);
@@ -42,10 +37,10 @@ export class SongPart {
     const type = env.key as SongPartType;
     const name = env.value;
     const metadata = PartMetadata.fromTokens(env, parentMetadata, name);
-    activePattern = activePattern?.time.equals(metadata.time)
-      ? activePattern
-      : Pattern.makeDefault(metadata.time);
-    let builder = new BarParagraphBuilder(activePattern);
+    let builder = new BarParagraphBuilder(
+      instrumentLib.activePatterns,
+      metadata.time
+    );
     let paragraphs = null;
 
     for (let token of env.children) {
@@ -56,32 +51,27 @@ export class SongPart {
             if (paragraphs) {
               parts.push(new SongPart(type, metadata, paragraphs));
             }
-            SongPart.fromTokens(
-              token,
-              metadata,
-              patterns,
-              instrumentLib,
-              parts,
-              activePattern
+            SongPart.fromTokens(token, metadata, instrumentLib, parts);
+            builder = new BarParagraphBuilder(
+              instrumentLib.activePatterns,
+              metadata.time
             );
-            builder = new BarParagraphBuilder(activePattern);
-          } else if (token.key === "tab") {
-            activePattern = Pattern.fromToken(token, metadata.time, patterns);
-            builder.switchPattern(activePattern);
           } else {
             console.log("Ignoring environment:", token);
           }
           break;
-        case TokenType.Pattern:
         case TokenType.TabEnv:
-          activePattern = Pattern.fromToken(token, metadata.time, patterns);
-          builder.switchPattern(activePattern);
+        case TokenType.Pattern:
+        case TokenType.InstrumentEnv:
+          instrumentLib.parseToken(token, metadata.time);
+          builder.switchPattern(instrumentLib.activePatterns);
+          break;
+        case TokenType.ChordDefinition:
+        case TokenType.Instrument:
+          instrumentLib.parseToken(token, metadata.time);
           break;
         case TokenType.Chord:
           builder.addChord(token.value);
-          break;
-        case TokenType.ChordDefinition:
-          instrumentLib.getDefault().chordLib.parseChord(token);
           break;
         case TokenType.Text:
           builder.addLyrics(token.value);
@@ -91,9 +81,6 @@ export class SongPart {
           break;
         case TokenType.Paragraph:
           builder.newParagraph();
-          break;
-        case TokenType.Instrument:
-          instrumentLib.addInstrument(Instrument.fromToken(token));
           break;
         case TokenType.Metadata:
           break;

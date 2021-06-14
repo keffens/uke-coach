@@ -4,15 +4,16 @@ import ChordComponent from "./ChordComponent";
 import LyricsComponent from "./LyricsComponent";
 import PatternComponent from "./PatternComponent";
 import SpacedGridRow from "./SpacedGridRow";
-import { Bar, BarParagraph, ChordLib, Pattern } from "../../lib/music";
+import { Bar, BarParagraph, InstrumentLib, Pattern } from "../../lib/music";
 import styles from "./Song.module.scss";
+import { range } from "../../lib/util";
 
 interface BarComponentProps {
   bar: Bar;
   isFirst: boolean;
-  useTab: boolean;
+  useTab: boolean[];
   nextAnacrusis?: string;
-  chordLib?: ChordLib;
+  instrumentLib: InstrumentLib;
   highlightTick?: number;
 }
 
@@ -21,7 +22,7 @@ function BarComponent({
   isFirst,
   useTab,
   nextAnacrusis,
-  chordLib,
+  instrumentLib,
   highlightTick,
 }: BarComponentProps) {
   if (isFirst && bar.anacrusis) {
@@ -29,7 +30,12 @@ function BarComponent({
       <Column isPaddingless className={styles.firstBarContainer}>
         <div className={styles.barContainer} style={{ flexGrow: 0 }}>
           <ChordComponent />
-          <PatternComponent pattern={Pattern.makeEmpty(bar.pattern.time, 0)} />
+          {bar.patterns.map((pattern, idx) => (
+            <PatternComponent
+              key={idx}
+              pattern={Pattern.makeEmpty(pattern.time, 0)}
+            />
+          ))}
           <LyricsComponent
             lyrics={[]}
             beats={[]}
@@ -43,13 +49,17 @@ function BarComponent({
               <ChordComponent key={i} chord={chord} />
             ))}
           </SpacedGridRow>
-          <PatternComponent
-            bar={bar}
-            useTab={useTab}
-            showStringLabels
-            chordLib={chordLib}
-            highlightTick={highlightTick}
-          />
+          {range(instrumentLib.length).map((idx) => (
+            <PatternComponent
+              key={idx}
+              bar={bar}
+              useTab={useTab[idx]}
+              showStringLabels
+              instrumentLib={instrumentLib}
+              instrumentIdx={idx}
+              highlightTick={highlightTick}
+            />
+          ))}
           <LyricsComponent
             lyrics={bar.lyrics}
             beats={bar.beats}
@@ -66,13 +76,17 @@ function BarComponent({
           <ChordComponent key={i} chord={chord} />
         ))}
       </SpacedGridRow>
-      <PatternComponent
-        bar={bar}
-        useTab={useTab}
-        showStringLabels={isFirst}
-        chordLib={chordLib}
-        highlightTick={highlightTick}
-      />
+      {range(instrumentLib.length).map((idx) => (
+        <PatternComponent
+          key={idx}
+          bar={bar}
+          useTab={useTab[idx]}
+          showStringLabels={isFirst}
+          instrumentLib={instrumentLib}
+          instrumentIdx={idx}
+          highlightTick={highlightTick}
+        />
+      ))}
       <LyricsComponent
         lyrics={bar.lyrics}
         beats={bar.beats}
@@ -84,17 +98,17 @@ function BarComponent({
 
 export interface BarParagraphComponentProps {
   paragraph: BarParagraph;
-  chordLib?: ChordLib;
+  instrumentLib: InstrumentLib;
   highlightTick?: number;
 }
 
 export default function BarParagraphComponent({
   paragraph,
-  chordLib,
+  instrumentLib,
   highlightTick,
 }: BarParagraphComponentProps) {
   highlightTick = highlightTick ?? NaN;
-  const useTab = paragraph.useTab();
+  const useTab = range(instrumentLib.length).map((i) => paragraph.useTab(i));
   const highlightInBar = Math.floor(highlightTick / paragraph.ticksPerBar);
   const tickInBar = highlightTick % paragraph.ticksPerBar;
   return (
@@ -106,7 +120,7 @@ export default function BarParagraphComponent({
           isFirst={i === 0}
           useTab={useTab}
           nextAnacrusis={paragraph.bars[i + 1]?.anacrusis}
-          chordLib={chordLib}
+          instrumentLib={instrumentLib}
           highlightTick={highlightInBar === i ? tickInBar : NaN}
         />
       ))}

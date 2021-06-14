@@ -1,6 +1,6 @@
-import { Bar, ChordLib, TICKS_PER_BEAT } from "../../lib/music";
+import { Bar, InstrumentLib, TICKS_PER_BEAT } from "../../lib/music";
 import { Pattern } from "../../lib/music/pattern";
-import { range } from "../../lib/util";
+import { assert, range } from "../../lib/util";
 import styles from "./Song.module.scss";
 import StrumComponent, { stringHeight } from "./StrumComponent";
 
@@ -59,7 +59,8 @@ export interface PatternComponentProps {
   bar?: Bar;
   showStringLabels?: boolean;
   useTab?: boolean;
-  chordLib?: ChordLib;
+  instrumentLib?: InstrumentLib;
+  instrumentIdx?: number;
   highlightTick?: number;
 }
 
@@ -69,18 +70,29 @@ export default function PatternComponent({
   bar,
   showStringLabels,
   useTab,
-  chordLib,
+  instrumentLib,
+  instrumentIdx,
   highlightTick,
 }: PatternComponentProps) {
-  if (!pattern === !bar) {
-    throw new Error("Either bar or pattern is required for PatternComponent.");
+  assert(
+    !!pattern !== !!bar,
+    "Either bar or pattern is required for PatternComponent."
+  );
+  if (bar) {
+    assert(instrumentIdx != null, "instrumentIdx is required if bar is set");
+    pattern = bar.patterns[instrumentIdx];
+    patternIdx = bar.patternIdxs[instrumentIdx];
   }
-  pattern = pattern ?? bar!.pattern;
-  useTab = useTab || pattern.useTab();
+  assert(pattern, "This should never happen");
   if (pattern.bars === 0) {
     return <div className={styles.pattern}></div>;
   }
-  patternIdx = (patternIdx ?? bar?.patternIdx ?? 0) % pattern.bars;
+
+  useTab = useTab || pattern.useTab();
+  patternIdx = patternIdx! % pattern.bars;
+  const chordLib = instrumentLib
+    ? [...instrumentLib.instruments][instrumentIdx ?? 0].chordLib
+    : undefined;
   const strums = pattern.strums.slice(
     patternIdx * pattern.strumsPerBar,
     (patternIdx + 1) * pattern.strumsPerBar

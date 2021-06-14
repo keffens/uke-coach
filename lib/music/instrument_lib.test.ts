@@ -1,6 +1,7 @@
 import { Instrument } from "./instrument";
 import { InstrumentLib } from "./instrument_lib";
 import { InstrumentType } from "./instrument_type";
+import { Pattern } from "./pattern";
 import { TimeSignature } from "./signature";
 import { Token, TokenType } from "./token";
 
@@ -9,22 +10,22 @@ test("adds and gets instruments", () => {
   lib.addInstrument(new Instrument("guitar", InstrumentType.Guitar));
   lib.addInstrument(new Instrument("uke", InstrumentType.Ukulele));
 
-  expect(lib.getInstrument("guitar")).toBeTruthy();
-  expect(lib.getInstrument("uke")).toBeTruthy();
-  expect(lib.getDefault()).toBe(lib.getInstrument("guitar"));
-  expect(lib.getInstrument()).toBe(lib.getInstrument("guitar"));
+  expect(lib.getInstrument("guitar")).toBe(lib.instruments[0]);
+  expect(lib.getInstrument("uke")).toBe(lib.instruments[1]);
+  expect(lib.getInstrument("foo")).toBeNull();
+  expect(lib.getDefault()).toBe(lib.instruments[0]);
 
   expect([...lib.instruments].map((i) => i.name).sort()).toEqual([
     "guitar",
     "uke",
   ]);
 
-  expect(() => lib.getInstrument("cigar-box")).toThrow();
+  expect(lib.getInstrument("cigar-box")).toBeNull();
 });
 
 test("creates default instrument if it doesn't exist", () => {
   const lib = new InstrumentLib();
-  expect(() => lib.getInstrument("ukulele")).toThrow();
+  expect(lib.getInstrument("ukulele")).toBeNull();
 
   expect(lib.getDefault()).toBe(lib.getInstrument("ukulele"));
 });
@@ -32,19 +33,22 @@ test("creates default instrument if it doesn't exist", () => {
 test("parses chords", () => {
   const lib = new InstrumentLib();
   const time = TimeSignature.DEFAULT;
-  lib.addInstrument(new Instrument("u1", InstrumentType.Ukulele));
-  lib.addInstrument(new Instrument("u2", InstrumentType.UkuleleLowG));
-  lib.addInstrument(new Instrument("g", InstrumentType.Guitar));
+  const uke1 = new Instrument("uke1", InstrumentType.Ukulele);
+  const uke2 = new Instrument("uke2", InstrumentType.UkuleleLowG);
+  const guit = new Instrument("guit", InstrumentType.Guitar);
+  lib.addInstrument(uke1);
+  lib.addInstrument(uke2);
+  lib.addInstrument(guit);
 
   lib.parseToken(
     new Token(TokenType.ChordDefinition, "E", "0 2 2 1 0 0"),
     time,
-    lib.getInstrument("g")
+    guit
   );
   lib.parseToken(
     new Token(TokenType.ChordDefinition, "E", "4 4 4 -1"),
     time,
-    lib.getInstrument("u1")
+    uke1
   );
   lib.parseToken(new Token(TokenType.ChordDefinition, "G", "0 2 3 2"), time);
   lib.parseToken(
@@ -53,29 +57,31 @@ test("parses chords", () => {
   );
   lib.parseToken(new Token(TokenType.ChordDefinition, "C", "0 0 0 3"), time);
 
-  expect(lib.getInstrument("g").chordLib.hasCustomChord("E")).toEqual(true);
-  expect(lib.getInstrument("g").chordLib.hasCustomChord("G")).toEqual(true);
-  expect(lib.getInstrument("g").chordLib.hasCustomChord("C")).toEqual(false);
+  expect(guit.chordLib.hasCustomChord("E")).toEqual(true);
+  expect(guit.chordLib.hasCustomChord("G")).toEqual(true);
+  expect(guit.chordLib.hasCustomChord("C")).toEqual(false);
 
-  expect(lib.getInstrument("u1").chordLib.hasCustomChord("E")).toEqual(true);
-  expect(lib.getInstrument("u1").chordLib.hasCustomChord("G")).toEqual(true);
-  expect(lib.getInstrument("u1").chordLib.hasCustomChord("C")).toEqual(true);
+  expect(uke1.chordLib.hasCustomChord("E")).toEqual(true);
+  expect(uke1.chordLib.hasCustomChord("G")).toEqual(true);
+  expect(uke1.chordLib.hasCustomChord("C")).toEqual(true);
 
-  expect(lib.getInstrument("u2").chordLib.hasCustomChord("E")).toEqual(false);
-  expect(lib.getInstrument("u2").chordLib.hasCustomChord("G")).toEqual(true);
-  expect(lib.getInstrument("u2").chordLib.hasCustomChord("C")).toEqual(true);
+  expect(uke2.chordLib.hasCustomChord("E")).toEqual(false);
+  expect(uke2.chordLib.hasCustomChord("G")).toEqual(true);
+  expect(uke2.chordLib.hasCustomChord("C")).toEqual(true);
 });
 
 test("parses patterns", () => {
   const lib = new InstrumentLib();
   const time = TimeSignature.DEFAULT;
-  lib.addInstrument(new Instrument("u", InstrumentType.Ukulele));
-  lib.addInstrument(new Instrument("g", InstrumentType.Guitar));
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const guit = new Instrument("guit", InstrumentType.Guitar);
+  lib.addInstrument(uke);
+  lib.addInstrument(guit);
 
   lib.parseToken(
     new Token(TokenType.Pattern, "island", "|d-du-udu|"),
     time,
-    lib.getInstrument("u")
+    uke
   );
   lib.parseToken(new Token(TokenType.Pattern, "island", "|D-duxudu|"), time);
   lib.parseToken(new Token(TokenType.Pattern, "plugged", "|12345654|"), time);
@@ -97,23 +103,21 @@ test("parses patterns", () => {
   ]);
 
   expect(() =>
-    lib.parseToken(
-      new Token(TokenType.Pattern, "plugged"),
-      time,
-      lib.getInstrument("u")
-    )
+    lib.parseToken(new Token(TokenType.Pattern, "plugged"), time, uke)
   ).toThrow();
 });
 
 test("parses instrument environment", () => {
   const lib = new InstrumentLib();
   const time = TimeSignature.DEFAULT;
-  lib.addInstrument(new Instrument("u", InstrumentType.Ukulele));
-  lib.addInstrument(new Instrument("g", InstrumentType.Guitar));
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const guit = new Instrument("guit", InstrumentType.Guitar);
+  lib.addInstrument(uke);
+  lib.addInstrument(guit);
   lib.parseToken(new Token(TokenType.Pattern, "island", "|d-du-udu|"), time);
 
   lib.parseToken(
-    new Token(TokenType.StartEnv, "instrument", "g", [
+    new Token(TokenType.InstrumentEnv, "instrument", "guit", [
       new Token(TokenType.Pattern, "island", "|D-duxudu|"),
       new Token(TokenType.ChordDefinition, "E", "0 2 2 1 0 0"),
     ]),
@@ -124,17 +128,18 @@ test("parses instrument environment", () => {
     "|d-du-udu|",
     "|D-duxudu|",
   ]);
-  expect(lib.getInstrument("g").chordLib.hasCustomChord("E")).toEqual(true);
+  expect(guit.chordLib.hasCustomChord("E")).toEqual(true);
 });
 
 test("parses an instrument", () => {
   const lib = new InstrumentLib();
   const time = TimeSignature.DEFAULT;
+
   lib.parseToken(
     new Token(TokenType.Instrument, undefined, "rythm guitar"),
     time
   );
-  expect(lib.getDefault()).toEqual(
-    new Instrument("rythm", InstrumentType.Guitar)
-  );
+
+  expect(lib.getDefault().name).toEqual("rythm");
+  expect(lib.activePatterns).toEqual([Pattern.makeEmpty(time)]);
 });

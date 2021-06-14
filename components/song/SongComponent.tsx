@@ -138,16 +138,23 @@ export default function SongComponent({ song }: SongComponentProps) {
   return (
     <Content>
       <SongMetadataComponent metadata={song.metadata} />
-      <Title tag="h3">Strumming patterns</Title>
-      <Columns isMultiline isMobile>
-        {[...song.patterns.values()]
-          .filter((pattern) => pattern.isMainPattern())
-          .map((pattern, i) => (
-            <Column key={i} style={{ minWidth: "max-content" }}>
-              <PatternWithCountComponent key={i} pattern={pattern} />
-            </Column>
-          ))}
-      </Columns>
+      <Title tag="h3" className="mb-2">
+        Strumming patterns
+      </Title>
+      {song.instrumentLib.instruments.map((inst) => (
+        <div key={inst.name}>
+          <Title tag="h4" className="mb-1 mt-4">
+            {inst.name}
+          </Title>
+          <Columns isMultiline isMobile>
+            {inst.getPatterns(/*onlyMain=*/ true).map((pattern, i) => (
+              <Column key={i} style={{ minWidth: "max-content" }}>
+                <PatternWithCountComponent key={i} pattern={pattern} />
+              </Column>
+            ))}
+          </Columns>
+        </div>
+      ))}
       <Title tag="h3">Song</Title>
       <PlayerComponent
         song={song}
@@ -163,7 +170,7 @@ export default function SongComponent({ song }: SongComponentProps) {
         <SongPartComponent
           key={i}
           part={part}
-          chordLib={song.instrumentLib.getDefault().chordLib}
+          instrumentLib={song.instrumentLib}
           startTime={state.getStart(i)}
           pauseAtTime={state.getPauseAt(i)}
         />

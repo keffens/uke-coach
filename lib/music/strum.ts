@@ -1,3 +1,5 @@
+import { assert, range } from "../util";
+
 export enum StrumType {
   Pause,
   Down,
@@ -96,20 +98,17 @@ export class Strum {
       const strings = new Array<number>();
       while (pos < pattern.length && pattern[pos] !== ")") {
         const string = parseInt(pattern[pos]);
-        if (string >= 1 && string <= 9) {
-          strings.push(string);
-        } else {
-          throw new Error(
-            `Failed to parse parenthesized chord in pattern "${pattern}".`
-          );
-        }
-        pos++;
-      }
-      if (pos >= pattern.length) {
-        throw new Error(
+        assert(
+          string >= 1 && string <= 9,
           `Failed to parse parenthesized chord in pattern "${pattern}".`
         );
+        strings.push(string);
+        pos++;
       }
+      assert(
+        pos < pattern.length,
+        `Failed to parse parenthesized chord in pattern "${pattern}".`
+      );
       return [Strum.plugged(strings), pos + 1];
     }
     throw new Error(
@@ -141,10 +140,11 @@ export class Strum {
           ? `${this.strings[0]}`
           : `(${this.strings.join("")})`;
       case StrumType.Tab:
-        const fret = this.frets[string ?? -1];
-        if (fret == null) {
-          throw new Error(`Invalid string selection: ${string}`);
+        if (string == null) {
+          const frets = range(this.frets.length).map((i) => this.toString(i));
+          return `TAB[${frets.join(" ")}]`;
         }
+        const fret = this.frets[string];
         if (fret < 0) return "-";
         if (fret <= 9) return `${fret}`;
         return `(${fret})`;

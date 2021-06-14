@@ -2,25 +2,32 @@ import { Chord } from "./chord";
 import { parseBeats, sumBeats } from "./note";
 import { Pattern } from "./pattern";
 import { assert } from "../util";
+import { TimeSignature } from "./signature";
 
 export class Bar {
   constructor(
     public chords: (Chord | null)[],
     public beats: number[],
-    public pattern: Pattern,
-    public patternIdx = 0,
+    public patterns: Pattern[],
+    public patternIdxs: number[],
     public lyrics: string[] = [],
     public anacrusis: string = ""
   ) {
+    assert(
+      this.patterns.length === this.patternIdxs.length,
+      `Number of patterns ${patterns.length} must match number indexes` +
+        patternIdxs.length
+    );
     if (this.lyrics.every((l) => !l)) {
       this.lyrics = [];
     }
   }
 
-  /** Returns the chord for the i-th chord. */
-  getChordForStrum(strumIdx: number): Chord | null {
+  /** Returns the chord for the i-th strum. */
+  getChordForStrum(strumIdx: number, instrumentIdx = 0): Chord | null {
     let beatValue =
-      ((strumIdx + 1) * this.pattern.time.beats) / this.pattern.strumsPerBar;
+      ((strumIdx + 1) * this.patterns[instrumentIdx].time.beats) /
+      this.patterns[instrumentIdx].strumsPerBar;
     for (let i = 0; i < this.beats.length; i++) {
       beatValue -= this.beats[i];
       if (beatValue <= Number.EPSILON) {
@@ -35,13 +42,13 @@ export class BarParagraph {
   constructor(readonly bars: Bar[]) {}
 
   /** Returns whether to use a tab notation for this paragraph. */
-  useTab(): boolean {
-    return this.bars.some((bar) => bar.pattern.useTab());
+  useTab(instrumentIdx = 0): boolean {
+    return this.bars.some((bar) => bar.patterns[instrumentIdx].useTab());
   }
 
   /** Returns the number of ticks per bar. */
   get ticksPerBar(): number {
-    return this.bars[0]?.pattern.ticksPerBar ?? NaN;
+    return this.bars[0]?.patterns[0].ticksPerBar ?? NaN;
   }
 
   /** Returns the number of ticks for the entire paragraph. */
@@ -51,115 +58,126 @@ export class BarParagraph {
 }
 
 export class BarParagraphBuilder {
-  private _paragraphs = new Array<BarParagraph>();
-  private _bars = new Array<Bar>();
-  private _beats = new Array<number>();
-  private _patternIdx = 0;
-  private _chords = new Array<Chord | null>();
-  private _lyrics = new Array<string>();
-  private _anacrusis: string = "";
+  private paragraphs = new Array<BarParagraph>();
+  private bars = new Array<Bar>();
+  private beats = new Array<number>();
+  private patternIdxs: number[];
+  private chords = new Array<Chord | null>();
+  private lyrics = new Array<string>();
+  private anacrusis: string = "";
 
-  constructor(private _pattern: Pattern | null = null) {}
+  constructor(private patterns: Pattern[], private time: TimeSignature) {
+    this.patternIdxs = new Array(patterns.length).fill(0);
+  }
 
-  addLyrics(value: string) {
+  addLyrics(value: string): void {
     if (!value.trim()) return;
     if (value.match(/\w$/)) {
       value += "-";
     }
     value = value.trimRight();
 
-    if (!this._chords.length) {
+    if (!this.chords.length) {
       // Handle anacrusis.
-      if (this._anacrusis) {
-        throw new Error("Got 2 lyrics passages before the first chord.");
-      }
-      this._anacrusis = value;
+      assert(!this.anacrusis, "Got 2 lyrics passages before the first chord.");
+      this.anacrusis = value;
     } else {
-      this._lyrics.push(value);
-      if (this._chords.length !== this._lyrics.length) {
-        throw new Error(
-          "Expected chrods to equal the number of lyrics pieces."
-        );
-      }
+      this.lyrics.push(value);
+      assert(
+        this.chords.length === this.lyrics.length,
+        "Expected chrods to equal the number of lyrics pieces."
+      );
     }
   }
 
-  addChord(value: string) {
-    assert(this._pattern, "Expected pattern to be set");
+  addChord(value: string): void {
+    assert(this.patterns.length, "Expected patterns to be set");
     this.closeFullChord();
     const chord = Chord.parse(value);
-    const beat = parseBeats(value, this._pattern.time.beats);
-    if (this._chords.length > this._lyrics.length) {
-      this._lyrics.push("");
+    const beat = parseBeats(value, this.time.beats);
+    if (this.chords.length > this.lyrics.length) {
+      this.lyrics.push("");
     }
-    this._beats.push(beat);
-    this._chords.push(chord);
+    this.beats.push(beat);
+    this.chords.push(chord);
   }
 
-  newLine() {
-    while (this._chords.length > this._lyrics.length) {
-      this._lyrics.push("");
+  newLine(): void {
+    while (this.chords.length > this.lyrics.length) {
+      this.lyrics.push("");
     }
-    if (this._lyrics[this._lyrics.length - 1]?.slice(-1) === "-") {
+    if (this.lyrics[this.lyrics.length - 1]?.slice(-1) === "-") {
       // Remove a dash that was added to the last lyrics element because it was
       // probably a mistake.
-      this._lyrics[this._lyrics.length - 1] = this._lyrics[
-        this._lyrics.length - 1
+      this.lyrics[this.lyrics.length - 1] = this.lyrics[
+        this.lyrics.length - 1
       ].slice(0, -1);
     }
-    if (!this.closeFullChord()) {
-      throw new Error("Beats in line don't add up to full bars.");
-    }
+    assert(this.closeFullChord(), "Beats in line don't add up to full bars.");
   }
 
-  newParagraph() {
+  newParagraph(): void {
     this.newLine();
-    this._patternIdx = 0;
-    if (this._bars.length) {
-      this._paragraphs.push(new BarParagraph(this._bars));
-      this._bars = [];
+    this.patternIdxs.fill(0);
+    if (this.bars.length) {
+      this.paragraphs.push(new BarParagraph(this.bars));
+      this.bars = [];
     }
   }
 
-  switchPattern(pattern: Pattern) {
-    if (!this.closeFullChord()) {
-      throw new Error("Cannot switch pattern in the middle of a bar.");
+  switchPattern(patterns: Pattern[]): void {
+    assert(
+      this.closeFullChord(),
+      "Cannot switch pattern in the middle of a bar."
+    );
+    if (this.patterns.length === 0) {
+      this.patterns = [...patterns];
+      this.patternIdxs = new Array(patterns.length).fill(0);
+      return;
     }
-    this._pattern = pattern;
-    this._patternIdx = 0;
+    assert(
+      this.patterns.length === patterns.length,
+      "Cannot change number of instruments in the middle of a paragraph"
+    );
+    for (let i = 0; i < patterns.length; i++) {
+      if (patterns[i] === this.patterns[i]) continue;
+      this.patterns[i] = patterns[i];
+      this.patternIdxs[i] = 0;
+    }
   }
 
-  build() {
+  build(): BarParagraph[] | null {
     this.newParagraph();
-    if (this._paragraphs.length) {
-      return this._paragraphs;
+    if (this.paragraphs.length) {
+      return this.paragraphs;
     }
     return null;
   }
 
-  private closeFullChord() {
-    const sum = sumBeats(this._beats);
+  private closeFullChord(): boolean {
+    const sum = sumBeats(this.beats);
     if (sum === 0) return true;
-    assert(this._pattern, "Expected pattern to be set");
-    if (sum < this._pattern.time.beats) return false;
-    if (sum > this._pattern.time.beats) {
-      throw new Error(`Beats add up to more than one bar: ${sum}`);
-    }
-    this._bars.push(
+    assert(this.patterns.length, "Expected patterns to be set");
+    if (sum < this.time.beats) return false;
+    assert(
+      sum === this.time.beats,
+      `Beats add up to more than one bar: ${sum}`
+    );
+    this.bars.push(
       new Bar(
-        this._chords,
-        this._beats,
-        this._pattern,
-        this._patternIdx,
-        this._lyrics,
-        this._anacrusis
+        this.chords,
+        this.beats,
+        [...this.patterns],
+        [...this.patternIdxs],
+        this.lyrics,
+        this.anacrusis
       )
     );
-    this._chords = [];
-    this._beats = [];
-    this._patternIdx++;
-    this._lyrics = [];
-    this._anacrusis = "";
+    this.chords = [];
+    this.beats = [];
+    this.patternIdxs = this.patternIdxs.map((idx) => idx + 1);
+    this.lyrics = [];
+    this.anacrusis = "";
     return true;
   }
 }

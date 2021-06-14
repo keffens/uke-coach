@@ -41,6 +41,17 @@ function back<T>(list: Array<T>): T {
   return list[list.length - 1];
 }
 
+function getEnvType(key: string): TokenType {
+  switch (key) {
+    case "instrument":
+      return TokenType.InstrumentEnv;
+    case "tab":
+      return TokenType.TabEnv;
+    default:
+      return TokenType.StartEnv;
+  }
+}
+
 function tokenizeDirective(
   lineNr: number,
   pos: number,
@@ -51,8 +62,7 @@ function tokenizeDirective(
   value = value?.trim();
   if (key.startsWith("start_of_")) {
     key = key.replace(/^start_of_/, "");
-    const tokenType = key === "tab" ? TokenType.TabEnv : TokenType.StartEnv;
-    return new Token(tokenType, key, value, [], lineNr, pos);
+    return new Token(getEnvType(key), key, value, [], lineNr, pos);
   }
   if (key.startsWith("end_of_")) {
     return new Token(
@@ -140,6 +150,7 @@ function addDirective(stack: Token[], token: Token): void {
   const children = back(stack).children;
   switch (token.type) {
     case TokenType.TabEnv:
+    case TokenType.InstrumentEnv:
     case TokenType.StartEnv:
       children.push(token);
       stack.push(token);

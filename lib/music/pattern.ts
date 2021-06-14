@@ -129,7 +129,7 @@ export class Pattern {
   /** Creates an empty (only pauses) pattern for the given time signature. */
   static makeEmpty(
     time: TimeSignature,
-    bars: number = 1,
+    bars = 1,
     strumsPerBar?: number
   ): Pattern {
     strumsPerBar = strumsPerBar ?? 2 * time.beats;

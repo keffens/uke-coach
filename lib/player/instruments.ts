@@ -30,7 +30,7 @@ export abstract class InstrumentPlayer {
     time: number,
     duration: number
   ): void;
-  abstract playBar(bar: Bar, time: number): void;
+  abstract playBar(bar: Bar, time: number, instrumentIdx?: number): void;
 }
 
 /** Instrument which uses the Tone.js samples to create sound. */
@@ -56,15 +56,15 @@ export class SamplerInstrument extends InstrumentPlayer {
     }
   }
 
-  playBar(bar: Bar, time: number) {
+  playBar(bar: Bar, time: number, instrumentIdx = 0) {
     const strumDuration =
-      Tone.Time("1m").toSeconds() / bar.pattern.strumsPerBar;
-    const strumBeats = 1 / bar.pattern.strumsPerBeat;
+      Tone.Time("1m").toSeconds() / bar.patterns[instrumentIdx].strumsPerBar;
+    const strumBeats = 1 / bar.patterns[instrumentIdx].strumsPerBeat;
     // TODO: Actually play the bar according to the pattern.
     let chordIdx = 0;
     let chord = undefined;
     let beats = 0;
-    for (let i = 0; i < bar.pattern.strumsPerBar; i++) {
+    for (let i = 0; i < bar.patterns[instrumentIdx].strumsPerBar; i++) {
       if (beats + Number.EPSILON >= bar.beats[chordIdx]) {
         beats -= bar.beats[chordIdx];
         chordIdx++;
@@ -73,7 +73,10 @@ export class SamplerInstrument extends InstrumentPlayer {
       // Keep previous chord if this one is not defined.
       chord = bar.chords[chordIdx] ?? chord;
       if (!chord) continue;
-      const strum = bar.pattern.getStrum(i, bar.patternIdx);
+      const strum = bar.patterns[instrumentIdx].getStrum(
+        i,
+        bar.patternIdxs[instrumentIdx]
+      );
       this.playChord(chord, strum, time + i * strumDuration, strumDuration);
     }
   }

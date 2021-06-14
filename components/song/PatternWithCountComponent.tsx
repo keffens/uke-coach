@@ -14,7 +14,7 @@ export default function PatternWithCountComponent({
   const beats = range(1, pattern.time.beats + 1);
   return (
     <div className="block">
-      <Title tag="h4" isSize={6} isMarginless>
+      <Title tag="h5" isSize={6} isMarginless>
         {pattern.name}
       </Title>
       {range(pattern.bars).map((idx) => (

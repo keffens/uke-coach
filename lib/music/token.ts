@@ -5,6 +5,7 @@ export enum TokenType {
   Metadata,
   Pattern,
   Instrument,
+  InstrumentEnv,
   Directive,
   StartEnv,
   EndEnv,
@@ -50,6 +51,7 @@ export class Token {
       case TokenType.Directive:
         return `{${this.key}: ${this.value}}`;
       case TokenType.TabEnv:
+      case TokenType.InstrumentEnv:
       case TokenType.StartEnv:
         if (includeChildren) {
           const inner = this.children.map((child) => child.toString()).join("");

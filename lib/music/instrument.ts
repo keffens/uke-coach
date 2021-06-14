@@ -50,6 +50,16 @@ export class Instrument {
     return this.activePatternVar;
   }
 
+  /** Returns all patterns or only the main patterns */
+  getPatterns(onlyMain: boolean = false): Array<Pattern> {
+    if (onlyMain) {
+      return [...this.patterns.values()].filter((pattern) =>
+        pattern.isMainPattern()
+      );
+    }
+    return [...this.patterns.values()];
+  }
+
   /** Parses an instrument from a string. */
   static parse(text: string): Instrument {
     const match = text.match(INSTRUMENT_RE);

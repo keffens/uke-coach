@@ -7,16 +7,14 @@ import { Token, TokenType } from "./token";
 
 /** Library holding all instruments for a song. */
 export class InstrumentLib {
-  private defaultInstrument: string | null = null;
-  private instrumentsMap = new Map<string, Instrument>();
-
-  /** Returns all instruments in this library. */
-  get instruments(): Iterable<Instrument> {
-    return this.instrumentsMap.values();
-  }
+  instruments = new Array<Instrument>();
 
   get activePatterns(): Pattern[] {
-    return [...this.instruments].map((inst) => inst.activePattern);
+    return this.instruments.map((inst) => inst.activePattern);
+  }
+
+  get length(): number {
+    return this.instruments.length;
   }
 
   /**
@@ -25,25 +23,19 @@ export class InstrumentLib {
    */
   addInstrument(instrument: Instrument): void {
     assert(instrument.name, "Cannot add an instrument without a name");
-    if (this.defaultInstrument == null) {
-      this.defaultInstrument = instrument.name;
-    }
     assert(
-      !this.instrumentsMap.get(instrument.name),
+      !this.getInstrument(instrument.name),
       `An instrument with name "${instrument.name}" already exists`
     );
-    this.instrumentsMap.set(instrument.name, instrument);
+    this.instruments.push(instrument);
   }
 
   /**
    * Returns the requested instrument. If name is empty, returns the default
    * instrument.
    */
-  getInstrument(name?: string): Instrument {
-    if (!name) return this.getDefault();
-    const instrument = this.instrumentsMap.get(name);
-    assert(instrument, `Instrument "${name}" is not defined`);
-    return instrument;
+  getInstrument(name: string): Instrument | null {
+    return this.instruments.find((inst) => inst.name === name) ?? null;
   }
 
   /**
@@ -51,12 +43,12 @@ export class InstrumentLib {
    * a ukulele as default.
    */
   getDefault(): Instrument {
-    if (!this.defaultInstrument) {
+    if (this.instruments.length === 0) {
       this.addInstrument(
         new Instrument(InstrumentType.Ukulele, InstrumentType.Ukulele)
       );
     }
-    return this.getInstrument(this.defaultInstrument!);
+    return this.instruments[0];
   }
 
   /**
@@ -77,30 +69,23 @@ export class InstrumentLib {
       case TokenType.ChordDefinition:
         this.parseChord(token, instrument);
         break;
-      case TokenType.StartEnv:
+      case TokenType.InstrumentEnv:
         this.parseInstrumentEnv(token, time);
         break;
       case TokenType.Instrument:
-        this.addInstrument(Instrument.fromToken(token));
+        const inst = Instrument.fromToken(token);
+        inst.setPattern(Pattern.makeEmpty(time));
+        this.addInstrument(inst);
         break;
       default:
         throw token.error("Expected pattern, tab or chord definition");
     }
   }
 
-  /**
-   * Updates the library from the given instrument environment. Supports parsing
-   * of chords and patterns, and setting patterns.
-   */
   private parseInstrumentEnv(env: Token, time: TimeSignature): void {
-    assert(env.key === "instrument", "Expected an instrument environment");
     assert(env.value, env.errorMsg("Expected instrument name"));
-    let instrument;
-    try {
-      instrument = this.getInstrument(env.value);
-    } catch (e) {
-      throw env.error(e.message);
-    }
+    let instrument = this.getInstrument(env.value);
+    assert(instrument, env.errorMsg(`Instrument ${env.value} is not defined`));
     for (const token of env.children) {
       switch (token.type) {
         case TokenType.Pattern:
@@ -125,7 +110,8 @@ export class InstrumentLib {
     }
 
     // If no instrument is explicitely selected, add to all compatible
-    // instruments.
+    // instruments. Ensure at least the default instrument is defined.
+    this.getDefault();
     let count = 0;
     for (const inst of this.instruments) {
       if (inst.chordLib.parseChord(token, /*assertCompatible=*/ false)) count++;
@@ -150,7 +136,8 @@ export class InstrumentLib {
     }
 
     // If no instrument is explicitely selected, add to all compatible
-    // instruments.
+    // instruments. Ensure at least the default instrument is defined.
+    this.getDefault();
     let count = 0;
     for (const inst of this.instruments) {
       if (inst.setPatternIfCompatible(pattern)) count++;

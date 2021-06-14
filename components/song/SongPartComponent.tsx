@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useState, useEffect } from "react";
 import { Title } from "bloomer";
 import BarParagraphComponent from "./BarParagraphComponent";
-import { ChordLib, SongPart, TICKS_PER_BEAT } from "../../lib/music";
+import { InstrumentLib, SongPart, TICKS_PER_BEAT } from "../../lib/music";
 import { Interval, Timeout } from "../../lib/util";
 
 class State {
@@ -70,14 +70,14 @@ class State {
 
 export interface SongPartComponentProps {
   part: SongPart;
-  chordLib?: ChordLib;
+  instrumentLib: InstrumentLib;
   startTime?: number;
   pauseAtTime?: number;
 }
 
 export default function SongPartComponent({
   part,
-  chordLib,
+  instrumentLib,
   startTime,
   pauseAtTime,
 }: SongPartComponentProps) {
@@ -116,7 +116,7 @@ export default function SongPartComponent({
         <BarParagraphComponent
           key={i}
           paragraph={paragraph}
-          chordLib={chordLib}
+          instrumentLib={instrumentLib}
           highlightTick={state.paragraph === i ? state.tick : NaN}
         />
       ))}

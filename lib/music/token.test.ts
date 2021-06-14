@@ -60,6 +60,18 @@ test("converts tab environment to string", () => {
   ).toEqual("{start_of_tab}\n" + "|1-2-|\n" + "|-3-4|\n" + "{end_of_tab}\n");
 });
 
+test("converts instrument environment to string", () => {
+  expect(
+    new Token(TokenType.InstrumentEnv, "instrument", "uke", [
+      new Token(TokenType.ChordDefinition, "Cadd9", "frets 0 2 0 3"),
+    ]).toString()
+  ).toEqual(
+    "{start_of_instrument: uke}\n" +
+      "{chord: Cadd9 frets 0 2 0 3}\n" +
+      "{end_of_instrument}\n"
+  );
+});
+
 test("makes error message", () => {
   const token = new Token(TokenType.Directive, "key", "value", [], 10, 2);
   expect(token.errorMsg("hi")).toEqual(

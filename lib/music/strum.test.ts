@@ -39,13 +39,13 @@ test("converts strums to strings", () => {
 
 test("converts tabs to string", () => {
   let tab = Strum.tab([-1, 0, 5, 10]);
+
+  expect(tab.toString()).toEqual("TAB[- 0 5 (10)]");
+
   expect(tab.toString(0)).toEqual("-");
   expect(tab.toString(1)).toEqual("0");
   expect(tab.toString(2)).toEqual("5");
   expect(tab.toString(3)).toEqual("(10)");
-
-  expect(() => tab.toString()).toThrow();
-  expect(() => tab.toString(5)).toThrow();
 
   let pause = Strum.tab([-1, -1]);
   expect(pause.toString(0)).toEqual("-");

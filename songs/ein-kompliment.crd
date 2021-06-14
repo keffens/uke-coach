@@ -2,72 +2,97 @@
 {artist: Sportfreunde Stiller}
 {key: D}
 {time: 8/8}
-{tempo: 160}
+{tempo: 158}
+
+{instrument: rythm ukulele}
+{instrument: lead ukulele}
 
 {chord: Cadd9 frets 0 2 0 3}
 
 {start_of_verse: Intro}
 {pattern: verse |d-d-dudud-d-dudu|}
+{start_of_instrument: lead}
+{pattern: *lead-pause |----------------|}
+{end_of_instrument}
 [D][Am][C....][Cadd9....]
-{start_of_tab: *pre-intro}
+{pattern: *single strum |d---------------|}
+{start_of_instrument: lead}
+{start_of_tab: *pre-intro-strum}
 |2---------------|
 |3-----------753-|
 |4---------------|
 |0---------------|
 {end_of_tab}
+{start_of_tab: *pre-intro}
+|----------------|
+|------------753-|
+|----------------|
+|----------------|
+{end_of_tab}
+{end_of_instrument}
 [Em]
+{pattern: verse}
+{start_of_instrument: lead}
 {start_of_tab: *intro}
 |----------------|----------------|----------------|----------------|
-|5-----------753-|5-----------753-|3-----------375-|0-----------735-|
+|5-----------753-|5-----------753-|3-----------357-|0-----------753-|
 |----------------|----------------|----------------|----------------|
 |----------------|----------------|----------------|----------------|
 {end_of_tab}
+{end_of_instrument}
 [D][Am][C....][Cadd9....][Em]
 [D][Am][C....][Cadd9....]
-{start_of_tab: *intro-end}
+{pattern: *single strum}
+{start_of_instrument: lead}
+{start_of_tab: *post-intro}
 |----------------|
 |0---------------|
 |----------------|
 |----------------|
 {end_of_tab}
+{end_of_instrument}
 [Em]
 {end_of_verse}
 
 {start_of_verse: Verse 1}
 {pattern: verse}
 [D..][......]Wenn man so will bist [Am]du das Ziel einer langen Reise, die [C.][.......]Perfektion der besten Art und [Em]Weise, in stillen Momenten leise,
-[D.][.......]die Schaumkrone der [Am]Woge der Begeisterung, berg[C]auf mein Antrieb und {pattern: *single strum |d---------------|}[Em]Schwung.
+[D.][.......]die Schaumkrone der [Am]Woge der Begeisterung, berg[C]auf mein Antrieb und {pattern: *single strum}[Em]Schwung.
 {end_of_verse}
 
 {start_of_chorus: Chorus}
 {pattern: chorus |duxu-uxu-uxu-uxu|}
-[D..][......]Ich wollte dir [Am]nur mal eben sagen dass du [C....]das [....]Größte für mich [Em]bist,
-[D..][......]und sicher gehn [Am]ob du denn das selbe für mich [C....]fühlst [....]für mich [Em]fühlst.
+[D..][......]Ich wollte dir [Am]nur mal eben sagen, dass du [C....]das [....]Größte für mich [Em]bist,
+[D..][......]und sicher gehn, [Am]ob du denn das selbe für mich [C....]fühlst, [....]für mich [Em]fühlst.
 {end_of_chorus}
 
 {start_of_verse: Verse 2}
 {pattern: *single slow |a-------|}
 [D..][......]Wenn man so will, bist [Am]du meine Chill-out Area, meine [C]Feiertage in jedem Jahr, meine [Em]Süßwarenabteilung im Supermarkt,
 {pattern: verse}
-[D.][.......]die Lösung wenn mal was hakt, so [Am]wertvoll das man es sich gerne auch [C]spart, und so schön dass man {pattern: *single strum}[Em]nie darauf verzichten mag.
+[D.][.......]die Lösung wenn mal was hakt, so [Am]wertvoll, dass man es sich gerne auf[C]spart, und so schön, dass man {pattern: *single strum}{pattern: *pre-intro-strum}[Em]nie darauf verzichten mag.
 {end_of_verse}
 
 {start_of_chorus: Chorus}
 {pattern: chorus}
-[D..][......]Ich wollte dir [Am]nur mal eben sagen dass du [C....]das [....]Größte für mich [Em]bist,
-[D..][......]und sicher gehn [Am]ob du denn das selbe für mich [C....]fühlst [....]für mich [Em]fühlst.
+{pattern: *intro}
+[D..][......]Ich wollte dir [Am]nur mal eben sagen, dass du [C....]das [....]Größte für mich [Em]bist,
+[D..][......]und sicher gehn, [Am]ob du denn das selbe für mich [C....]fühlst, [....]für mich {pattern: *post-intro}[Em]fühlst.
 {end_of_chorus}
 
 {start_of_verse: Instrumental}
 {pattern: chorus}
+{pattern: *lead-pause} # TODO: add instrumental solo 
 [D][Am][C][Em]
-[D][Am][C][Em]
+[D][Am][C]{pattern: *pre-intro}[Em]
 {end_of_verse}
 
 {start_of_chorus: Chorus}
 {pattern: chorus}
+{pattern: *intro}
 [D..][......]Ich wollte dir [Am]nur mal eben sagen dass du [C....]das [....]Größte für mich [Em]bist,
-[D..][......]und sicher gehn [Am]ob du denn das selbe für mich [C....]fühlst [....]für mich [Em]fühlst.
+[D..][......]und sicher gehn [Am]ob du denn das selbe für mich [C....]fühlst [....]für mich {pattern: *post-intro}[Em]fühlst.
 {pattern: *single strum}
+{pattern: *lead-pause}
 [D] 
 {end_of_chorus}
