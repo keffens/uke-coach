@@ -91,7 +91,7 @@
 {end_of_tab}
 {end_of_instrument}
 [D][Am][C][Em]
-[D][Am][C]{pattern: *single strum}[Em]
+[D][Am][C]{start_of_instrument: rythm}{pattern: *single strum}{end_of_instrument}[Em]
 {end_of_verse}
 
 {start_of_chorus: Chorus}
