@@ -6,6 +6,7 @@ import SongMetadataComponent from "./SongMetadataComponent";
 import SongPartComponent from "./SongPartComponent";
 import { Song } from "../../lib/music";
 import { Timeout } from "../../lib/util";
+import SongPatternsComponent from "./SongPatternsComponent";
 
 class State {
   readonly start = NaN;
@@ -138,24 +139,7 @@ export default function SongComponent({ song }: SongComponentProps) {
   return (
     <Content>
       <SongMetadataComponent metadata={song.metadata} />
-      <Title tag="h3" className="mb-2">
-        Strumming patterns
-      </Title>
-      {song.instrumentLib.instruments.map((inst) => (
-        <div key={inst.name}>
-          <Title tag="h4" className="mb-1 mt-4">
-            {inst.name}
-          </Title>
-          <Columns isMultiline isMobile>
-            {inst.getPatterns(/*onlyMain=*/ true).map((pattern, i) => (
-              <Column key={i} style={{ minWidth: "max-content" }}>
-                <PatternWithCountComponent key={i} pattern={pattern} />
-              </Column>
-            ))}
-          </Columns>
-        </div>
-      ))}
-      <Title tag="h3">Song</Title>
+      <SongPatternsComponent instrumentLib={song.instrumentLib} />
       <PlayerComponent
         song={song}
         playing={state.playing}

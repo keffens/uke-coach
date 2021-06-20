@@ -46,7 +46,9 @@ class StringPercurion extends SamplerInstrument {
 }
 
 function pluggedVelocity(notes: Array<PitchedNote | null>) {
-  return 1.2 - notes.filter((n) => n).length * 0.2;
+  const steps = notes.filter((n) => n).length - 1;
+  const decrease = 0.4 / (notes.length - 1);
+  return 1.0 - steps * decrease;
 }
 
 /** Base class for plugged string instruments. */
@@ -54,7 +56,6 @@ export class StringInstrument extends SamplerInstrument {
   private static percursion: StringPercurion;
   constructor(readonly instrument: Instrument) {
     super(instrument.name, makeSamplerOptions(instrument.sound));
-    console.log("creating instrument player", instrument);
     // Set lowest string as chord base.
     this.chordBase = this.tuning.reduce(
       (lhs, rhs) => (lhs.compare(rhs) < 0 ? lhs : rhs),
@@ -97,7 +98,9 @@ export class StringInstrument extends SamplerInstrument {
         this.playStrings(notes, time + duration / 2, -delay, 0.5);
         return;
       case StrumType.Plugged:
-        notes = notes.filter((_, idx) => strum.strings?.includes(idx + 1));
+        notes = notes.map((note, idx) =>
+          strum.strings?.includes(idx + 1) ? note : null
+        );
         velocity = pluggedVelocity(notes);
         break;
       case StrumType.Tab:

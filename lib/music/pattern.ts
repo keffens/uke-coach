@@ -101,7 +101,7 @@ function praseFret(line: string, pos: number, frets: number[]): number {
 export class Pattern {
   private constructor(
     readonly time: TimeSignature,
-    readonly strums: Strum[],
+    readonly strums: ReadonlyArray<Strum>,
     readonly bars = 1,
     readonly name = ""
   ) {
@@ -209,19 +209,23 @@ export class Pattern {
     time: TimeSignature,
     patterns?: Map<string, Pattern>
   ): Pattern {
-    if (token.type === TokenType.Pattern) {
-      if (!token.value && patterns) {
-        return getPattern(token.key, patterns, time);
+    try {
+      if (token.type === TokenType.Pattern) {
+        if (!token.value && patterns) {
+          return getPattern(token.key, patterns, time);
+        }
+        const pattern = Pattern.parse(token.value, time, token.key);
+        setPattern(token.key, pattern, patterns);
+        return pattern;
       }
-      const pattern = Pattern.parse(token.value, time, token.key);
-      setPattern(token.key, pattern, patterns);
-      return pattern;
-    }
-    if (token.type === TokenType.TabEnv) {
-      const lines = token.children.map((line) => line.value).reverse();
-      const pattern = Pattern.parseTab(lines, time, token.value);
-      setPattern(token.value, pattern, patterns);
-      return pattern;
+      if (token.type === TokenType.TabEnv) {
+        const lines = token.children.map((line) => line.value).reverse();
+        const pattern = Pattern.parseTab(lines, time, token.value);
+        setPattern(token.value, pattern, patterns);
+        return pattern;
+      }
+    } catch (e) {
+      throw token.error(e.message);
     }
     throw token.error("expected pattern or tab token");
   }
@@ -236,6 +240,11 @@ export class Pattern {
 
   get ticksPerBar(): number {
     return this.time.beats * TICKS_PER_BEAT;
+  }
+
+  /** Returns a copy of this pattern. */
+  clone(name?: string): Pattern {
+    return new Pattern(this.time, this.strums, this.bars, name ?? this.name);
   }
 
   /** Returns the requested strum. Works for all integers. */
