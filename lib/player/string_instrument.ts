@@ -7,6 +7,7 @@ import {
   SoundType,
   Strum,
   StrumType,
+  VolumeSetting,
 } from "../music";
 
 function makeSamplerOptions(sound: SoundType): Partial<Tone.SamplerOptions> {
@@ -72,6 +73,7 @@ export class StringInstrument extends SamplerInstrument {
   }
 
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
+    if (this.instrument!.volume === VolumeSetting.Mute) return;
     let notes =
       this.instrument!.chordLib.getPitchedNotes(chord) ??
       chord.asPitchedNotes(this.chordBase);
@@ -82,7 +84,11 @@ export class StringInstrument extends SamplerInstrument {
         return;
       case StrumType.Percursion:
         this.mute(time);
-        StringInstrument.percursion.playNote(this.chordBase, time, velocity);
+        StringInstrument.percursion.playNote(
+          this.chordBase,
+          time,
+          this.instrument!.volume === VolumeSetting.Low ? 0.2 : 0.6
+        );
         return;
       case StrumType.Down:
         delay = Math.min(0.02, duration / this.tuning.length);
