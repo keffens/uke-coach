@@ -175,9 +175,9 @@ $eightColWidth: 1760px;
   position: -webkit-sticky; /* Safari */
   position: sticky;
   top: 0;
-  width: 100%;
-  z-index: 1000;
   margin: -1em;
+  width: calc(100% + 2em);
+  z-index: 1000;
   padding: 0.5em 1em;
   background-color: white;
   text-align: center;

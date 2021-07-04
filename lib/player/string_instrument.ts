@@ -54,8 +54,8 @@ function pluggedVelocity(notes: Array<PitchedNote | null>) {
 /** Base class for plugged string instruments. */
 export class StringInstrument extends SamplerInstrument {
   private static percursion: StringPercurion;
-  constructor(readonly instrument: Instrument) {
-    super(instrument.name, makeSamplerOptions(instrument.sound));
+  constructor(instrument: Instrument) {
+    super(instrument, makeSamplerOptions(instrument.sound));
     // Set lowest string as chord base.
     this.chordBase = this.tuning.reduce(
       (lhs, rhs) => (lhs.compare(rhs) < 0 ? lhs : rhs),
@@ -68,12 +68,12 @@ export class StringInstrument extends SamplerInstrument {
 
   /** Returns the tuning of this instrument. */
   get tuning(): PitchedNote[] {
-    return this.instrument.chordLib.tuning;
+    return this.instrument!.chordLib.tuning;
   }
 
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
     let notes =
-      this.instrument.chordLib.getPitchedNotes(chord) ??
+      this.instrument!.chordLib.getPitchedNotes(chord) ??
       chord.asPitchedNotes(this.chordBase);
     let delay = 0;
     let velocity = strum.emphasize ? 0.8 : 0.6;
@@ -81,6 +81,7 @@ export class StringInstrument extends SamplerInstrument {
       case StrumType.Pause:
         return;
       case StrumType.Percursion:
+        this.mute(time);
         StringInstrument.percursion.playNote(this.chordBase, time, velocity);
         return;
       case StrumType.Down:
@@ -121,15 +122,18 @@ export class StringInstrument extends SamplerInstrument {
   ) {
     // Remove null notes.
     notes = notes.filter((note) => note);
+
+    // Mute previous notes first. Otherwise, the player might get overloaded,
+    // in particular, on Android.
+    if (notes.length >= 3) {
+      // TODO: maybe release strings individually for a better sound.
+      this.mute(time);
+    }
     // A negative delay means the bottom note is played first, so we add some
     // time for the first note.
     if (delay < 0) time -= delay * notes.length;
     for (let i = 0; i < notes.length; i++) {
-      this.sampler.triggerAttack(
-        notes[i]!.toString(),
-        time + delay * i,
-        velocity
-      );
+      this.playNote(notes[i]!, time + delay * i, velocity);
     }
   }
 }

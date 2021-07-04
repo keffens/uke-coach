@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from "react";
-import { Button, Icon } from "bloomer";
+import { Button } from "bloomer";
 
 interface ToggleIconProps {
   children: ReactNode;
@@ -16,8 +16,7 @@ export default function ToggleIcon({
   const color = state ? "has-text-primary-dark" : "has-text-grey";
   return (
     <Button
-      style={{ border: "none" }}
-      className="m-1 p-3"
+      className="m-1 p-3 is-white"
       onClick={() => {
         setState(!state);
         onClick(!state);

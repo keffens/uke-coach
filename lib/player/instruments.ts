@@ -1,5 +1,13 @@
 import * as Tone from "tone";
-import { Bar, Chord, PitchedNote, Strum, StrumType } from "../music";
+import {
+  Bar,
+  Chord,
+  Instrument,
+  PitchedNote,
+  Strum,
+  StrumType,
+  VolumeSetting,
+} from "../music";
 
 export const DEFAULT_SAMPLE_URLS = {
   A0: "A0.mp3",
@@ -21,9 +29,19 @@ export const DEFAULT_SAMPLE_URLS = {
 
 /** Base class for all instruments. */
 export abstract class InstrumentPlayer {
-  constructor(readonly name: string) {}
+  readonly instrument?: Instrument;
+  readonly name: string;
+  constructor(instrumentOrName: Instrument | string) {
+    if (typeof instrumentOrName === "string") {
+      this.name = instrumentOrName;
+    } else {
+      this.instrument = instrumentOrName;
+      this.name = this.instrument?.name;
+    }
+  }
 
   abstract playNote(note: PitchedNote, time: number, velocity?: number): void;
+  abstract mute(time: number): void;
   abstract playChord(
     chord: Chord,
     strum: Strum,
@@ -37,16 +55,24 @@ export abstract class InstrumentPlayer {
 export class SamplerInstrument extends InstrumentPlayer {
   readonly sampler: Tone.Sampler;
   constructor(
-    name: string,
+    instrumentOrName: Instrument | string,
     samplerOptions: Partial<Tone.SamplerOptions>,
     protected chordBase = PitchedNote.C4
   ) {
-    super(name);
+    super(instrumentOrName);
     this.sampler = new Tone.Sampler(samplerOptions).toDestination();
   }
 
   playNote(note: PitchedNote, time: number, velocity = 1.0): void {
+    if (this.instrument) {
+      if (this.instrument.volume == VolumeSetting.Mute) return;
+      if (this.instrument.volume == VolumeSetting.Low) velocity *= 0.3;
+    }
     this.sampler.triggerAttack(note.toString(), time, velocity);
+  }
+
+  mute(time: number): void {
+    this.sampler.releaseAll(time);
   }
 
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {

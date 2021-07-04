@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { Column, Columns, Content, Title } from "bloomer";
-import PatternWithCountComponent from "./PatternWithCountComponent";
+import { Content } from "bloomer";
+import InstrumentsComponent from "./InstrumentsComponent";
 import PlayerComponent from "./PlayerComponent";
 import SongMetadataComponent from "./SongMetadataComponent";
 import SongPartComponent from "./SongPartComponent";
@@ -135,10 +135,17 @@ export interface SongComponentProps {
 
 export default function SongComponent({ song }: SongComponentProps) {
   const [state, setState] = useState(new State(song));
+  const [update, forceUpdate] = useState(0);
   state.setSetter(setState);
   return (
     <Content>
       <SongMetadataComponent metadata={song.metadata} />
+      <InstrumentsComponent
+        instrumentLib={song.instrumentLib}
+        onVisibilityChange={() => {
+          forceUpdate(update + 1);
+        }}
+      />
       <SongPatternsComponent instrumentLib={song.instrumentLib} />
       <PlayerComponent
         song={song}

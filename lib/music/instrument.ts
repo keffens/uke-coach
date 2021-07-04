@@ -15,11 +15,32 @@ export const INSTRUMENT_RE = new RegExp(
     String.raw`(?:\s+(${Object.values(SoundType).join("|")}))?$`
 );
 
+/** Supported volume settings for playback. */
+export enum VolumeSetting {
+  High,
+  Low,
+  Mute,
+}
+
+/** Returns the next volume state. */
+export function toggleVolume(vol: VolumeSetting): VolumeSetting {
+  switch (vol) {
+    case VolumeSetting.High:
+      return VolumeSetting.Low;
+    case VolumeSetting.Low:
+      return VolumeSetting.Mute;
+    case VolumeSetting.Mute:
+      return VolumeSetting.High;
+  }
+}
+
 /**
  * Represents one instrument with chord library and information which sampler to
  * use for audio playback.
  */
 export class Instrument {
+  volume = VolumeSetting.High;
+  show = true;
   readonly chordLib: ChordLib;
   readonly sound: SoundType;
   private patterns = new Map<string, Pattern>();
