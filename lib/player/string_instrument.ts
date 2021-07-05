@@ -55,6 +55,8 @@ function pluggedVelocity(notes: Array<PitchedNote | null>) {
 /** Base class for plugged string instruments. */
 export class StringInstrument extends SamplerInstrument {
   private static percursion: StringPercurion;
+  private activeNotes: Array<string | null>;
+
   constructor(instrument: Instrument) {
     super(instrument, makeSamplerOptions(instrument.sound));
     // Set lowest string as chord base.
@@ -65,11 +67,17 @@ export class StringInstrument extends SamplerInstrument {
     if (!StringInstrument.percursion) {
       StringInstrument.percursion = new StringPercurion();
     }
+    this.activeNotes = Array(instrument.tuning.length).fill(null);
   }
 
   /** Returns the tuning of this instrument. */
   get tuning(): PitchedNote[] {
     return this.instrument!.chordLib.tuning;
+  }
+
+  mute(time: number): void {
+    super.mute(time);
+    this.activeNotes.fill(null);
   }
 
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
@@ -127,19 +135,41 @@ export class StringInstrument extends SamplerInstrument {
     velocity: number
   ) {
     // Remove null notes.
-    notes = notes.filter((note) => note);
+    const playedNotes = notes.filter((note) => note).length;
 
-    // Mute previous notes first. Otherwise, the player might get overloaded,
-    // in particular, on Android.
-    if (notes.length >= 3) {
-      // TODO: maybe release strings individually for a better sound.
-      this.mute(time);
-    }
     // A negative delay means the bottom note is played first, so we add some
     // time for the first note.
-    if (delay < 0) time -= delay * notes.length;
+    if (delay < 0) time -= delay * playedNotes;
     for (let i = 0; i < notes.length; i++) {
-      this.playNote(notes[i]!, time + delay * i, velocity);
+      const note = notes[i];
+      if (!note) continue;
+      this.releaseIfActive(i, note, time);
+      this.playNote(note, time, velocity);
+      time += delay;
+    }
+  }
+
+  // Mute previously played notes on the same string. Since notes are
+  // silenced by their note value, we also mute all previously played notes
+  // of this type.
+  private releaseIfActive(
+    stringIdx: number,
+    note: PitchedNote,
+    time: number
+  ): void {
+    if (this.activeNotes[stringIdx]) {
+      this.sampler.triggerRelease(this.activeNotes[stringIdx]!, time);
+      this.activeNotes[stringIdx] = null;
+    }
+    let released = false;
+    for (let i = 0; i < this.activeNotes.length; i++) {
+      if (this.activeNotes[i] === note.toString()) {
+        if (!released) {
+          this.sampler.triggerRelease(this.activeNotes[i]!, time);
+          released = true;
+        }
+        this.activeNotes[i] = null;
+      }
     }
   }
 }
