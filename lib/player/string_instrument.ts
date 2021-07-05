@@ -143,16 +143,16 @@ export class StringInstrument extends SamplerInstrument {
     for (let i = 0; i < notes.length; i++) {
       const note = notes[i];
       if (!note) continue;
-      this.releaseIfActive(i, note, time);
+      this.setActiveNote(i, note, time);
       this.playNote(note, time, velocity);
       time += delay;
     }
   }
 
-  // Mute previously played notes on the same string. Since notes are
-  // silenced by their note value, we also mute all previously played notes
-  // of this type.
-  private releaseIfActive(
+  // Mute previously played notes on the same string, then set the new note.
+  // Since notes are silenced by their note value, we also mute the same note
+  // if it was already played on another string.
+  private setActiveNote(
     stringIdx: number,
     note: PitchedNote,
     time: number
@@ -161,15 +161,12 @@ export class StringInstrument extends SamplerInstrument {
       this.sampler.triggerRelease(this.activeNotes[stringIdx]!, time);
       this.activeNotes[stringIdx] = null;
     }
-    let released = false;
     for (let i = 0; i < this.activeNotes.length; i++) {
       if (this.activeNotes[i] === note.toString()) {
-        if (!released) {
-          this.sampler.triggerRelease(this.activeNotes[i]!, time);
-          released = true;
-        }
+        this.sampler.triggerRelease(note.toString(), time);
         this.activeNotes[i] = null;
       }
     }
+    this.activeNotes[stringIdx] = note.toString();
   }
 }
