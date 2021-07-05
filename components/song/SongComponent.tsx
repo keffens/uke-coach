@@ -6,7 +6,6 @@ import SongMetadataComponent from "./SongMetadataComponent";
 import SongPartComponent from "./SongPartComponent";
 import { Song } from "../../lib/music";
 import { Timeout } from "../../lib/util";
-import SongPatternsComponent from "./SongPatternsComponent";
 
 class State {
   readonly start = NaN;
@@ -146,7 +145,6 @@ export default function SongComponent({ song }: SongComponentProps) {
           forceUpdate(update + 1);
         }}
       />
-      <SongPatternsComponent instrumentLib={song.instrumentLib} />
       <PlayerComponent
         song={song}
         playing={state.playing}

@@ -134,3 +134,19 @@ test("adds fallback pattern if possible", () => {
   expect(uke.setPatternIfCompatible(island2)).toEqual(false);
   expect(uke.activePattern).toBe(island);
 });
+
+test("filters patterns", () => {
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const island = Pattern.parse("|d-du-udu|", TimeSignature.DEFAULT, "island");
+  const dudu = Pattern.parse("|dudu|", TimeSignature.DEFAULT, "dudu");
+  const other_dudu = Pattern.parse("|DUDU|", TimeSignature.DEFAULT, "dudu");
+  uke.setPattern(island);
+  uke.setPattern(dudu);
+  expect(uke.getPatterns()).toEqual([island, dudu]);
+
+  uke.filterPatterns(new Set([island, other_dudu]));
+  expect(uke.getPatterns()).toEqual([island]);
+
+  uke.filterPatterns(new Set());
+  expect(uke.getPatterns()).toEqual([]);
+});

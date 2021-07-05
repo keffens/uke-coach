@@ -1,6 +1,8 @@
+import { setUnion } from "../util";
 import { Bar, BarParagraph, BarParagraphBuilder } from "./bar";
 import { InstrumentLib } from "./instrument_lib";
 import { PartMetadata, SongMetadata } from "./metadata";
+import { Pattern } from "./pattern";
 import { Token, TokenType } from "./token";
 
 export enum SongPartType {
@@ -142,5 +144,14 @@ export class SongPart {
   /** Returns the duration of on bar in seconds. */
   get barDurationSec(): number {
     return this.barDuration / 1000;
+  }
+
+  /**
+   * Returns the patterns used in this part for the given instrument.
+   */
+  usedPatterns(instrumentIdx: number): Set<Pattern> {
+    return setUnion(
+      ...this.paragraphs.map((p) => p.usedPatterns(instrumentIdx))
+    );
   }
 }

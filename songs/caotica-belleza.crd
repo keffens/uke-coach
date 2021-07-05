@@ -16,8 +16,8 @@
 {start_of_instrument: uke 2}
 {chord: C frets 5 4 3 3}
 {pattern: intro 1st |(34)-4-(23)-3-|}
-{pattern: verse |(14)-2-3-2-|}
-{start_of_tab: verse ii}
+{pattern: intro/verse |(14)-2-3-2-|}
+{start_of_tab: *verse ii}
 |--------|--------|--------|--------|
 |--------|0-----3-|------0-|--------|
 |----0---|----4---|2---2---|--------|
@@ -27,13 +27,13 @@
 {end_of_instrument}
 
 {pattern: single plugged}{pattern: intro 1st}
-[Am]{pattern: verse}[C][G][Am]
+[Am]{pattern: intro/verse}[C][G][Am]
 {pattern: intro 1st}
-[Am]{pattern: verse}[C][G][Am]
+[Am]{pattern: intro/verse}[C][G][Am]
 
 {start_of_verse: Verse 1}
 {pattern: single plugged}
-{pattern: verse}
+{pattern: intro/verse}
 Un lu[Am]gar para es[C]tar y vi[G]vir lo que se he[Am]reda.
 Una can[Am]ción sin condi[C]ción para so[G]nar lo que noes [Am]queda.
 {pattern: doube plugged}
@@ -52,7 +52,7 @@ Uh oh [Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh [Am]oh_, uh oh
 
 {start_of_verse: Verse 2}
 {pattern: doube plugged}
-{pattern: verse ii}
+{pattern: *verse ii}
 Por un [Am]fluir, por lo esen[C]tial, por lo que [G]hace, por lo que [Am]muere,
 por lo sen[Am]tido y lo sinsen[C]tido, por lo que [G]hay y nunca {pattern: single plugged}{pattern: *verse ii end}[Am]hubo,
 {pattern: offbeat |1(234)-(234)-(234)-(234)|}

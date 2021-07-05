@@ -2,10 +2,11 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { Tab, Tabs, TabList, TabLink, Title } from "bloomer";
 import { FaGuitar } from "react-icons/fa";
 import { BiHide } from "react-icons/bi";
-import VisibilityToggle from "../elements/VisibilityToggle";
 import { Instrument, InstrumentLib } from "../../lib/music";
+import VisibilityToggle from "../elements/VisibilityToggle";
 import VolumeToggle from "../elements/VolumeToggle";
 import VolumeIcon from "../elements/VolumeIcon";
+import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
 
 interface InstrumentIconProps {
   instrument: Instrument;
@@ -52,7 +53,7 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
   }
   return (
     <>
-      <Title tag="h3">
+      <Title tag="h3" className="mb-3">
         {name}{" "}
         <VisibilityToggle
           initialVisibility={instrument.show}
@@ -69,6 +70,7 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
           }}
         />
       </Title>
+      <InstrumentPatternsComponent instrument={instrument} />
     </>
   );
 }

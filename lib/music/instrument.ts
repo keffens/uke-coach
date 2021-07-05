@@ -81,6 +81,15 @@ export class Instrument {
     return [...this.patterns.values()];
   }
 
+  /** Remove all patterns which are not in the given list of patterns. */
+  filterPatterns(filter: Set<Pattern>): void {
+    for (const [name, pattern] of this.patterns.entries()) {
+      if (!filter.has(pattern)) {
+        this.patterns.delete(name);
+      }
+    }
+  }
+
   /** Parses an instrument from a string. */
   static parse(text: string): Instrument {
     const match = text.match(INSTRUMENT_RE);

@@ -55,6 +55,17 @@ export class BarParagraph {
   get ticks(): number {
     return this.ticksPerBar * this.bars.length;
   }
+
+  /**
+   * Returns the patterns used in this bar paragraph for the given instrument.
+   */
+  usedPatterns(instrumentIdx: number): Set<Pattern> {
+    const patterns = new Set<Pattern>();
+    for (const bar of this.bars) {
+      patterns.add(bar.patterns[instrumentIdx]);
+    }
+    return patterns;
+  }
 }
 
 export class BarParagraphBuilder {
