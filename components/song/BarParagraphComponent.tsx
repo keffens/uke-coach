@@ -34,6 +34,8 @@ function BarComponent({
             <PatternComponent
               key={idx}
               pattern={Pattern.makeEmpty(pattern.time, 0)}
+              instrumentLib={instrumentLib}
+              instrumentIdx={idx}
             />
           ))}
           <LyricsComponent

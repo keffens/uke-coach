@@ -78,12 +78,15 @@ export default function PatternComponent({
     !!pattern !== !!bar,
     "Either bar or pattern is required for PatternComponent."
   );
+  if (
+    instrumentIdx != null &&
+    instrumentLib?.instruments[instrumentIdx].show === false
+  ) {
+    // This instrument's track is hidden.
+    return <></>;
+  }
   if (bar) {
     assert(instrumentIdx != null, "instrumentIdx is required if bar is set");
-    if (instrumentLib?.instruments[instrumentIdx].show === false) {
-      // This instrument's track is hidden.
-      return <></>;
-    }
     pattern = bar.patterns[instrumentIdx];
     patternIdx = bar.patternIdxs[instrumentIdx];
   }
