@@ -9,8 +9,14 @@ import { Token, TokenType } from "./token";
 export class InstrumentLib {
   instruments = new Array<Instrument>();
 
+  /** If not all of the active patterns are set, returns an empty array. */
   get activePatterns(): Pattern[] {
-    return this.instruments.map((inst) => inst.activePattern);
+    const patterns = [];
+    for (const instrument of this.instruments) {
+      if (!instrument.activePattern) return [];
+      patterns.push(instrument.activePattern);
+    }
+    return patterns;
   }
 
   get length(): number {

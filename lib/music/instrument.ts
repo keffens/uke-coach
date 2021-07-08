@@ -66,8 +66,7 @@ export class Instrument {
   }
 
   /** Returns the active pattern. */
-  get activePattern(): Pattern {
-    assert(this.activePatternVar, `No pattern set for instrument ${this.name}`);
+  get activePattern(): Pattern | null {
     return this.activePatternVar;
   }
 

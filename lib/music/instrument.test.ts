@@ -73,7 +73,7 @@ test("adds patterns and select active pattern", () => {
   const island = Pattern.parse("|d-du-udu|", TimeSignature.DEFAULT, "island");
   const noname = Pattern.parse("|dudu|", TimeSignature.DEFAULT, "");
 
-  expect(() => uke.activePattern).toThrow();
+  expect(uke.activePattern).toBeNull();
   expect(() => uke.setActivePattern("island")).toThrow();
 
   uke.setPattern(island);
@@ -94,7 +94,7 @@ test("selects active pattern if defined", () => {
   const noname = Pattern.parse("|dudu|", TimeSignature.DEFAULT, "");
 
   expect(uke.setActivePatternIfDefined("island")).toEqual(false);
-  expect(() => uke.activePattern).toThrow();
+  expect(uke.activePattern).toBeNull();
 
   uke.setPattern(island);
   uke.setPattern(noname);
