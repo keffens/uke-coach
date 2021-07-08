@@ -3,6 +3,7 @@ import { parseBeats, sumBeats } from "./note";
 import { Pattern } from "./pattern";
 import { assert } from "../util";
 import { TimeSignature } from "./signature";
+import { StrumType } from "./strum";
 
 export class Bar {
   constructor(
@@ -65,6 +66,22 @@ export class BarParagraph {
       patterns.add(bar.patterns[instrumentIdx]);
     }
     return patterns;
+  }
+
+  /** Returns the chords used by the given instrument.*/
+  usedChords(instrumentIdx: number): Set<string> {
+    const chords = new Set<string>();
+    for (const bar of this.bars) {
+      const pattern = bar.patterns[instrumentIdx];
+      const patternIdx = bar.patternIdxs[instrumentIdx];
+      for (let i = 0; i < pattern.strumsPerBar; i++) {
+        const chord = bar.getChordForStrum(i, instrumentIdx);
+        if (chord && pattern.getStrum(i, patternIdx).usesChord()) {
+          chords.add(chord.toString());
+        }
+      }
+    }
+    return chords;
   }
 }
 

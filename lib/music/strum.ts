@@ -152,4 +152,11 @@ export class Strum {
         throw new Error(`Unknown strum StrumType: "${this.type}"`);
     }
   }
+
+  /** Whether this strum uses a chord or works standalone. */
+  usesChord(): boolean {
+    return ![StrumType.Pause, StrumType.Percursion, StrumType.Tab].includes(
+      this.type
+    );
+  }
 }

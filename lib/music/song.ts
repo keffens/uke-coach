@@ -1,4 +1,5 @@
 import { Bar } from "./bar";
+import { Chord } from "./chord";
 import { InstrumentLib } from "./instrument_lib";
 import { Pattern } from "./pattern";
 import { SongMetadata } from "./metadata";
@@ -14,6 +15,7 @@ export class Song {
   ) {
     for (let i = 0; i < instrumentLib.length; i++) {
       instrumentLib.instruments[i].filterPatterns(this.usedPatterns(i));
+      instrumentLib.instruments[i].chordLib.usedChords = this.usedChords(i);
     }
   }
 
@@ -39,5 +41,10 @@ export class Song {
    */
   usedPatterns(instrumentIdx: number): Set<Pattern> {
     return setUnion(...this.parts.map((p) => p.usedPatterns(instrumentIdx)));
+  }
+
+  /** Returns the chords used by the given instrument.*/
+  usedChords(instrumentIdx: number): Set<string> {
+    return setUnion(...this.parts.map((p) => p.usedChords(instrumentIdx)));
   }
 }

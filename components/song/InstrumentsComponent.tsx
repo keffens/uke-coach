@@ -6,6 +6,7 @@ import { Instrument, InstrumentLib } from "../../lib/music";
 import VisibilityToggle from "../elements/VisibilityToggle";
 import VolumeToggle from "../elements/VolumeToggle";
 import VolumeIcon from "../elements/VolumeIcon";
+import InstrumentChordsComponent from "./InstrumentChordsComponent";
 import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
 
 interface InstrumentIconProps {
@@ -70,6 +71,7 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
           }}
         />
       </Title>
+      <InstrumentChordsComponent chordLib={instrument.chordLib} />
       <InstrumentPatternsComponent instrument={instrument} />
     </>
   );

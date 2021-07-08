@@ -1,5 +1,6 @@
 import { setUnion } from "../util";
 import { Bar, BarParagraph, BarParagraphBuilder } from "./bar";
+import { Chord } from "./chord";
 import { InstrumentLib } from "./instrument_lib";
 import { PartMetadata, SongMetadata } from "./metadata";
 import { Pattern } from "./pattern";
@@ -153,5 +154,10 @@ export class SongPart {
     return setUnion(
       ...this.paragraphs.map((p) => p.usedPatterns(instrumentIdx))
     );
+  }
+
+  /** Returns the chords used by the given instrument.*/
+  usedChords(instrumentIdx: number): Set<string> {
+    return setUnion(...this.paragraphs.map((p) => p.usedChords(instrumentIdx)));
   }
 }

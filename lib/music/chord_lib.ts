@@ -8,7 +8,8 @@ import {
 import { NOTE_IDENTITY, PitchedNote, toSharp } from "./note";
 import { Token, TokenType } from "./token";
 
-type ChordInput = Chord | string;
+/** Most functions in the chord lib support either a chord or a string */
+export type ChordInput = Chord | string;
 
 const UKULELE_CHORD_FRETS = new Map<string, number[]>([
   ["C", [0, 0, 0, 3]],
@@ -77,6 +78,7 @@ function fretsFromMap(
 
 /** Maps chords to frets, with the option to add custom chords. */
 export class ChordLib {
+  usedChords = new Set<string>();
   private costumChords = new Map<string, number[]>();
 
   private constructor(

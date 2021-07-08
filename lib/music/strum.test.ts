@@ -51,3 +51,15 @@ test("converts tabs to string", () => {
   expect(pause.toString(0)).toEqual("-");
   expect(pause.toString(1)).toEqual("-");
 });
+
+test("returns whether strums use chords", () => {
+  expect(Strum.down().usesChord()).toEqual(true);
+  expect(Strum.up().usesChord()).toEqual(true);
+  expect(Strum.arpeggio().usesChord()).toEqual(true);
+  expect(Strum.tremolo().usesChord()).toEqual(true);
+  expect(Strum.plugged([1]).usesChord()).toEqual(true);
+
+  expect(Strum.pause().usesChord()).toEqual(false);
+  expect(Strum.percursion().usesChord()).toEqual(false);
+  expect(Strum.tab([-1, 0, 5, 10]).usesChord()).toEqual(false);
+});
