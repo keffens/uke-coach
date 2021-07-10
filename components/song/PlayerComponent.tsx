@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import ReactTooltip from "react-tooltip";
 import {
   FaPlay,
   FaPause,
@@ -7,6 +8,7 @@ import {
   FaStop,
 } from "react-icons/fa";
 import { GiMetronome, GiSnail } from "react-icons/gi";
+import { VscDesktopDownload } from "react-icons/vsc";
 import styles from "./Song.module.scss";
 import IconButton from "../elements/IconButton";
 import SmallIconButton from "../elements/SmallIconButton";
@@ -91,15 +93,25 @@ export default function PlayerComponent({
       <ToggleIcon
         initialState={Player.metronomeEnabled}
         onClick={(enable: boolean) => (Player.metronomeEnabled = enable)}
+        tooltip="Enable metronome."
       >
         <GiMetronome />
       </ToggleIcon>
       <ToggleIcon
+        initialState={Player.autoScroll}
+        onClick={(enable: boolean) => (Player.autoScroll = enable)}
+        tooltip="Enable auto-scroll while palying."
+      >
+        <VscDesktopDownload />
+      </ToggleIcon>
+      <ToggleIcon
         initialState={Player.resrouceSavingEnabled}
         onClick={(enable: boolean) => (Player.resrouceSavingEnabled = enable)}
+        tooltip="Use less resources for playback. Sound quality may suffer."
       >
         <GiSnail />
       </ToggleIcon>
+      <ReactTooltip className={styles.tooltip} />
     </div>
   );
 }

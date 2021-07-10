@@ -6,6 +6,7 @@ import { StringInstrument } from "./string_instrument";
 
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
+  autoScroll = true;
   private playing = false;
   private countInBars = 1;
   private initialized = false;
@@ -89,6 +90,10 @@ class PlayerImpl {
     for (const instrument of this.instruments) {
       instrument.resourceSavingEnabled = enable;
     }
+  }
+
+  get resourceSavingEnabled(): boolean {
+    return !!this.instruments[0]?.resourceSavingEnabled;
   }
 
   get metronomeEnabled() {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Column, Columns } from "bloomer";
 import ChordComponent from "./ChordComponent";
 import LyricsComponent from "./LyricsComponent";
@@ -7,6 +7,7 @@ import SpacedGridRow from "./SpacedGridRow";
 import { Bar, BarParagraph, InstrumentLib, Pattern } from "../../lib/music";
 import styles from "./Song.module.scss";
 import { range } from "../../lib/util";
+import { Player } from "../../lib/player";
 
 interface BarComponentProps {
   bar: Bar;
@@ -25,9 +26,25 @@ function BarComponent({
   instrumentLib,
   highlightTick,
 }: BarComponentProps) {
+  const barRef = useRef<HTMLDivElement>(null);
+  const [highlightState, setHighlight] = useState(false);
+  const isHiglighted = highlightTick != null && !isNaN(highlightTick);
+  if (isHiglighted !== highlightState) {
+    setHighlight(isHiglighted);
+  }
+  useEffect(() => {
+    if (Player.autoScroll && highlightState) {
+      barRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+    }
+  }, [highlightState]);
+
   if (isFirst && bar.anacrusis) {
     return (
-      <Column isPaddingless className={styles.firstBarContainer}>
+      <div ref={barRef} className={styles.firstBarContainer}>
         <div className={styles.barContainer} style={{ flexGrow: 0 }}>
           <ChordComponent />
           {bar.patterns.map((pattern, idx) => (
@@ -68,11 +85,11 @@ function BarComponent({
             nextAnacrusis={nextAnacrusis}
           />
         </div>
-      </Column>
+      </div>
     );
   }
   return (
-    <Column isPaddingless className={styles.barContainer}>
+    <div ref={barRef} className={styles.barContainer}>
       <SpacedGridRow spacing={bar.beats}>
         {bar.chords.map((chord, i) => (
           <ChordComponent key={i} chord={chord} />
@@ -94,7 +111,7 @@ function BarComponent({
         beats={bar.beats}
         nextAnacrusis={nextAnacrusis}
       />
-    </Column>
+    </div>
   );
 }
 
