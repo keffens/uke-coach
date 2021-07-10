@@ -81,6 +81,16 @@ class PlayerImpl {
     }
   }
 
+  /**
+   * Make playback more resource firendly. Helps with playback on Android
+   * phones and maybe other browsers / systems.
+   */
+  set resrouceSavingEnabled(enable: boolean) {
+    for (const instrument of this.instruments) {
+      instrument.resourceSavingEnabled = enable;
+    }
+  }
+
   get metronomeEnabled() {
     return this.metronomeIsOn;
   }

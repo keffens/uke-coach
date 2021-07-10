@@ -27,10 +27,22 @@ export const DEFAULT_SAMPLE_URLS = {
   E7: "E7.mp3",
 };
 
+export type NoteInput = PitchedNote | string;
+
+/**
+ * If the input is a string, returns the string. If it's a PitchedNote,
+ * converts it to string.
+ */
+export function noteToString(note: NoteInput): string {
+  if (note instanceof PitchedNote) return note.toString();
+  return note;
+}
+
 /** Base class for all instruments. */
 export abstract class InstrumentPlayer {
   readonly instrument?: Instrument;
   readonly name: string;
+  public resourceSavingEnabled = false;
   constructor(instrumentOrName: Instrument | string) {
     if (typeof instrumentOrName === "string") {
       this.name = instrumentOrName;
@@ -40,7 +52,8 @@ export abstract class InstrumentPlayer {
     }
   }
 
-  abstract playNote(note: PitchedNote, time: number, velocity?: number): void;
+  abstract playNote(note: NoteInput, time: number, velocity?: number): void;
+  abstract muteNote(note: NoteInput, time: number): void;
   abstract mute(time: number): void;
   abstract playChord(
     chord: Chord,
@@ -63,12 +76,16 @@ export class SamplerInstrument extends InstrumentPlayer {
     this.sampler = new Tone.Sampler(samplerOptions).toDestination();
   }
 
-  playNote(note: PitchedNote, time: number, velocity = 1.0): void {
+  playNote(note: NoteInput, time: number, velocity = 1.0): void {
     if (this.instrument) {
       if (this.instrument.volume == VolumeSetting.Mute) return;
       if (this.instrument.volume == VolumeSetting.Low) velocity *= 0.3;
     }
-    this.sampler.triggerAttack(note.toString(), time, velocity);
+    this.sampler.triggerAttack(noteToString(note), time, velocity);
+  }
+
+  muteNote(note: NoteInput, time: number) {
+    this.sampler.triggerRelease(noteToString(note), time);
   }
 
   mute(time: number): void {
@@ -77,6 +94,9 @@ export class SamplerInstrument extends InstrumentPlayer {
 
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
     if (strum.type === StrumType.Pause) return;
+    if (this.resourceSavingEnabled) {
+      this.mute(time);
+    }
     for (const note of chord.asPitchedNotes(this.chordBase)) {
       this.playNote(note, time);
     }

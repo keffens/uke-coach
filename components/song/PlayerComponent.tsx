@@ -1,14 +1,12 @@
 import React, { useEffect } from "react";
-import { Button } from "bloomer";
 import {
-  FaGuitar,
   FaPlay,
   FaPause,
   FaStepBackward,
   FaStepForward,
   FaStop,
 } from "react-icons/fa";
-import { GiMetronome } from "react-icons/gi";
+import { GiMetronome, GiSnail } from "react-icons/gi";
 import styles from "./Song.module.scss";
 import IconButton from "../elements/IconButton";
 import SmallIconButton from "../elements/SmallIconButton";
@@ -27,7 +25,7 @@ interface PlayerComponentProps {
   onGoForward: () => void;
 }
 
-export default function PlayerComponentProps({
+export default function PlayerComponent({
   song,
   playing,
   pauseTime,
@@ -43,12 +41,6 @@ export default function PlayerComponentProps({
   }, []);
   return (
     <div className={styles.player}>
-      <ToggleIcon
-        initialState={Player.playbackEnabled}
-        onClick={(enable: boolean) => (Player.playbackEnabled = enable)}
-      >
-        <FaGuitar />
-      </ToggleIcon>
       <SmallIconButton
         disabled={playing}
         onClick={() => {
@@ -101,6 +93,12 @@ export default function PlayerComponentProps({
         onClick={(enable: boolean) => (Player.metronomeEnabled = enable)}
       >
         <GiMetronome />
+      </ToggleIcon>
+      <ToggleIcon
+        initialState={Player.resrouceSavingEnabled}
+        onClick={(enable: boolean) => (Player.resrouceSavingEnabled = enable)}
+      >
+        <GiSnail />
       </ToggleIcon>
     </div>
   );

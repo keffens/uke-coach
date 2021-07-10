@@ -137,6 +137,9 @@ export class StringInstrument extends SamplerInstrument {
     // Remove null notes.
     const playedNotes = notes.filter((note) => note).length;
 
+    if (this.resourceSavingEnabled && playedNotes >= 3) {
+      this.mute(time);
+    }
     // A negative delay means the bottom note is played first, so we add some
     // time for the first note.
     if (delay < 0) time -= delay * playedNotes;
@@ -150,20 +153,20 @@ export class StringInstrument extends SamplerInstrument {
   }
 
   // Mute previously played notes on the same string, then set the new note.
-  // Since notes are silenced by their note value, we also mute the same note
-  // if it was already played on another string.
+  // Since notes are silenced by their note value, we have to remove all
+  // previous uses of the note from the array. Note that tonejs mutes a note
+  // before playing the same note.
   private setActiveNote(
     stringIdx: number,
     note: PitchedNote,
     time: number
   ): void {
     if (this.activeNotes[stringIdx]) {
-      this.sampler.triggerRelease(this.activeNotes[stringIdx]!, time);
+      this.muteNote(this.activeNotes[stringIdx]!, time);
       this.activeNotes[stringIdx] = null;
     }
     for (let i = 0; i < this.activeNotes.length; i++) {
       if (this.activeNotes[i] === note.toString()) {
-        this.sampler.triggerRelease(note.toString(), time);
         this.activeNotes[i] = null;
       }
     }

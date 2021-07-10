@@ -16,7 +16,7 @@ export default function ToggleIcon({
   const color = state ? "has-text-primary-dark" : "has-text-grey";
   return (
     <Button
-      className="m-1 p-3 is-white"
+      className="p-3 is-white"
       onClick={() => {
         setState(!state);
         onClick(!state);
