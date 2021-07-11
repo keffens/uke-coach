@@ -47,4 +47,14 @@ export class Song {
   usedChords(instrumentIdx: number): Set<string> {
     return setUnion(...this.parts.map((p) => p.usedChords(instrumentIdx)));
   }
+
+  /**
+   * Highlights the specified bar. Any negative value for either input clears
+   * all highlights.
+   */
+  highlightPart(partIdx: number, barIdx = 0): void {
+    this.parts.forEach((part, i) => {
+      part.highlightBar(partIdx === i ? barIdx : -1);
+    });
+  }
 }

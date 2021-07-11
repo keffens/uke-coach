@@ -15,7 +15,6 @@ interface BarComponentProps {
   useTab: boolean[];
   nextAnacrusis?: string;
   instrumentLib: InstrumentLib;
-  highlightTick?: number;
 }
 
 function BarComponent({
@@ -24,14 +23,16 @@ function BarComponent({
   useTab,
   nextAnacrusis,
   instrumentLib,
-  highlightTick,
 }: BarComponentProps) {
   const barRef = useRef<HTMLDivElement>(null);
   const [highlightState, setHighlight] = useState(false);
-  const isHiglighted = highlightTick != null && !isNaN(highlightTick);
-  if (isHiglighted !== highlightState) {
-    setHighlight(isHiglighted);
-  }
+  const highlightClass = highlightState ? styles.highlight : "";
+
+  bar.onHighlightChange((highlight) => {
+    if (highlightState !== highlight) {
+      setHighlight(highlight);
+    }
+  });
   useEffect(() => {
     if (Player.autoScroll && highlightState) {
       barRef.current?.scrollIntoView({
@@ -62,7 +63,10 @@ function BarComponent({
             isSoloAnacrusis
           />
         </div>
-        <div className={styles.barContainer} style={{ minWidth: "unset" }}>
+        <div
+          className={`${styles.barContainer} ${highlightClass}`}
+          style={{ minWidth: "unset" }}
+        >
           <SpacedGridRow spacing={bar.beats}>
             {bar.chords.map((chord, i) => (
               <ChordComponent key={i} chord={chord} />
@@ -76,7 +80,6 @@ function BarComponent({
               showStringLabels
               instrumentLib={instrumentLib}
               instrumentIdx={idx}
-              highlightTick={highlightTick}
             />
           ))}
           <LyricsComponent
@@ -89,7 +92,7 @@ function BarComponent({
     );
   }
   return (
-    <div ref={barRef} className={styles.barContainer}>
+    <div ref={barRef} className={`${styles.barContainer} ${highlightClass}`}>
       <SpacedGridRow spacing={bar.beats}>
         {bar.chords.map((chord, i) => (
           <ChordComponent key={i} chord={chord} />
@@ -103,7 +106,6 @@ function BarComponent({
           showStringLabels={isFirst}
           instrumentLib={instrumentLib}
           instrumentIdx={idx}
-          highlightTick={highlightTick}
         />
       ))}
       <LyricsComponent
@@ -118,18 +120,13 @@ function BarComponent({
 export interface BarParagraphComponentProps {
   paragraph: BarParagraph;
   instrumentLib: InstrumentLib;
-  highlightTick?: number;
 }
 
 export default function BarParagraphComponent({
   paragraph,
   instrumentLib,
-  highlightTick,
 }: BarParagraphComponentProps) {
-  highlightTick = highlightTick ?? NaN;
   const useTab = range(instrumentLib.length).map((i) => paragraph.useTab(i));
-  const highlightInBar = Math.floor(highlightTick / paragraph.ticksPerBar);
-  const tickInBar = highlightTick % paragraph.ticksPerBar;
   return (
     <Columns isMultiline isMobile isMarginless className={styles.barParagraph}>
       {paragraph.bars.map((bar, i) => (
@@ -140,7 +137,6 @@ export default function BarParagraphComponent({
           useTab={useTab}
           nextAnacrusis={paragraph.bars[i + 1]?.anacrusis}
           instrumentLib={instrumentLib}
-          highlightTick={highlightInBar === i ? tickInBar : NaN}
         />
       ))}
     </Columns>

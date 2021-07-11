@@ -3,9 +3,11 @@ import { parseBeats, sumBeats } from "./note";
 import { Pattern } from "./pattern";
 import { assert } from "../util";
 import { TimeSignature } from "./signature";
-import { StrumType } from "./strum";
 
 export class Bar {
+  private highlightInternal = false;
+  private highlightListener?: (highlight: boolean) => void;
+
   constructor(
     public chords: (Chord | null)[],
     public beats: number[],
@@ -22,6 +24,17 @@ export class Bar {
     if (this.lyrics.every((l) => !l)) {
       this.lyrics = [];
     }
+  }
+
+  set highlight(highlight: boolean) {
+    if (this.highlightInternal !== highlight && this.highlightListener) {
+      this.highlightInternal = highlight;
+      this.highlightListener(highlight);
+    }
+  }
+
+  onHighlightChange(listener: (highlight: boolean) => void): void {
+    this.highlightListener = listener;
   }
 
   /** Returns the chord for the i-th strum. */
@@ -55,6 +68,13 @@ export class BarParagraph {
   /** Returns the number of ticks for the entire paragraph. */
   get ticks(): number {
     return this.ticksPerBar * this.bars.length;
+  }
+
+  /** Clears the highlight on all bars. */
+  clearHighlight(): void {
+    for (const bar of this.bars) {
+      bar.highlight = false;
+    }
   }
 
   /**

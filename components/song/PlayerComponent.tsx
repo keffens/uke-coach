@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import {
   FaPlay,
@@ -8,8 +8,9 @@ import {
   FaStop,
 } from "react-icons/fa";
 import { GiMetronome, GiSnail } from "react-icons/gi";
-import { VscDesktopDownload } from "react-icons/vsc";
+import { BiCaretDownSquare } from "react-icons/bi";
 import styles from "./Song.module.scss";
+import BpmSelect from "../elements/BpmSelect";
 import IconButton from "../elements/IconButton";
 import SmallIconButton from "../elements/SmallIconButton";
 import ToggleIcon from "../elements/ToggleIcon";
@@ -18,100 +19,91 @@ import { Player } from "../../lib/player";
 
 interface PlayerComponentProps {
   song: Song;
-  pauseTime?: number;
-  playing?: boolean;
-  onPlay: (startTime: number) => void;
-  onPause: () => void;
-  onStop: () => void;
-  onGoBackward: () => void;
-  onGoForward: () => void;
 }
 
-export default function PlayerComponent({
-  song,
-  playing,
-  pauseTime,
-  onPlay,
-  onPause,
-  onStop,
-  onGoBackward,
-  onGoForward,
-}: PlayerComponentProps) {
+export default function PlayerComponent({ song }: PlayerComponentProps) {
+  const [playing, setPlaying] = useState(false);
   useEffect(() => {
     Player.loadSong(song);
     return () => Player.cleanup();
   }, []);
   return (
     <div className={styles.player}>
-      <SmallIconButton
-        disabled={playing}
-        onClick={() => {
-          onGoBackward();
+      <BpmSelect
+        initialBpm={song.metadata.tempo}
+        onChange={(bpm) => {
+          Player.bpm = bpm;
         }}
-      >
-        <FaStepBackward />
-      </SmallIconButton>
-      {playing ? (
+      />
+      <span className="m-2" style={{ whiteSpace: "nowrap" }}>
+        <SmallIconButton
+          disabled={playing}
+          onClick={() => Player.goToPrevPart()}
+        >
+          <FaStepBackward />
+        </SmallIconButton>
+        {playing ? (
+          <IconButton
+            isColor="primary"
+            onClick={() => {
+              Player.pause();
+              setPlaying(false);
+            }}
+          >
+            <FaPause />
+          </IconButton>
+        ) : (
+          <IconButton
+            isColor="primary"
+            onClick={async () => {
+              await Player.init();
+              Player.play();
+              setPlaying(true);
+            }}
+          >
+            <FaPlay />
+          </IconButton>
+        )}
         <IconButton
-          isColor="primary"
+          isColor="light"
           onClick={() => {
             Player.stop();
-            onPause();
+            setPlaying(false);
           }}
         >
-          <FaPause />
+          <FaStop />
         </IconButton>
-      ) : (
-        <IconButton
-          isColor="primary"
-          onClick={async () => {
-            await Player.init();
-            const startTime = Player.play(pauseTime);
-            onPlay(startTime);
-          }}
+        <SmallIconButton
+          disabled={playing}
+          onClick={() => Player.goToNextPart()}
         >
-          <FaPlay />
-        </IconButton>
-      )}
-      <IconButton
-        isColor="light"
-        onClick={() => {
-          Player.stop();
-          onStop();
-        }}
-      >
-        <FaStop />
-      </IconButton>
-      <SmallIconButton
-        disabled={playing}
-        onClick={() => {
-          onGoForward();
-        }}
-      >
-        <FaStepForward />
-      </SmallIconButton>
-      <ToggleIcon
-        initialState={Player.metronomeEnabled}
-        onClick={(enable: boolean) => (Player.metronomeEnabled = enable)}
-        tooltip="Enable metronome."
-      >
-        <GiMetronome />
-      </ToggleIcon>
-      <ToggleIcon
-        initialState={Player.autoScroll}
-        onClick={(enable: boolean) => (Player.autoScroll = enable)}
-        tooltip="Enable auto-scroll while palying."
-      >
-        <VscDesktopDownload />
-      </ToggleIcon>
-      <ToggleIcon
-        initialState={Player.resrouceSavingEnabled}
-        onClick={(enable: boolean) => (Player.resrouceSavingEnabled = enable)}
-        tooltip="Use less resources for playback. Sound quality may suffer."
-      >
-        <GiSnail />
-      </ToggleIcon>
-      <ReactTooltip className={styles.tooltip} />
+          <FaStepForward />
+        </SmallIconButton>
+      </span>
+      <span style={{ whiteSpace: "nowrap" }}>
+        <ToggleIcon
+          initialState={Player.metronomeEnabled}
+          onClick={(enable: boolean) => (Player.metronomeEnabled = enable)}
+          tooltip="Enable metronome."
+        >
+          <GiMetronome />
+        </ToggleIcon>
+        <ToggleIcon
+          initialState={Player.autoScroll}
+          onClick={(enable: boolean) => (Player.autoScroll = enable)}
+          tooltip="Auto-scroll while palying."
+        >
+          <BiCaretDownSquare />
+        </ToggleIcon>
+        <ToggleIcon
+          initialState={Player.resrouceSavingEnabled}
+          onClick={(enable: boolean) => (Player.resrouceSavingEnabled = enable)}
+          tooltip="Use less resources for playback. Sound quality may suffer."
+        >
+          <GiSnail />
+        </ToggleIcon>
+        <ReactTooltip className={styles.tooltip} />
+      </span>
     </div>
   );
 }

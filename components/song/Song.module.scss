@@ -40,6 +40,7 @@ $eightColWidth: 1760px;
   @extend .colSizingTemplate;
   display: inline-flex;
   flex-direction: column;
+  position: relative;
 }
 
 .firstBarContainer {
@@ -113,20 +114,20 @@ $eightColWidth: 1760px;
   &.emStrum svg {
     transform: scale(1.25);
   }
+}
 
-  &.highlight:before {
-    transform: none;
-    position: absolute;
-    content: "";
-    top: -0.2em;
-    bottom: -0.2em;
-    left: -0.2em;
-    right: -0.2em;
-    border-radius: 0.2em;
-    z-index: -2;
-    background-color: $primary;
-    opacity: 0.75;
-  }
+.highlight:before {
+  transform: none;
+  position: absolute;
+  content: "";
+  top: -0.2em;
+  bottom: -0.2em;
+  left: -0.2em;
+  right: -0.2em;
+  border-radius: 0.2em;
+  z-index: -2;
+  background-color: $primary;
+  opacity: 0.25;
 }
 
 .stringLabel {

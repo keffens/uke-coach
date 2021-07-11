@@ -1,8 +1,15 @@
 import * as Tone from "tone";
-import { PitchedNote, Song } from "../music";
+import { Bar, PitchedNote, Song } from "../music";
 import { assert } from "../util";
 import { InstrumentPlayer, Woodblock } from "./instruments";
 import { StringInstrument } from "./string_instrument";
+
+interface TimeBar {
+  time: Tone.Unit.Time;
+  // Absence of the bar triggers the Player to stop.
+  bar?: Bar;
+  idx?: number;
+}
 
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
@@ -14,9 +21,10 @@ class PlayerImpl {
   private metronomeInstrument: InstrumentPlayer | null = null;
   private metronomeLoop: Tone.Loop | null = null;
   private metronomeIsOn = true;
-  private playback = new Array<Tone.Part>();
+  private playback: Tone.Part | null = null;
   private playbackIsOn = true;
   private song: Song | null = null;
+  private activeBarIdx = 0;
 
   /** Initializes the player. Must be called from a user action. */
   async init(): Promise<void> {
@@ -43,7 +51,9 @@ class PlayerImpl {
     if (this.song === song) return;
     this.cleanup();
     this.song = song;
+    Tone.Transport.bpm.value = this.song.metadata.tempo;
     console.log("Loading song", this.song.metadata.title);
+    this.activeBarIdx = 0;
     if (this.initialized) {
       this.setUpSong();
       // The extra seems to be necessary when switching pages for some reason.
@@ -57,10 +67,9 @@ class PlayerImpl {
     if (!this.song) return;
     console.log("Cleaning up song", this.song.metadata.title);
     this.metronomeLoop?.dispose();
-    for (const pb of this.playback) {
-      pb.dispose();
-    }
-    this.playback = [];
+    this.playback?.clear();
+    this.playback?.dispose();
+    this.playback = null;
     this.song = null;
   }
 
@@ -103,8 +112,8 @@ class PlayerImpl {
   /** Whether to enable the playback. */
   set playbackEnabled(enable: boolean) {
     this.playbackIsOn = enable;
-    for (const pb of this.playback) {
-      pb.mute = !enable;
+    if (this.playback) {
+      this.playback.mute = !enable;
     }
   }
 
@@ -116,23 +125,29 @@ class PlayerImpl {
     this.countInBars = bars;
   }
 
+  set bpm(bpm: number) {
+    Tone.Transport.bpm.value = bpm;
+  }
+
+  get bpm(): number {
+    return Tone.Transport.bpm.value;
+  }
+
   /**
    * Starts playback. Returns the time in milliseconds, when the first part
    * starts. The pauseTime can be set to specify the point where to continue
    * the playback.
    */
-  play(continueAtMs: number = 0): number {
-    if (this.playing) return NaN;
+  play(): void {
+    if (this.playing) return;
     this.playing = true;
-    console.log("starting playback");
+    console.log("starting playback at bar", this.activeBarIdx);
     let countInStart = Tone.immediate() + 0.2;
-    let dateStart = Date.now() + 200 + this.countInDurationMs;
-    if (continueAtMs > 0) {
-      Tone.Transport.seconds = continueAtMs / 1000;
-    }
     this.playMetronome(countInStart, this.countInBars);
-    Tone.Transport.start(countInStart + this.countInDurationSec);
-    return dateStart;
+    Tone.Transport.start(
+      countInStart + this.countInDurationSec,
+      `${this.activeBarIdx}:0`
+    );
   }
 
   /** Stops the playback. */
@@ -140,6 +155,46 @@ class PlayerImpl {
     this.playing = false;
     console.log("stopping playback");
     Tone.Transport.stop();
+    this.song?.highlightPart(-1);
+    this.activeBarIdx = 0;
+  }
+
+  /** Pauses the playback a the current bar. */
+  pause(): void {
+    this.playing = false;
+    console.log("pausing playback");
+    Tone.Transport.stop();
+  }
+
+  /** Sets the bar where to continue playing. */
+  goToPrevPart(): void {
+    if (this.playing) return;
+    let barCount = 0;
+    let partIdx = 0;
+    for (const part of this.song!.parts) {
+      if (barCount + part.barsLength >= this.activeBarIdx) break;
+      barCount += part.barsLength;
+      partIdx++;
+    }
+
+    this.activeBarIdx = barCount;
+    this.song!.highlightPart(partIdx);
+  }
+
+  /** Sets the bar where to continue playing. */
+  goToNextPart(): void {
+    if (this.playing) return;
+    let barCount = 0;
+    let partIdx = 0;
+    for (const part of this.song!.parts) {
+      barCount += part.barsLength;
+      partIdx++;
+      if (barCount > this.activeBarIdx) break;
+    }
+    if (partIdx >= this.song!.parts.length) return;
+
+    this.activeBarIdx = barCount;
+    this.song!.highlightPart(partIdx);
   }
 
   private setUpSong(): void {
@@ -149,7 +204,6 @@ class PlayerImpl {
     // TODO: Support setting the bpm per part. Setting might not even the
     //       real problem but rather resetting when loading a new song.
     Tone.Transport.timeSignature = this.song!.metadata.time.beats;
-    Tone.Transport.bpm.value = this.song!.metadata.tempo;
     this.setUpMetronome();
     this.setUpPlayback();
   }
@@ -178,15 +232,32 @@ class PlayerImpl {
   }
 
   private setUpPlayback(): void {
-    assert(this.playback.length === 0, "Expected playback to be empty");
-    for (let idx = 0; idx < this.instruments.length; idx++) {
-      this.playback.push(
-        new Tone.Part(
-          (time, value) => this.instruments[idx].playBar(value.bar, time, idx),
-          this.song!.bars.map((bar, i) => ({ time: `${i}:0`, bar }))
-        ).start("0:0")
-      );
-    }
+    assert(!this.playback, "Expected playback to be empty");
+    const bars: TimeBar[] = this.song!.bars.map((bar, idx) => ({
+      time: `${idx}:0`,
+      bar,
+      idx,
+    }));
+    // The last element stops the playback and resets the player.
+    bars.push({ time: `${bars.length}:0` });
+
+    let lastBar: Bar | null = null;
+    this.playback = new Tone.Part((time, { bar, idx }) => {
+      if (lastBar) {
+        lastBar.highlight = false;
+      }
+      if (!bar) {
+        this.stop();
+        return;
+      }
+
+      this.activeBarIdx = idx || 0;
+      lastBar = bar;
+      bar.highlight = true;
+      for (let i = 0; i < this.instruments.length; i++) {
+        this.instruments[i].playBar(bar, time, i);
+      }
+    }, bars).start("0:0");
   }
 }
 

@@ -147,6 +147,13 @@ export class SongPart {
     return this.barDuration / 1000;
   }
 
+  /** Highlights the specified bar. Any negative value clears all highlights. */
+  highlightBar(idx: number): void {
+    this.bars.forEach((bar, i) => {
+      bar.highlight = idx === i;
+    });
+  }
+
   /**
    * Returns the patterns used in this part for the given instrument.
    */
