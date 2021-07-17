@@ -14,6 +14,7 @@ interface TimeBar {
 /** Connects to the audio interface and initializes instruments. */
 class PlayerImpl {
   autoScroll = true;
+  onSongFinishes: (() => void) | null = null;
   private playing = false;
   private countInBars = 1;
   private initialized = false;
@@ -71,6 +72,7 @@ class PlayerImpl {
     this.playback?.dispose();
     this.playback = null;
     this.song = null;
+    this.onSongFinishes = null;
   }
 
   /** Returns the count-in time in seconds. */
@@ -248,6 +250,9 @@ class PlayerImpl {
       }
       if (!bar) {
         this.stop();
+        if (this.onSongFinishes) {
+          this.onSongFinishes();
+        }
         return;
       }
 

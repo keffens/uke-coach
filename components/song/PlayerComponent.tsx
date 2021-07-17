@@ -25,6 +25,7 @@ export default function PlayerComponent({ song }: PlayerComponentProps) {
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
     Player.loadSong(song);
+    Player.onSongFinishes = () => setPlaying(false);
     return () => Player.cleanup();
   }, []);
   return (
