@@ -42,7 +42,7 @@ test("gets pitched notes", () => {
   expect(chordLib.getPitchedNotes(null)).toBeNull();
 });
 
-test("defines gets custom chords frets", () => {
+test("defines custom chords frets", () => {
   const chordLib = ChordLib.forUkulele();
   // Overwrite default chord.
   expect(chordLib.getFrets("C")).toEqual([0, 0, 0, 3]);
@@ -94,12 +94,10 @@ test("parses custom chord frets", () => {
   expect(chordLib.getFrets("C")).toEqual([12, 12, 12, -1]);
 });
 
-function noteSet(notes: Array<PitchedNote | null> | null): Set<Note | null> {
+function noteSet(notes: Array<PitchedNote | null> | null): Set<Note> {
   if (!notes) return new Set();
   return new Set(
-    notes
-      .filter((note) => note)
-      .map((note) => (note ? toSharp(note.note) : null))
+    notes.filter((note) => note).map((note) => toSharp(note!.note))
   );
 }
 
@@ -115,6 +113,29 @@ test("verifies ukulele chord lib", () => {
         );
       } catch (e) {
         throw new Error(`Error in ukulele chord ${chord}:\n${e}`);
+      }
+    }
+  }
+});
+
+function noteArray(notes: Array<PitchedNote | null> | null): Array<Note> {
+  return [...noteSet(notes)].sort();
+}
+
+test("verifies guitar chord lib", () => {
+  // Guitar chords don't always cover all the notes of the chord
+  // (e.g., C7 => [C, E, Bb]), so we use a weaker condition.
+  const chordLib = ChordLib.forGuitar();
+
+  for (const note of Object.values(Note)) {
+    for (const suffix of ["", "m", "7"]) {
+      const chord = Chord.parse(note + suffix);
+      try {
+        expect(noteArray(chord?.asPitchedNotes() ?? null)).toEqual(
+          expect.arrayContaining(noteArray(chordLib.getPitchedNotes(chord)))
+        );
+      } catch (e) {
+        throw new Error(`Error in guitar chord ${chord}:\n${e}`);
       }
     }
   }
