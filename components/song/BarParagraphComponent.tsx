@@ -46,23 +46,12 @@ function BarComponent({
   if (isFirst && bar.anacrusis) {
     return (
       <div ref={barRef} className={styles.firstBarContainer}>
-        <div className={styles.barContainer} style={{ flexGrow: 0 }}>
-          <ChordComponent />
-          {bar.patterns.map((pattern, idx) => (
-            <PatternComponent
-              key={idx}
-              pattern={Pattern.makeEmpty(pattern.time, 0)}
-              instrumentLib={instrumentLib}
-              instrumentIdx={idx}
-            />
-          ))}
-          <LyricsComponent
-            lyrics={[]}
-            beats={[]}
-            nextAnacrusis={bar.anacrusis}
-            isSoloAnacrusis
-          />
-        </div>
+        <LyricsComponent
+          lyrics={[]}
+          beats={[]}
+          nextAnacrusis={bar.anacrusis}
+          isSoloAnacrusis
+        />
         <div
           className={`${styles.barContainer} ${highlightClass}`}
           style={{ minWidth: "unset" }}
