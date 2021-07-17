@@ -19,7 +19,11 @@ export default function InstrumentPatternsComponent({
       <Columns isMultiline isMobile>
         {patterns.map((pattern, i) => (
           <Column key={i} style={{ minWidth: "max-content" }}>
-            <PatternWithCountComponent key={i} pattern={pattern} />
+            <PatternWithCountComponent
+              key={i}
+              pattern={pattern}
+              instrument={instrument}
+            />
           </Column>
         ))}
       </Columns>

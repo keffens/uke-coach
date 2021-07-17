@@ -8,10 +8,10 @@ import {
 import { Strum, StrumType } from "../../lib/music";
 import styles from "./Song.module.scss";
 
+export const STRING_SEP = 0.4;
+
 export function stringHeight(string: number) {
-  const f = (string - 1) / 3;
-  const top = 1 - 2.25 * f;
-  return `${top}em`;
+  return `${STRING_SEP * 2 * (string - 1) - 0.9}em`;
 }
 
 export interface StrumComponentProps {
@@ -20,14 +20,9 @@ export interface StrumComponentProps {
   highlight?: boolean;
 }
 
-export default function StrumComponent({
-  strum,
-  frets,
-  highlight,
-}: StrumComponentProps) {
+export default function StrumComponent({ strum, frets }: StrumComponentProps) {
   let classes = [styles.strum];
   if (strum.emphasize) classes.push(styles.emStrum);
-  if (highlight) classes.push(styles.highlight);
 
   switch (strum.type) {
     case StrumType.Down:
@@ -65,6 +60,7 @@ export default function StrumComponent({
         </div>
       );
     case StrumType.Plugged:
+      classes.push(styles.tabStrum);
       return (
         <div className={classes.join(" ")}>
           {strum.strings.map((string) => (
@@ -72,7 +68,7 @@ export default function StrumComponent({
               key={string}
               className={styles.string}
               style={{
-                top: stringHeight(string),
+                bottom: stringHeight(string),
               }}
             >
               {frets?.[string - 1] ?? (

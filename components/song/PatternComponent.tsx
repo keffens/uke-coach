@@ -1,25 +1,32 @@
-import { Bar, InstrumentLib, TICKS_PER_BEAT } from "../../lib/music";
-import { Pattern } from "../../lib/music/pattern";
-import { assert, range } from "../../lib/util";
+import {
+  Bar,
+  Instrument,
+  InstrumentLib,
+  Pattern,
+  PitchedNote,
+} from "../../lib/music";
+import { assert } from "../../lib/util";
+import BackgroundGrid from "../elements/BackgroundGrid";
 import styles from "./Song.module.scss";
-import StrumComponent, { stringHeight } from "./StrumComponent";
+import StrumComponent, { stringHeight, STRING_SEP } from "./StrumComponent";
 
 interface StringLabelsProps {
-  useTab: boolean;
+  enable: boolean;
+  tuning: PitchedNote[];
 }
 
-function StringLabels({ useTab }: StringLabelsProps) {
-  if (!useTab) return <></>;
-  const strings = ["G", "C", "E", "A"];
+function StringLabels({ enable, tuning }: StringLabelsProps) {
+  if (!enable || !tuning) return <></>;
+  const notes = tuning.map((note) => note.note);
   return (
     <span className={styles.stringLabel}>
-      {strings.map((string, i) => (
+      {notes.map((note, i) => (
         <div
-          key={string}
+          key={i}
           className={styles.string}
-          style={{ top: stringHeight(i + 1) }}
+          style={{ bottom: stringHeight(i + 1) }}
         >
-          {string}
+          {note}
         </div>
       ))}
     </span>
@@ -28,29 +35,11 @@ function StringLabels({ useTab }: StringLabelsProps) {
 
 interface TabLinesComponent {
   useTab: boolean;
+  strings: number;
 }
 
-function TabLines({ useTab }: TabLinesComponent) {
-  const lines = new Array<string>();
-  if (useTab) {
-    for (const i of range(0, 101, 33.3333)) {
-      lines.push(`${i}%`);
-    }
-  } else {
-    lines.push("50%");
-  }
-
-  return (
-    <>
-      {lines.map((line) => (
-        <div
-          key={`tab-line-${line}`}
-          className={styles.tabLine}
-          style={{ bottom: line }}
-        />
-      ))}
-    </>
-  );
+function TabLines({ useTab, strings }: TabLinesComponent) {
+  return <BackgroundGrid cols={1} rows={useTab ? strings - 1 : 0} />;
 }
 
 export interface PatternComponentProps {
@@ -61,7 +50,7 @@ export interface PatternComponentProps {
   useTab?: boolean;
   instrumentLib?: InstrumentLib;
   instrumentIdx?: number;
-  highlightTick?: number;
+  instrument?: Instrument;
 }
 
 export default function PatternComponent({
@@ -72,16 +61,19 @@ export default function PatternComponent({
   useTab,
   instrumentLib,
   instrumentIdx,
-  highlightTick,
+  instrument,
 }: PatternComponentProps) {
   assert(
     !!pattern !== !!bar,
     "Either bar or pattern is required for PatternComponent."
   );
-  if (
-    instrumentIdx != null &&
-    instrumentLib?.instruments[instrumentIdx].show === false
-  ) {
+  instrument = instrument ?? instrumentLib?.instruments[instrumentIdx ?? -1];
+  assert(
+    instrument,
+    "instrument or instrumentLib + instrumentIdx is required for " +
+      "PatternComponent."
+  );
+  if (!instrument.show) {
     // This instrument's track is hidden.
     return <></>;
   }
@@ -97,27 +89,29 @@ export default function PatternComponent({
 
   useTab = useTab || pattern.useTab();
   patternIdx = patternIdx! % pattern.bars;
-  const chordLib = instrumentLib
-    ? [...instrumentLib.instruments][instrumentIdx ?? 0].chordLib
-    : undefined;
   const strums = pattern.strums.slice(
     patternIdx * pattern.strumsPerBar,
     (patternIdx + 1) * pattern.strumsPerBar
   );
-  const highlightStrum = Math.floor(
-    (pattern.strumsPerBeat * (highlightTick ?? NaN)) / TICKS_PER_BEAT
-  );
+
+  const height = useTab
+    ? `${(instrument.tuning.length - 1) * STRING_SEP}em`
+    : undefined;
   return (
-    <div className={styles.pattern}>
-      <TabLines useTab={useTab} />
-      {showStringLabels ? <StringLabels useTab={useTab} /> : <></>}
+    <div className={styles.pattern} style={{ height }}>
+      <TabLines useTab={useTab} strings={instrument.tuning.length} />
+      <StringLabels
+        enable={!!useTab && !!showStringLabels}
+        tuning={instrument.tuning}
+      />
       <span className={styles.barSeperator} />
       {strums.map((s, i) => (
         <StrumComponent
           key={`strum-${i}`}
           strum={s}
-          frets={chordLib?.getStringFrets(bar?.getChordForStrum(i) ?? null)}
-          highlight={i === highlightStrum}
+          frets={instrument!.chordLib.getStringFrets(
+            bar?.getChordForStrum(i) ?? null
+          )}
         />
       ))}
       <span className={styles.barSeperator} />

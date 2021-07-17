@@ -56,6 +56,20 @@ $eightColWidth: 1760px;
   }
 }
 
+.highlight:before {
+  transform: none;
+  position: absolute;
+  content: "";
+  top: -0.2em;
+  bottom: -0.2em;
+  left: -0.2em;
+  right: -0.2em;
+  border-radius: 0.2em;
+  z-index: -2;
+  background-color: $primary;
+  opacity: 0.25;
+}
+
 // Chord row.
 .chord {
   color: $primary-dark;
@@ -86,15 +100,6 @@ $eightColWidth: 1760px;
     vertical-align: middle;
   }
 
-  > .barSeperator {
-    flex: none;
-    margin-right: -$stringWidth;
-    background-color: $stringColor;
-    display: inline-block;
-    width: $stringWidth;
-    height: 1.1em;
-  }
-
   .tabLine {
     background-color: $stringColor;
     height: $stringWidth;
@@ -110,38 +115,30 @@ $eightColWidth: 1760px;
   position: relative;
   height: 1em;
   width: 1em;
+  margin: auto;
 
   &.emStrum svg {
     transform: scale(1.25);
   }
 }
 
-.highlight:before {
-  transform: none;
-  position: absolute;
-  content: "";
-  top: -0.2em;
-  bottom: -0.2em;
-  left: -0.2em;
-  right: -0.2em;
-  border-radius: 0.2em;
-  z-index: -2;
-  background-color: $primary;
-  opacity: 0.25;
+.tabStrum {
+  height: 100%;
 }
 
 .stringLabel {
   display: inline-block;
   position: absolute;
-  left: -0.5em;
-  height: 1em;
-  width: 0.5em;
+  left: -0.75em;
+  height: 100%;
+  width: 0.75em;
   font-weight: bold;
 }
 
 .string {
   position: absolute;
   width: 100%;
+  height: 2em;
   text-align: center;
   font-size: 50%;
   font-weight: bold;

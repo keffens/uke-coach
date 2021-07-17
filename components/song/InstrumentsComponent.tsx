@@ -1,8 +1,9 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { Tab, Tabs, TabList, TabLink, Title } from "bloomer";
-import { FaGuitar } from "react-icons/fa";
 import { BiHide } from "react-icons/bi";
-import { Instrument, InstrumentLib } from "../../lib/music";
+import { FaGuitar } from "react-icons/fa";
+import { GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
+import { Instrument, InstrumentLib, InstrumentType } from "../../lib/music";
 import VisibilityToggle from "../elements/VisibilityToggle";
 import VolumeToggle from "../elements/VolumeToggle";
 import VolumeIcon from "../elements/VolumeIcon";
@@ -14,8 +15,15 @@ interface InstrumentIconProps {
 }
 
 function InstrumentIcon({ instrument }: InstrumentIconProps) {
-  // TODO: Add a different icons for each instrument type.
-  return <FaGuitar />;
+  switch (instrument.type) {
+    case InstrumentType.Ukulele:
+    case InstrumentType.UkuleleLowG:
+      return <GiGuitarBassHead />;
+    case InstrumentType.Guitar:
+      return <GiGuitarHead />;
+    default:
+      return <FaGuitar />;
+  }
 }
 
 interface IntrumentButtonProps {

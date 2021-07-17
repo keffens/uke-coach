@@ -1,0 +1,37 @@
+@import "../../styles/variables.scss";
+$borderWidth: 2px;
+$borderStyle: $borderWidth solid $grey-lighter;
+
+.gridTemplate {
+  display: grid;
+  position: absolute;
+  bottom: #{-$borderWidth/2};
+  left: #{-$borderWidth/2};
+  width: calc(100% + #{$borderWidth});
+  height: calc(100% + #{$borderWidth});
+  z-index: -1;
+}
+
+.grid {
+  @extend .gridTemplate;
+
+  border-bottom: $borderStyle;
+  border-left: $borderStyle;
+
+  div {
+    border-top: $borderStyle;
+    border-right: $borderStyle;
+  }
+}
+
+.line {
+  @extend .gridTemplate;
+
+  border-left: $borderStyle;
+  border-right: $borderStyle;
+
+  div {
+    height: 50%;
+    border-bottom: $borderStyle;
+  }
+}

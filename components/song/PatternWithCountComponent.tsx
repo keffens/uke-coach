@@ -1,15 +1,17 @@
 import { Title } from "bloomer";
 import PatternComponent from "./PatternComponent";
-import { Pattern } from "../../lib/music";
+import { Pattern, Instrument } from "../../lib/music";
 import { range } from "../../lib/util";
 import styles from "./Song.module.scss";
 
 export interface PatternWithCountComponentProps {
   pattern: Pattern;
+  instrument: Instrument;
 }
 
 export default function PatternWithCountComponent({
   pattern,
+  instrument,
 }: PatternWithCountComponentProps) {
   const beats = range(1, pattern.time.beats + 1);
   return (
@@ -28,6 +30,7 @@ export default function PatternWithCountComponent({
             pattern={pattern}
             patternIdx={idx}
             showStringLabels={idx === 0}
+            instrument={instrument}
           />
         </div>
       ))}
