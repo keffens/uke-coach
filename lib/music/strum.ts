@@ -50,7 +50,10 @@ export class Strum {
     return new Strum(StrumType.Tremolo);
   }
 
-  /** Creates a plugged strum using the given strings. */
+  /**
+   * Creates a plugged strum using the given strings. A 0 indicates the
+   * base/root note.
+   */
   static plugged(strings: number[]): Strum {
     if (!strings.length) {
       throw new Error("Plugged strum requires a string set.");
@@ -90,7 +93,7 @@ export class Strum {
       case "t":
         return [Strum.tremolo(), pos + 1];
     }
-    if (pattern[pos] >= "1" && pattern[pos] <= "9") {
+    if (pattern[pos] >= "0" && pattern[pos] <= "9") {
       return [Strum.plugged([parseInt(pattern[pos])]), pos + 1];
     }
     if (pattern[pos] === "(") {
@@ -99,7 +102,7 @@ export class Strum {
       while (pos < pattern.length && pattern[pos] !== ")") {
         const string = parseInt(pattern[pos]);
         assert(
-          string >= 1 && string <= 9,
+          string >= 0 && string <= 9,
           `Failed to parse parenthesized chord in pattern "${pattern}".`
         );
         strings.push(string);

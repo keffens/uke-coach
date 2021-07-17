@@ -210,6 +210,31 @@ export class ChordLib {
     return this.toPitchedNotes(frets);
   }
 
+  /**
+   * Returns the bass string - i.e., the lowest string playing the root note.
+   */
+  getRootString(chord: ChordInput | null): number | null {
+    if (!chord) return null;
+    const root = toChord(chord).rootNote().note;
+    const notes = this.getPitchedNotes(chord) ?? [];
+    let lowest = PitchedNote.MAX_NOTE;
+    let string = null;
+    for (let i = 0; i < notes.length; i++) {
+      const note = notes[i];
+      if (note?.note === root && note.compare(lowest) < 0) {
+        lowest = note;
+        string = i + 1;
+      }
+    }
+    return string;
+  }
+
+  /** If `string` is 0, returns the root string. Otherwise, returns `string`. */
+  replaceRootString(string: number, chord: ChordInput | null): number {
+    if (string > 0) return string;
+    return this.getRootString(chord) ?? 1;
+  }
+
   /** Returns true if this custom chord has been defined. */
   hasCustomChord(chord: ChordInput): boolean {
     return !!this.costumChords.get(toString(chord));

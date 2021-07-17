@@ -109,9 +109,8 @@ export default function PatternComponent({
         <StrumComponent
           key={`strum-${i}`}
           strum={s}
-          frets={instrument!.chordLib.getStringFrets(
-            bar?.getChordForStrum(i) ?? null
-          )}
+          chord={bar?.getChordForStrum(i)}
+          chordLib={instrument?.chordLib}
         />
       ))}
       <span className={styles.barSeperator} />

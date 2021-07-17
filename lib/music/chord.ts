@@ -126,4 +126,9 @@ export class Chord {
       .getNext(this.root)
       .makeChord(chordIntervals(this.qualifier, this.extension));
   }
+
+  /** Returns the root note of the chord. */
+  rootNote(minNote = PitchedNote.C4): PitchedNote {
+    return this.asPitchedNotes(minNote)[0];
+  }
 }

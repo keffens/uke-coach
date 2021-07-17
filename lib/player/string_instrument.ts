@@ -41,8 +41,13 @@ class StringPercurion extends SamplerInstrument {
   }
 
   playNote(note: PitchedNote, time: number, velocity = 1.0): void {
-    // Without the early release the timpani sounds too long.
-    this.sampler.triggerAttackRelease(note.toString(), 0.2, time, velocity);
+    // Adjust Timpani to sound a bit more like a chuck strum.
+    this.sampler.triggerAttackRelease(
+      note.addSemitones(12).toString(),
+      0.2,
+      time,
+      velocity
+    );
   }
 }
 
@@ -113,8 +118,12 @@ export class StringInstrument extends SamplerInstrument {
         this.playStrings(notes, time + duration / 2, -delay, 0.5);
         return;
       case StrumType.Plugged:
+        let strings = strum.strings ?? [];
+        strings = strings.map((i) =>
+          this.instrument!.chordLib.replaceRootString(i, chord)
+        );
         notes = notes.map((note, idx) =>
-          strum.strings?.includes(idx + 1) ? note : null
+          strings.includes(idx + 1) ? note : null
         );
         velocity = pluggedVelocity(notes);
         break;

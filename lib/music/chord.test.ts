@@ -125,3 +125,12 @@ test("converts chords to pitched note arrays", () => {
       .map((n) => n.toString())
   ).toEqual(["C3", "E3", "G3"]);
 });
+
+test("gets root notes", () => {
+  expect(Chord.parse("C")?.rootNote().toString()).toEqual("C4");
+  expect(Chord.parse("Am")?.rootNote().toString()).toEqual("A4");
+  expect(Chord.parse("Bdim")?.rootNote().toString()).toEqual("B4");
+  expect(
+    Chord.parse("C")?.rootNote(PitchedNote.parse("E2")).toString()
+  ).toEqual("C3");
+});

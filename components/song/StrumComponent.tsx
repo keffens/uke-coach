@@ -5,10 +5,16 @@ import {
   FaTimes,
   FaExchangeAlt,
 } from "react-icons/fa";
-import { Strum, StrumType } from "../../lib/music";
+import { Chord, ChordLib, Strum, StrumType } from "../../lib/music";
 import styles from "./Song.module.scss";
 
 export const STRING_SEP = 0.4;
+
+function fretToString(fret?: number): string {
+  if (fret == null) return "";
+  if (fret >= 0) return `${fret}`;
+  return "X";
+}
 
 export function stringHeight(string: number) {
   return `${STRING_SEP * 2 * (string - 1) - 0.9}em`;
@@ -16,11 +22,47 @@ export function stringHeight(string: number) {
 
 export interface StrumComponentProps {
   strum: Strum;
-  frets?: string[] | null;
-  highlight?: boolean;
+  chord?: Chord | null;
+  chordLib?: ChordLib;
 }
 
-export default function StrumComponent({ strum, frets }: StrumComponentProps) {
+function PluggedStrum({ strum, chord, chordLib }: StrumComponentProps) {
+  let strings = strum.strings?.slice() ?? [];
+  let frets: string[] = [];
+  if (chordLib && chord) {
+    strings = strings.map((i) => chordLib?.replaceRootString(i, chord));
+    const chordFrets = chordLib.getFrets(chord);
+    frets = strings.map((string) => fretToString(chordFrets?.[string - 1]));
+  } else {
+    for (let i = 0; i < strings.length; i++) {
+      if (!strings[i]) {
+        strings[i] = 1.5;
+        frets[i] = "R";
+      }
+    }
+  }
+  return (
+    <div className={`${styles.strum} ${styles.tabStrum}`}>
+      {strings.map((string, i) => (
+        <div
+          key={i}
+          className={styles.string}
+          style={{
+            bottom: stringHeight(string),
+          }}
+        >
+          {frets[i] ?? <span style={{ fontSize: "80%" }}>⬤</span>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function StrumComponent({
+  strum,
+  chord,
+  chordLib,
+}: StrumComponentProps) {
   let classes = [styles.strum];
   if (strum.emphasize) classes.push(styles.emStrum);
 
@@ -60,24 +102,7 @@ export default function StrumComponent({ strum, frets }: StrumComponentProps) {
         </div>
       );
     case StrumType.Plugged:
-      classes.push(styles.tabStrum);
-      return (
-        <div className={classes.join(" ")}>
-          {strum.strings.map((string) => (
-            <div
-              key={string}
-              className={styles.string}
-              style={{
-                bottom: stringHeight(string),
-              }}
-            >
-              {frets?.[string - 1] ?? (
-                <span style={{ fontSize: "80%" }}>⬤</span>
-              )}
-            </div>
-          ))}
-        </div>
-      );
+      return <PluggedStrum strum={strum} chord={chord} chordLib={chordLib} />;
     case StrumType.Tab:
       return (
         <div className={classes.join(" ")}>

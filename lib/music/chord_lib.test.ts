@@ -42,6 +42,48 @@ test("gets pitched notes", () => {
   expect(chordLib.getPitchedNotes(null)).toBeNull();
 });
 
+test("gets root notes for guitar", () => {
+  const chordLib = ChordLib.forGuitar();
+  expect(chordLib.getRootString("Em")).toEqual(1);
+  expect(chordLib.getRootString("F")).toEqual(1);
+  expect(chordLib.getRootString("A")).toEqual(2);
+  expect(chordLib.getRootString("C#")).toEqual(2);
+  expect(chordLib.getRootString("D7")).toEqual(3);
+  expect(chordLib.getRootString(null)).toBeNull();
+});
+
+test("gets root notes for ukulele", () => {
+  const chordLib = ChordLib.forUkulele();
+  expect(chordLib.getRootString("Em")).toEqual(2);
+  expect(chordLib.getRootString("F")).toEqual(3);
+  expect(chordLib.getRootString("A")).toEqual(1);
+  expect(chordLib.getRootString("C")).toEqual(2);
+  expect(chordLib.getRootString(null)).toBeNull();
+
+  // A chord with all Cs, but the second C is the lowest.
+  chordLib.defineChord("C", [5, 0, 8, 3]);
+  expect(chordLib.getRootString("C")).toEqual(2);
+
+  // This time the first and second C are the same.
+  const lowChordLib = ChordLib.for(InstrumentType.UkuleleLowG);
+  lowChordLib.defineChord("C", [5, 0, 8, 3]);
+  expect(lowChordLib.getRootString("C")).toEqual(1);
+});
+
+test("replaces the root string", () => {
+  const chordLib = ChordLib.forGuitar();
+  expect(chordLib.replaceRootString(0, "Em")).toEqual(1);
+  expect(chordLib.replaceRootString(0, "A")).toEqual(2);
+  expect(chordLib.replaceRootString(0, "D7")).toEqual(3);
+
+  expect(chordLib.replaceRootString(3, "Em")).toEqual(3);
+  expect(chordLib.replaceRootString(4, "A")).toEqual(4);
+  expect(chordLib.replaceRootString(1, "D7")).toEqual(1);
+
+  expect(chordLib.replaceRootString(2, null)).toEqual(2);
+  expect(chordLib.replaceRootString(0, null)).toEqual(1);
+});
+
 test("defines custom chords frets", () => {
   const chordLib = ChordLib.forUkulele();
   // Overwrite default chord.
