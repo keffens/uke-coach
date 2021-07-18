@@ -22,15 +22,19 @@
 {chord: C frets 5 4 3 3}
 {pattern: intro 1st |(34)-4-(23)-3-|}
 {pattern: intro/verse |(14)-2-3-2-|}
-{pattern: chorus |xu-u-u-u|}
+{start_of_tab: chorus}
+|--------|--------|--------|--------|
+|--0---0-|--3---3-|--------|--0---0-|
+|--------|0---0--0|--2---2-|--------|
+|2---2--2|--------|0---0--0|2---2---|
+{end_of_tab}
 {start_of_tab: verse ii}
 |--------|--------|--------|--------|
 |--------|0-----3-|------0-|--------|
 |----0---|----4---|2---2---|--------|
 |2-------|--------|--------|2-------|
 {end_of_tab}
-{pattern: *verse ii end |d-------|}
-{pattern: *single |d-------|}
+{pattern: *single |1-------|}
 {end_of_instrument}
 
 {start_of_instrument: guitar}
@@ -104,7 +108,7 @@ Uh oh [Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh [Am]oh_, uh oh
 {pattern: verse ii}
 {pattern: verse}
 Por un [Am]fluir, por lo esen[C]tial, por lo que [G]hace, por lo que [Am]muere,
-por lo sen[Am]tido y lo sinsen[C]tido, por lo que [G]hay y nunca {pattern: single plugged}{pattern: *verse ii end}[Am]hubo,
+por lo sen[Am]tido y lo sinsen[C]tido, por lo que [G]hay y nunca {pattern: single plugged}[Am]hubo,
 {pattern: chorus}
 {pattern: offbeat}
 {pattern: intro/verse}
