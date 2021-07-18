@@ -116,6 +116,7 @@ $eightColWidth: 1760px;
   height: 1em;
   width: 1em;
   margin: auto;
+  margin-left: 0;
 
   &.emStrum svg {
     transform: scale(1.25);
@@ -123,6 +124,7 @@ $eightColWidth: 1760px;
 }
 
 .tabStrum {
+  @extend .strum;
   height: 100%;
 }
 

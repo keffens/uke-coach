@@ -6,7 +6,7 @@ interface SubtitleProps {
 }
 
 function SongSubtitle({ artist }: SubtitleProps) {
-  if (!artist) return <></>;
+  if (!artist) return null;
   return (
     <Subtitle tag="h2" hasTextAlign="centered">
       by {artist}

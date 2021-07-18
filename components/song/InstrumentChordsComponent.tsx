@@ -11,10 +11,11 @@ export default function InstrumentChordsComponent({
   chordLib,
 }: InstrumentChordsComponentProps) {
   const chords = [...chordLib.usedChords];
+  if (!chords.length) return null;
   return (
     <>
       <Title tag="h4" className="mb-2">
-        Strumming Chords
+        Chords
       </Title>
       <Columns isMultiline isMobile>
         {chords.map((chord) => (

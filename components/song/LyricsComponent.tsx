@@ -23,7 +23,7 @@ function LyricsCellComponent({
       <div className={styles.lyrics}>
         <div className={`${styles.streched} ${lyric[0] === " " ? "pl-5" : ""}`}>
           {lyric}
-          {lyric.slice(-1) === "-" ? <></> : <> &zwnj;</>}
+          {lyric.slice(-1) === "-" ? null : <> &zwnj;</>}
         </div>
       </div>
     );
@@ -34,9 +34,7 @@ function LyricsCellComponent({
         <div className={styles.left + ` ${lyric[0] === " " ? "pl-5" : ""}`}>
           {lyric}
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
       <div
         className={
           styles.right +
@@ -65,7 +63,7 @@ export default function LyricsComponent({
 }: LyricsComponentProps) {
   if (!lyrics?.length) {
     if (!nextAnacrusis) {
-      return <></>;
+      return null;
     }
     return (
       <LyricsCellComponent

@@ -1,6 +1,11 @@
 import { assert } from "../util";
 import { Chord } from "./chord";
 import {
+  BASS_GUITAR_CHORD_FRETS,
+  GUITAR_CHORD_FRETS,
+  UKULELE_CHORD_FRETS,
+} from "./chord_tables";
+import {
   compatibleWithDefaultTuning,
   getTuning,
   InstrumentType,
@@ -10,84 +15,6 @@ import { Token, TokenType } from "./token";
 
 /** Most functions in the chord lib support either a chord or a string */
 export type ChordInput = Chord | string;
-
-const UKULELE_CHORD_FRETS = new Map<string, number[]>([
-  ["C", [0, 0, 0, 3]],
-  ["Cm", [0, 3, 3, 3]],
-  ["C7", [0, 0, 0, 1]],
-  ["D", [2, 2, 2, 0]],
-  ["Dm", [2, 2, 1, 0]],
-  ["D7", [2, 2, 2, 3]],
-  ["E", [4, 4, 4, -1]],
-  ["Em", [0, 4, 3, 2]],
-  ["E7", [1, 2, 0, 2]],
-  ["F", [2, 0, 1, 0]],
-  ["Fm", [1, 0, 1, 3]],
-  ["F7", [2, 3, 1, 3]],
-  ["G", [0, 2, 3, 2]],
-  ["Gm", [0, 2, 3, 1]],
-  ["G7", [0, 2, 1, 2]],
-  ["A", [2, 1, 0, 0]],
-  ["Am", [2, 0, 0, 0]],
-  ["A7", [0, 1, 0, 0]],
-  ["B", [4, 3, 2, 2]],
-  ["Bm", [4, 2, 2, 2]],
-  ["B7", [2, 3, 2, 2]],
-  ["C#", [1, 1, 1, 4]],
-  ["C#m", [-1, 4, 4, 4]],
-  ["C#7", [1, 1, 1, 2]],
-  ["D#", [0, 3, 3, 1]],
-  ["D#m", [3, 3, 2, 1]],
-  ["D#7", [3, 3, 3, 4]],
-  ["F#", [3, 1, 2, 1]],
-  ["F#m", [2, 1, 2, 0]],
-  ["F#7", [3, 4, 2, 4]],
-  ["G#", [5, 3, 4, 3]],
-  ["G#m", [4, 3, 4, 2]],
-  ["G#7", [1, 3, 2, 3]],
-  ["A#", [3, 2, 1, 1]],
-  ["A#m", [3, 1, 1, 1]],
-  ["A#7", [1, 2, 1, 1]],
-]);
-
-const GUITAR_CHORD_FRETS = new Map<string, number[]>([
-  ["C", [-1, 3, 2, 0, 1, 0]],
-  ["Cm", [-1, 3, 5, 5, 4, 3]],
-  ["C7", [-1, 3, 2, 3, 1, 0]],
-  ["D", [-1, -1, 0, 2, 3, 2]],
-  ["Dm", [-1, -1, 0, 2, 3, 1]],
-  ["D7", [-1, -1, 0, 2, 1, 2]],
-  ["E", [0, 2, 2, 1, 0, 0]],
-  ["Em", [0, 2, 2, 0, 0, 0]],
-  ["E7", [0, 2, 2, 1, 3, 0]],
-  ["F", [1, 3, 3, 2, 1, 1]],
-  ["Fm", [1, 3, 3, 1, 1, 1]],
-  ["F7", [1, 3, 1, 2, 1, 1]],
-  ["G", [3, 2, 0, 0, 0, 3]],
-  ["Gm", [3, 5, 5, 3, 3, 3]],
-  ["G7", [3, 2, 0, 0, 0, 1]],
-  ["A", [-1, 0, 2, 2, 2, 0]],
-  ["Am", [-1, 0, 2, 2, 1, 0]],
-  ["A7", [-1, 0, 2, 2, 2, 3]],
-  ["B", [-1, 2, 4, 4, 4, 2]],
-  ["Bm", [-1, 2, 4, 4, 3, 2]],
-  ["B7", [-1, 2, 1, 2, 0, 2]],
-  ["C#", [-1, 4, 3, 1, 2, 1]],
-  ["C#m", [-1, -1, 2, 1, 2, 0]],
-  ["C#7", [-1, 4, 3, 4, 2, -1]],
-  ["D#", [-1, -1, 1, 3, 4, 3]],
-  ["D#m", [-1, -1, 1, 3, 4, 2]],
-  ["D#7", [-1, -1, 1, 3, 2, 3]],
-  ["F#", [2, 4, 4, 3, 2, 2]],
-  ["F#m", [2, 4, 4, 2, 2, 2]],
-  ["F#7", [2, 4, 2, 3, 2, 2]],
-  ["G#", [-1, -1, 1, 1, 1, 4]],
-  ["G#m", [4, 6, 6, 4, 4, 4]],
-  ["G#7", [-1, -1, 1, 1, 1, 2]],
-  ["A#", [-1, 1, 3, 3, 3, 1]],
-  ["A#m", [-1, 1, 3, 3, 2, 1]],
-  ["A#7", [-1, 1, 3, 1, 3, 1]],
-]);
 
 function toString(chord: ChordInput): string {
   if (chord instanceof Chord) return chord.toString();
@@ -151,6 +78,10 @@ export class ChordLib {
         break;
       case InstrumentType.Guitar:
         chords = GUITAR_CHORD_FRETS;
+        break;
+      case InstrumentType.Bass:
+        chords = BASS_GUITAR_CHORD_FRETS;
+        break;
     }
     return new ChordLib(chords, tuning ?? getTuning(instrument));
   }

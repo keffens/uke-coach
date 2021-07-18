@@ -16,7 +16,7 @@ interface StringLabelsProps {
 }
 
 function StringLabels({ enable, tuning }: StringLabelsProps) {
-  if (!enable || !tuning) return <></>;
+  if (!enable || !tuning) return null;
   const notes = tuning.map((note) => note.note);
   return (
     <span className={styles.stringLabel}>
@@ -51,6 +51,7 @@ export interface PatternComponentProps {
   instrumentLib?: InstrumentLib;
   instrumentIdx?: number;
   instrument?: Instrument;
+  alwaysShow?: boolean;
 }
 
 export default function PatternComponent({
@@ -62,6 +63,7 @@ export default function PatternComponent({
   instrumentLib,
   instrumentIdx,
   instrument,
+  alwaysShow,
 }: PatternComponentProps) {
   assert(
     !!pattern !== !!bar,
@@ -73,9 +75,9 @@ export default function PatternComponent({
     "instrument or instrumentLib + instrumentIdx is required for " +
       "PatternComponent."
   );
-  if (!instrument.show) {
+  if (!instrument.show && !alwaysShow) {
     // This instrument's track is hidden.
-    return <></>;
+    return null;
   }
   if (bar) {
     assert(instrumentIdx != null, "instrumentIdx is required if bar is set");
@@ -104,7 +106,6 @@ export default function PatternComponent({
         enable={!!useTab && !!showStringLabels}
         tuning={instrument.tuning}
       />
-      <span className={styles.barSeperator} />
       {strums.map((s, i) => (
         <StrumComponent
           key={`strum-${i}`}
@@ -113,7 +114,6 @@ export default function PatternComponent({
           chordLib={instrument?.chordLib}
         />
       ))}
-      <span className={styles.barSeperator} />
     </div>
   );
 }

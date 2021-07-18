@@ -8,27 +8,29 @@
 {instrument: uke 1 ukulele}
 {instrument: uke 2 ukulele (low G-string) steel}
 {instrument: guitar guitar}
-
-{pattern: offbeat |1(234)-(234)-(234)-(234)|}
+{instrument: bajo bass}
 
 {start_of_instrument: uke 1}
 {pattern: single plugged |1234----|}
 {pattern: doube plugged |12341234|}
-{pattern: upstroke |xu-u-u-u|}
+{pattern: chorus |xu-u-u-u|}
+{pattern: offbeat |1(234)-(234)-(234)-(234)|}
+{pattern: *single |d-------|}
 {end_of_instrument}
 
 {start_of_instrument: uke 2}
 {chord: C frets 5 4 3 3}
 {pattern: intro 1st |(34)-4-(23)-3-|}
 {pattern: intro/verse |(14)-2-3-2-|}
-{pattern: upstroke |xu-u-u-u|}
-{start_of_tab: *verse ii}
+{pattern: chorus |xu-u-u-u|}
+{start_of_tab: verse ii}
 |--------|--------|--------|--------|
 |--------|0-----3-|------0-|--------|
 |----0---|----4---|2---2---|--------|
 |2-------|--------|--------|2-------|
 {end_of_tab}
 {pattern: *verse ii end |d-------|}
+{pattern: *single |d-------|}
 {end_of_instrument}
 
 {start_of_instrument: guitar}
@@ -37,10 +39,41 @@
 {chord: C frets 0 3 2 0 1 0}
 {pattern: single plugged |0345----|}
 {pattern: doube plugged |03450345|}
-{pattern: offbeat |2(345)1(345)2(345)-(345)|}
+{pattern: chorus |2(345)1(345)2(345)-(345)|}
+{pattern: *single |d-------|}
 {end_of_instrument}
 
-{pattern: single plugged}{pattern: intro 1st}
+{start_of_instrument: bajo}
+{start_of_tab: verse}
+|----|----|----|----|----|----|----|----|
+|----|----|----|----|----|----|----|----|
+|----|3---|----|----|----|3---|----|----|
+|5---|----|3---|5---|5-7-|----|3--0|5---|
+{end_of_tab}
+{start_of_tab: *bass verse ii}
+|----|----|----|----|----|----|----|----|
+|----|----|----|----|----|----|----|----|
+|----|3333|----|----|----|3333|----|----|
+|5555|----|3333|5555|5577|----|3330|5---|
+{end_of_tab}
+{start_of_tab: chorus}
+|--------|--------|--------|--------|
+|--------|--5---5-|--------|--------|
+|--7---7-|3---3--3|--5---5-|--7---7-|
+|5---5--5|--------|3---3--3|5---5---|
+{end_of_tab}
+{start_of_tab: *single}
+|----|
+|----|
+|----|
+|5---|
+{end_of_tab}
+{pattern: *bass pause |----|}
+{end_of_instrument}
+
+{pattern: single plugged}
+{pattern: intro 1st}
+{pattern: verse}
 [Am]{pattern: intro/verse}[C][G][Am]
 {pattern: intro 1st}
 [Am]{pattern: intro/verse}[C][G][Am]
@@ -48,36 +81,40 @@
 {start_of_verse: Verse 1}
 {pattern: single plugged}
 {pattern: intro/verse}
+{pattern: *bass pause}
 Un lu[Am]gar para es[C]tar y vi[G]vir lo que se he[Am]reda.
 Una can[Am]ción sin condi[C]ción para so[G]nar lo que noes [Am]queda.
 {pattern: doube plugged}
+{pattern: verse}
 Hoy puedo [Am]ver lo que yo [C]fui. De donde [G]soy, de donde [Am]vengo.
 No es prote[Am]star no es una [C]guerra, es lo que [G]soy y lo que {pattern: single plugged}[Am]tengo.
 {end_of_verse}
 
 {start_of_chorus}
-{pattern: offbeat}
-{pattern: upstroke}
+{pattern: chorus}
 Hay cosas en la [Am]vida que no se pueden cam[C]biar, intentos de orde[G]nar a la natura[Am]leza.
 Pero yo prefiero es[Am]tar en un lugar  donde se [C]da un ritmo natu[G]ral, chaótica belle[Am]za.
 
 Uh oh [Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh [Am]oh_, uh oh
-[Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh {pattern: *single |d-------|}[Am]oh_.
+[Am]oh_, uh oh [C]oh_, oh [G]oh_, uh oh {pattern: *single}[Am]oh_.
 {end_of_chorus}
 
 {start_of_verse: Verse 2}
 {pattern: doube plugged}
-{pattern: *verse ii}
+{pattern: verse ii}
+{pattern: verse}
 Por un [Am]fluir, por lo esen[C]tial, por lo que [G]hace, por lo que [Am]muere,
 por lo sen[Am]tido y lo sinsen[C]tido, por lo que [G]hay y nunca {pattern: single plugged}{pattern: *verse ii end}[Am]hubo,
+{pattern: chorus}
 {pattern: offbeat}
+{pattern: intro/verse}
+{pattern: *bass verse ii}
 por una his[Am]torio, por mil his[C]torias, que sean con[G]tadas, pero sin [Am]huecos,
 por lo di[Am]verso, por este [C]caos, desorde [G]nado con mil en{pattern: *single}[Am]cantos.
 {end_of_verse}
 
 {start_of_chorus}
-{pattern: offbeat}
-{pattern: upstroke}
+{pattern: chorus}
 Hay cosas en la [Am]vida que no se pueden cam[C]biar, intentos de orde[G]nar a la natura[Am]leza.
 Pero yo prefiero es[Am]tar en un lugar  donde se [C]da un ritmo natu[G]ral, chaótica belle[Am]za.
 

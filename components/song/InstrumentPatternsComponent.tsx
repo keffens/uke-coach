@@ -11,10 +11,11 @@ export default function InstrumentPatternsComponent({
   instrument,
 }: InstrumentPatternsComponentProps) {
   const patterns = instrument.getPatterns(/*onlyMain=*/ true);
+  if (!patterns.length) return null;
   return (
     <>
       <Title tag="h4" className="mb-2">
-        Strumming patterns
+        Patterns
       </Title>
       <Columns isMultiline isMobile>
         {patterns.map((pattern, i) => (

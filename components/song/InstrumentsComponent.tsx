@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { Tab, Tabs, TabList, TabLink, Title } from "bloomer";
 import { BiHide } from "react-icons/bi";
 import { FaGuitar } from "react-icons/fa";
-import { GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
+import { GiGuitar, GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
 import { Instrument, InstrumentLib, InstrumentType } from "../../lib/music";
 import VisibilityToggle from "../elements/VisibilityToggle";
 import VolumeToggle from "../elements/VolumeToggle";
@@ -18,11 +18,13 @@ function InstrumentIcon({ instrument }: InstrumentIconProps) {
   switch (instrument.type) {
     case InstrumentType.Ukulele:
     case InstrumentType.UkuleleLowG:
-      return <GiGuitarBassHead />;
+      return <FaGuitar />;
     case InstrumentType.Guitar:
       return <GiGuitarHead />;
+    case InstrumentType.Bass:
+      return <GiGuitarBassHead />;
     default:
-      return <FaGuitar />;
+      return <GiGuitar />;
   }
 }
 

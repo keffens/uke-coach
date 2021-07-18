@@ -12,7 +12,7 @@ export default function ChordComponent({ chord }: ChordComponentProps) {
   return (
     <span className={styles.chord}>
       {chord.base}
-      {chord.sup ? <sup>{chord.sup}</sup> : <></>}
+      {chord.sup ? <sup>{chord.sup}</sup> : null}
     </span>
   );
 }

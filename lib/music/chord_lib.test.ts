@@ -183,6 +183,23 @@ test("verifies guitar chord lib", () => {
   }
 });
 
+test("verifies bass guitar chord lib", () => {
+  const chordLib = ChordLib.for(InstrumentType.Bass);
+
+  for (const note of Object.values(Note)) {
+    for (const suffix of ["", "m"]) {
+      const chord = Chord.parse(note + suffix);
+      try {
+        expect(noteSet(chordLib.getPitchedNotes(chord))).toEqual(
+          noteSet(chord?.asPitchedNotes() ?? null)
+        );
+      } catch (e) {
+        throw new Error(`Error in bass guitar chord ${chord}:\n${e}`);
+      }
+    }
+  }
+});
+
 test("creates chord libs", () => {
   expect(ChordLib.for(InstrumentType.Ukulele)).toEqual(ChordLib.forUkulele());
   expect(ChordLib.for(InstrumentType.Guitar)).toEqual(ChordLib.forGuitar());

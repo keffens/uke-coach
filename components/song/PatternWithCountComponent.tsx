@@ -31,6 +31,7 @@ export default function PatternWithCountComponent({
             patternIdx={idx}
             showStringLabels={idx === 0}
             instrument={instrument}
+            alwaysShow
           />
         </div>
       ))}

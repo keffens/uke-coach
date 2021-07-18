@@ -16,7 +16,7 @@ export default function ChordFrets({ chord, chordLib }: ChordFretsProps) {
     <div>
       <span className={styles.chord}>
         {chord.base}
-        {chord.sup ? <sup>{chord.sup}</sup> : <></>}
+        {chord.sup ? <sup>{chord.sup}</sup> : null}
       </span>{" "}
       ({frets?.join(",")})
     </div>

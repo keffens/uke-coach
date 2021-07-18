@@ -6,6 +6,7 @@ export enum InstrumentType {
   Ukulele = "ukulele",
   UkuleleLowG = "ukulele (low G-string)",
   Guitar = "guitar",
+  Bass = "bass",
   CustomStrings = "custom-strings",
 }
 
@@ -21,6 +22,10 @@ const TUNING = new Map<InstrumentType, PitchedNote[]>([
   [
     InstrumentType.Guitar,
     ["E2", "A2", "D3", "G3", "B3", "E4"].map((s) => PitchedNote.parse(s)),
+  ],
+  [
+    InstrumentType.Bass,
+    ["E1", "A1", "D2", "G2"].map((s) => PitchedNote.parse(s)),
   ],
 ]);
 
@@ -59,6 +64,9 @@ export enum SoundType {
 
 /** Returns the default sound for this instrument. */
 export function getDefaultSound(instrument: InstrumentType): SoundType {
-  // For now, we always return Nylon.
+  if (instrument === InstrumentType.Bass) {
+    return SoundType.Bass;
+  }
+  // Default for guitar and ukulele.
   return SoundType.Nylon;
 }

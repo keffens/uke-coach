@@ -42,7 +42,7 @@ function PluggedStrum({ strum, chord, chordLib }: StrumComponentProps) {
     }
   }
   return (
-    <div className={`${styles.strum} ${styles.tabStrum}`}>
+    <div className={styles.tabStrum}>
       {strings.map((string, i) => (
         <div
           key={i}
@@ -105,13 +105,13 @@ export default function StrumComponent({
       return <PluggedStrum strum={strum} chord={chord} chordLib={chordLib} />;
     case StrumType.Tab:
       return (
-        <div className={classes.join(" ")}>
+        <div className={styles.tabStrum}>
           {strum.frets.map((fret, string) => (
             <div
               key={string}
               className={styles.string}
               style={{
-                top: stringHeight(string + 1),
+                bottom: stringHeight(string + 1),
               }}
             >
               {fret < 0 ? "" : fret}
