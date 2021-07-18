@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { GiMetronome, GiSnail } from "react-icons/gi";
 import { BiCaretDownSquare } from "react-icons/bi";
-import styles from "./Song.module.scss";
+import styles from "./PLayer.module.scss";
 import BpmSelect from "../elements/BpmSelect";
 import IconButton from "../elements/IconButton";
 import SmallIconButton from "../elements/SmallIconButton";

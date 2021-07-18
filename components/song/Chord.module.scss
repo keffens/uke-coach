@@ -1,0 +1,15 @@
+@import "./templates.scss";
+
+.chord {
+  color: $primary-dark;
+  font-size: 100%;
+  font-weight: bold;
+  text-align: center;
+  height: 1.3em;
+  width: $strumSize / 1.1;
+
+  sup {
+    font-size: 70%;
+    vertical-align: top;
+  }
+}

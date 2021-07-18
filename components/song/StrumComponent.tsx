@@ -6,7 +6,7 @@ import {
   FaExchangeAlt,
 } from "react-icons/fa";
 import { Chord, ChordLib, Strum, StrumType } from "../../lib/music";
-import styles from "./Song.module.scss";
+import styles from "./Strum.module.scss";
 
 export const STRING_SEP = 0.4;
 

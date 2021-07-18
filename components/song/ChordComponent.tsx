@@ -1,5 +1,5 @@
 import { Chord } from "../../lib/music";
-import styles from "./Song.module.scss";
+import styles from "./Chord.module.scss";
 
 export interface ChordComponentProps {
   chord?: Chord | null;

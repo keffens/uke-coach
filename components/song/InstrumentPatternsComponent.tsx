@@ -17,7 +17,7 @@ export default function InstrumentPatternsComponent({
       <Title tag="h4" className="mb-2">
         Patterns
       </Title>
-      <Columns isMultiline isMobile>
+      <Columns isMultiline isMobile style={{ width: "100%", overflow: "auto" }}>
         {patterns.map((pattern, i) => (
           <Column key={i} style={{ minWidth: "max-content" }}>
             <PatternWithCountComponent

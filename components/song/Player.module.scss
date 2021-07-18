@@ -1,0 +1,21 @@
+.player {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
+  margin: -1em;
+  width: calc(100% + 2em);
+  z-index: 1000;
+  padding: 0.5em 1em;
+  background-color: white;
+  text-align: center;
+
+  * {
+    vertical-align: middle;
+  }
+}
+
+.tooltip {
+  background-color: white;
+  border-radius: 4px;
+  max-width: 240px;
+}

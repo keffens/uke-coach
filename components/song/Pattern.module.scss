@@ -1,0 +1,16 @@
+@import "./templates.scss";
+
+.pattern {
+  @extend .flexRowTemplate;
+
+  $color: $black-bis;
+  font-size: $strumSize;
+  position: relative;
+  margin: 0.3em 0;
+  line-height: 1.1em;
+  height: 1.1em;
+
+  > * {
+    vertical-align: middle;
+  }
+}

@@ -1,6 +1,6 @@
 import React from "react";
-import styles from "./Song.module.scss";
-import SpacedGridRow from "./SpacedGridRow";
+import styles from "./Lyrics.module.scss";
+import SpacedGridRow from "../elements/SpacedGridRow";
 
 interface LyricsCellComponentProps {
   lyric?: string;

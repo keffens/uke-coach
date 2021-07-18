@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
-import { Column, Columns } from "bloomer";
+import { Columns } from "bloomer";
+import SpacedGridRow from "../elements/SpacedGridRow";
 import ChordComponent from "./ChordComponent";
 import LyricsComponent from "./LyricsComponent";
 import PatternComponent from "./PatternComponent";
-import SpacedGridRow from "./SpacedGridRow";
-import { Bar, BarParagraph, InstrumentLib, Pattern } from "../../lib/music";
-import styles from "./Song.module.scss";
+import { Bar, BarParagraph, InstrumentLib } from "../../lib/music";
+import styles from "./BarParagraph.module.scss";
 import { range } from "../../lib/util";
 import { Player } from "../../lib/player";
 

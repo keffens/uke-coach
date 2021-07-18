@@ -1,0 +1,25 @@
+@import "../../styles/variables.scss";
+
+$strumSize: 1.25em;
+$sixColWidth: 1400px;
+$eightColWidth: 1760px;
+
+.colSizingTemplate {
+  min-width: max-content;
+  flex: 1 0 21%; // At most 4 columns.
+  @media screen and (min-width: $sixColWidth) {
+    flex: 1 0 15%; // At most 6 columns.
+  }
+  @media screen and (min-width: $eightColWidth) {
+    flex: 1 0 12%; // At most 8 columns.
+  }
+}
+
+.flexRowTemplate {
+  display: flex;
+  flex-direction: row;
+
+  > * {
+    margin-right: auto;
+  }
+}

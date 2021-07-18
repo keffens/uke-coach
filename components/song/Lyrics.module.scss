@@ -1,0 +1,23 @@
+.lyrics {
+  height: 2em;
+  margin-top: auto;
+
+  .left {
+    float: left;
+  }
+
+  .right {
+    float: right;
+  }
+
+  .streched {
+    // Justify content even thought it's just one line.
+    text-align: justify;
+
+    &:after {
+      content: "";
+      display: inline-block;
+      width: 100%;
+    }
+  }
+}

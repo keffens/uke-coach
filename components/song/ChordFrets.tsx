@@ -1,5 +1,5 @@
 import { Chord, ChordInput, ChordLib } from "../../lib/music";
-import styles from "./Song.module.scss";
+import styles from "./Chord.module.scss";
 
 export interface ChordFretsProps {
   chord: ChordInput;
