@@ -19,6 +19,8 @@ $borderStyle: $borderWidth solid $grey-lighter;
   border-left: $borderStyle;
 
   div {
+    margin-left: -1px;
+    margin-bottom: -1px;
     border-top: $borderStyle;
     border-right: $borderStyle;
   }
@@ -32,6 +34,7 @@ $borderStyle: $borderWidth solid $grey-lighter;
 
   div {
     height: 50%;
+    margin: 0 -1px;
     border-bottom: $borderStyle;
   }
 }

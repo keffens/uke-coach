@@ -6,10 +6,28 @@
   font-weight: bold;
   text-align: center;
   height: 1.3em;
-  width: $strumSize / 1.1;
+  width: $strumSize / 1.1 + 2em;
+  margin: 0 -1em;
 
   sup {
     font-size: 70%;
     vertical-align: top;
   }
+}
+
+.chordFrets {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  width: fit-content;
+  align-items: center;
+}
+
+.fret {
+  position: absolute;
+  width: 16px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 80%;
+  font-weight: bold;
 }
