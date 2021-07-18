@@ -51,14 +51,14 @@ export default function ChordFrets({ chord, chordLib }: ChordFretsProps) {
   }
 
   if (max <= 3) {
-    min = 0;
+    min = 1;
     max = 3;
-  } else if (max - min < 3) {
-    max = min + 3;
+  } else if (max - min < 2) {
+    max = min + 2;
   }
 
   const cols = frets.length - 1;
-  const rows = max - min;
+  const rows = max - min + 1;
   const width = `${12 * cols}px`;
   const height = `${16 * rows}px`;
 
@@ -73,7 +73,7 @@ export default function ChordFrets({ chord, chordLib }: ChordFretsProps) {
         {frets.map((f, i) => (
           <Fret key={i} fret={f} string={i} min={min} />
         ))}
-        {min > 0 ? <Fret fret={1} string={-0.75} char={min} /> : null}
+        {min > 1 ? <Fret fret={1} string={-0.75} char={min} /> : null}
       </div>
     </div>
   );
