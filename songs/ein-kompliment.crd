@@ -67,7 +67,7 @@
 {end_of_chorus}
 
 {start_of_verse: Verse 2}
-{pattern: *single strum}
+{pattern: |a---------------|}
 [D..][......]Wenn man so will, bist [Am]du meine Chill-out Area, meine [C]Feiertage in jedem Jahr, meine [Em]Süßwarenabteilung im Supermarkt,
 {pattern: verse}
 [D.][.......]die Lösung wenn mal was hakt, so [Am]wertvoll, dass man es sich gerne auf[C]spart, und so schön, dass man {pattern: *single strum}{pattern: *pre-intro-strum}[Em]nie darauf verzichten mag.

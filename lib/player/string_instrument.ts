@@ -110,7 +110,8 @@ export class StringInstrument extends SamplerInstrument {
         delay = Math.max(-0.02, -duration / this.tuning.length);
         break;
       case StrumType.Arpeggio:
-        delay = (2 * duration) / this.tuning.length;
+        delay = duration / this.tuning.length;
+        if (delay <= 0.03) delay *= 2;
         break;
       case StrumType.Tremolo:
         delay = duration / (2 * this.tuning.length);
