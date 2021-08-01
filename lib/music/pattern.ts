@@ -1,6 +1,6 @@
 import { TICKS_PER_BEAT } from "./note";
 import { TimeSignature } from "./signature";
-import { Strum } from "./strum";
+import { Strum, StrumType } from "./strum";
 import { Token, TokenType } from "./token";
 
 /**
@@ -208,6 +208,25 @@ export class Pattern {
     let idx = (bar * this.strumsPerBar + i) % this.strums.length;
     if (idx < 0) idx += this.strums.length;
     return this.strums[idx];
+  }
+
+  /**
+   * Returns the number of strums that the requested strum holds, i.e.,  1 + the
+   * number of pauses following the strum in the same bar. Returns 0 if the
+   * strum is a pause.
+   */
+  strumLength(i: number, bar: number = 0): number {
+    let start = (bar * this.strumsPerBar + i) % this.strums.length;
+    if (start < 0) start += this.strums.length;
+    if (this.strums[start].type === StrumType.Pause) return 0;
+    let end = start + 1;
+    while (
+      end % this.strumsPerBar !== 0 &&
+      this.strums[end].type === StrumType.Pause
+    ) {
+      end++;
+    }
+    return end - start;
   }
 
   /**

@@ -3,6 +3,7 @@ import {
   Bar,
   Chord,
   Instrument,
+  Pattern,
   PitchedNote,
   Strum,
   StrumType,
@@ -102,8 +103,9 @@ export class SamplerInstrument extends InstrumentPlayer {
     }
   }
 
-  playBar(bar: Bar, time: number, instrumentIdx = 0) {
+  playBar(bar: Bar, time: number, instrumentIdx = 0): void {
     const pattern = bar.patterns[instrumentIdx];
+    const barIdx = bar.patternIdxs[instrumentIdx];
     const strumDuration = Tone.Time("1m").toSeconds() / pattern.strumsPerBar;
     const strumBeats = 1 / pattern.strumsPerBeat;
     let chordIdx = 0;
@@ -118,8 +120,28 @@ export class SamplerInstrument extends InstrumentPlayer {
       // Keep previous chord if this one is not defined.
       chord = bar.chords[chordIdx] ?? chord;
       if (!chord) continue;
-      const strum = pattern.getStrum(i, bar.patternIdxs[instrumentIdx]);
-      this.playChord(chord, strum, time + i * strumDuration, strumDuration);
+      const strum = pattern.getStrum(i, barIdx);
+      if (strum.type === StrumType.Tremolo) {
+        const noteLength =
+          pattern.strumLength(i, barIdx) /
+          (pattern.strumsPerBeat * pattern.time.noteValue);
+        this.playTremolo(chord, time + i * strumDuration, noteLength);
+      } else {
+        this.playChord(chord, strum, time + i * strumDuration, strumDuration);
+      }
+    }
+  }
+
+  private playTremolo(chord: Chord, time: number, noteLength: number): void {
+    const sixteenth = Tone.Time("16n").toSeconds();
+    const count = 16 * noteLength + Number.EPSILON;
+    for (let i = 0; i < count; i++) {
+      this.playChord(
+        chord,
+        i % 2 === 0 ? Strum.down() : Strum.up(),
+        time + i * sixteenth,
+        sixteenth
+      );
     }
   }
 }

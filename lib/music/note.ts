@@ -225,13 +225,13 @@ export const BEAT_LENGTHS_PATTERN = `[_.,:;'"]*`;
  * Parses beats from a string ignoring all symbols which don't represent beat
  * values.
  */
-export function parseBeats(value: string, beatsInBar = 4): number {
+export function parseBeats(values: string, beatsInBar = 4): number {
   let sum = 0;
-  for (let i = 0; i < value.length; i++) {
-    if (value[i] === "_") {
+  for (const value of values) {
+    if (value === "_") {
       sum += beatsInBar;
     } else {
-      sum += BEAT_LENGTHS.get(value[i]) ?? 0;
+      sum += BEAT_LENGTHS.get(value) ?? 0;
     }
   }
   return sum || beatsInBar;

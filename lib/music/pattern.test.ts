@@ -88,6 +88,18 @@ test("gets strums", () => {
   expect(pattern.getStrum(1, -1)).toEqual(Strum.up());
 });
 
+test("gets strum length", () => {
+  const pattern = Pattern.parse("|d-u-|-d--|", FOUR_FOUR);
+  expect(pattern.strumLength(0)).toEqual(2);
+  expect(pattern.strumLength(1)).toEqual(0);
+  expect(pattern.strumLength(2)).toEqual(2);
+  expect(pattern.strumLength(3)).toEqual(0);
+  expect(pattern.strumLength(0, 1)).toEqual(0);
+  expect(pattern.strumLength(1, 1)).toEqual(3);
+  expect(pattern.strumLength(2, 1)).toEqual(0);
+  expect(pattern.strumLength(3, 1)).toEqual(0);
+});
+
 test("determines whether to use tabs", () => {
   expect(Pattern.parse("|d-du|", TWO_TWO).useTab()).toEqual(false);
   expect(Pattern.parse("|d-2u|", TWO_TWO).useTab()).toEqual(true);

@@ -117,6 +117,7 @@ export class StringInstrument extends SamplerInstrument {
         if (delay <= 0.03) delay *= 2;
         break;
       case StrumType.Tremolo:
+        // Tremolo is handled in the playBar function.
         delay = duration / (2 * this.tuning.length);
         this.playStrings(notes, time, delay, 0.5);
         this.playStrings(notes, time + duration / 2, -delay, 0.5);
