@@ -95,6 +95,9 @@ export class StringInstrument extends SamplerInstrument {
     switch (strum.type) {
       case StrumType.Pause:
         return;
+      case StrumType.Rest:
+        this.mute(time);
+        return;
       case StrumType.Percursion:
         this.mute(time);
         StringInstrument.percursion.playNote(

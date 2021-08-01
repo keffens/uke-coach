@@ -57,13 +57,16 @@ class PlayerImpl {
     this.activeBarIdx = 0;
     if (this.initialized) {
       this.setUpSong();
-      // The extra seems to be necessary when switching pages for some reason.
+      // The extra stop seems to be necessary when switching pages for some
+      // reason.
       this.stop();
     }
   }
 
   /** Cleans up all scheduled events and loops. */
   cleanup(): void {
+    // TODO: Cleanup doesn't work. Every time we navigate from one page to
+    // another, something is broken.
     this.stop();
     if (!this.song) return;
     console.log("Cleaning up song", this.song.metadata.title);
@@ -72,7 +75,6 @@ class PlayerImpl {
     this.playback?.dispose();
     this.playback = null;
     this.song = null;
-    this.onSongFinishes = null;
   }
 
   /** Returns the count-in time in seconds. */

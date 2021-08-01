@@ -1,7 +1,7 @@
 import { Strum } from "./strum";
 
 test("parses strums from string", () => {
-  const strums = ".-dDuUxat1(23)";
+  const strums = ".-dDuUxat1(23)*";
   expect(Strum.parse(strums, 0)).toEqual([Strum.pause(), 1]);
   expect(Strum.parse(strums, 1)).toEqual([Strum.pause(), 2]);
   expect(Strum.parse(strums, 2)).toEqual([Strum.down(), 3]);
@@ -13,6 +13,7 @@ test("parses strums from string", () => {
   expect(Strum.parse(strums, 8)).toEqual([Strum.tremolo(), 9]);
   expect(Strum.parse(strums, 9)).toEqual([Strum.plugged([1]), 10]);
   expect(Strum.parse(strums, 10)).toEqual([Strum.plugged([2, 3]), 14]);
+  expect(Strum.parse(strums, 14)).toEqual([Strum.rest(), 15]);
 });
 
 test("parsing strums fails for invalid patterns", () => {
@@ -25,6 +26,7 @@ test("parsing strums fails for invalid patterns", () => {
 
 test("converts strums to strings", () => {
   expect(Strum.pause().toString()).toEqual("-");
+  expect(Strum.rest().toString()).toEqual("*");
   expect(Strum.down().toString()).toEqual("d");
   expect(Strum.down(/*emphasize=*/ true).toString()).toEqual("D");
   expect(Strum.up().toString()).toEqual("u");

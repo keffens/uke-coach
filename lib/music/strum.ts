@@ -2,6 +2,7 @@ import { assert, range } from "../util";
 
 export enum StrumType {
   Pause,
+  Rest,
   Down,
   Up,
   Percursion,
@@ -23,6 +24,11 @@ export class Strum {
   /** Creates a pause. */
   static pause(): Strum {
     return new Strum(StrumType.Pause);
+  }
+
+  /** Creates a rest. */
+  static rest(): Strum {
+    return new Strum(StrumType.Rest);
   }
 
   /** Creates a down stroke. */
@@ -82,6 +88,8 @@ export class Strum {
       case "-":
       case ".":
         return [Strum.pause(), pos + 1];
+      case "*":
+        return [Strum.rest(), pos + 1];
       case "d":
         return [Strum.down(pattern[pos] == "D"), pos + 1];
       case "u":
@@ -128,6 +136,8 @@ export class Strum {
     switch (this.type) {
       case StrumType.Pause:
         return "-";
+      case StrumType.Rest:
+        return "*";
       case StrumType.Down:
         return this.emphasize ? "D" : "d";
       case StrumType.Up:
@@ -158,8 +168,11 @@ export class Strum {
 
   /** Whether this strum uses a chord or works standalone. */
   usesChord(): boolean {
-    return ![StrumType.Pause, StrumType.Percursion, StrumType.Tab].includes(
-      this.type
-    );
+    return ![
+      StrumType.Pause,
+      StrumType.Rest,
+      StrumType.Percursion,
+      StrumType.Tab,
+    ].includes(this.type);
   }
 }

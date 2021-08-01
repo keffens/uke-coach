@@ -94,7 +94,7 @@ export class SamplerInstrument extends InstrumentPlayer {
 
   playChord(chord: Chord, strum: Strum, time: number, duration: number): void {
     if (strum.type === StrumType.Pause) return;
-    if (this.resourceSavingEnabled) {
+    if (strum.type === StrumType.Rest || this.resourceSavingEnabled) {
       this.mute(time);
     }
     for (const note of chord.asPitchedNotes(this.chordBase)) {
@@ -103,13 +103,13 @@ export class SamplerInstrument extends InstrumentPlayer {
   }
 
   playBar(bar: Bar, time: number, instrumentIdx = 0) {
-    const strumDuration =
-      Tone.Time("1m").toSeconds() / bar.patterns[instrumentIdx].strumsPerBar;
-    const strumBeats = 1 / bar.patterns[instrumentIdx].strumsPerBeat;
+    const pattern = bar.patterns[instrumentIdx];
+    const strumDuration = Tone.Time("1m").toSeconds() / pattern.strumsPerBar;
+    const strumBeats = 1 / pattern.strumsPerBeat;
     let chordIdx = 0;
     let chord = undefined;
     let beats = 0;
-    for (let i = 0; i < bar.patterns[instrumentIdx].strumsPerBar; i++) {
+    for (let i = 0; i < pattern.strumsPerBar; i++) {
       if (beats + Number.EPSILON >= bar.beats[chordIdx]) {
         beats -= bar.beats[chordIdx];
         chordIdx++;
@@ -118,10 +118,7 @@ export class SamplerInstrument extends InstrumentPlayer {
       // Keep previous chord if this one is not defined.
       chord = bar.chords[chordIdx] ?? chord;
       if (!chord) continue;
-      const strum = bar.patterns[instrumentIdx].getStrum(
-        i,
-        bar.patternIdxs[instrumentIdx]
-      );
+      const strum = pattern.getStrum(i, bar.patternIdxs[instrumentIdx]);
       this.playChord(chord, strum, time + i * strumDuration, strumDuration);
     }
   }
