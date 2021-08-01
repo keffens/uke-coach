@@ -44,37 +44,6 @@ class StrumsPerBar {
   }
 }
 
-function getPattern(
-  key: string,
-  patterns: Map<string, Pattern>,
-  time: TimeSignature
-): Pattern {
-  const pattern = patterns.get(key);
-  if (!pattern) {
-    throw new Error(`Unknown pattern name "${key}".`);
-  }
-  if (!pattern.time.equals(time)) {
-    throw new Error(
-      "Cannot load pattern with mismatching time signature: " +
-        `${time.toString()} vs. ${pattern.time.toString()}`
-    );
-  }
-  return pattern;
-}
-
-function setPattern(
-  key: string,
-  pattern: Pattern,
-  patterns?: Map<string, Pattern>
-): void {
-  if (key && patterns) {
-    if (patterns.has(key)) {
-      throw new Error(`Redefinition of pattern "${key}".`);
-    }
-    patterns.set(key, pattern);
-  }
-}
-
 function praseFret(line: string, pos: number, frets: number[]): number {
   if (line[pos] === "-") {
     frets.push(-1);
@@ -202,27 +171,14 @@ export class Pattern {
   }
 
   /** Parses a pattern from a Pattern or Tab token. */
-  // TODO: Remove `patterns` argument once it's no longer in use. The pattern
-  //       maps are handled through the InstrumentLib in future.
-  static fromToken(
-    token: Token,
-    time: TimeSignature,
-    patterns?: Map<string, Pattern>
-  ): Pattern {
+  static fromToken(token: Token, time: TimeSignature): Pattern {
     try {
       if (token.type === TokenType.Pattern) {
-        if (!token.value && patterns) {
-          return getPattern(token.key, patterns, time);
-        }
-        const pattern = Pattern.parse(token.value, time, token.key);
-        setPattern(token.key, pattern, patterns);
-        return pattern;
+        return Pattern.parse(token.value, time, token.key);
       }
       if (token.type === TokenType.TabEnv) {
         const lines = token.children.map((line) => line.value).reverse();
-        const pattern = Pattern.parseTab(lines, time, token.value);
-        setPattern(token.value, pattern, patterns);
-        return pattern;
+        return Pattern.parseTab(lines, time, token.value);
       }
     } catch (e) {
       throw token.error(e.message);

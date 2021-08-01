@@ -102,40 +102,16 @@ test("determines whether to display as main pattern", () => {
 });
 
 test("converts between tokens and patterns", () => {
-  const patterns = new Map<string, Pattern>();
   const tokenA = new Token(TokenType.Pattern, "island", "|d-du-udu|");
-  const readA = new Token(TokenType.Pattern, "island");
-  const patternA = Pattern.fromToken(tokenA, FOUR_FOUR, patterns);
+  const patternA = Pattern.fromToken(tokenA, FOUR_FOUR);
   const tokenB = new Token(TokenType.Pattern, "dum-dagadaga", "|d---dudu|");
-  const patternB = Pattern.fromToken(tokenB, FOUR_FOUR, patterns);
+  const patternB = Pattern.fromToken(tokenB, FOUR_FOUR);
   const tokenC = new Token(TokenType.Pattern, undefined, "|d---|");
-  const patternC = Pattern.fromToken(tokenC, FOUR_FOUR, patterns);
+  const patternC = Pattern.fromToken(tokenC, FOUR_FOUR);
 
   expect(patternA.toToken()).toEqual(tokenA);
   expect(patternB.toToken()).toEqual(tokenB);
   expect(patternC.toToken()).toEqual(tokenC);
-
-  expect(patterns).toEqual(
-    new Map([
-      ["island", patternA],
-      ["dum-dagadaga", patternB],
-    ])
-  );
-
-  expect(Pattern.fromToken(readA, FOUR_FOUR, patterns)).toEqual(patternA);
-});
-
-test("fails for invalid calls to token conversion", () => {
-  const patterns = new Map<string, Pattern>();
-  const tokenA = new Token(TokenType.Pattern, "island", "|d-du-udu|");
-  const readA = new Token(TokenType.Pattern, "island");
-  const tokenAA = new Token(TokenType.Pattern, "island", "|D-du-udu|");
-  const readB = new Token(TokenType.Pattern, "unknown");
-  Pattern.fromToken(tokenA, FOUR_FOUR, patterns);
-
-  expect(() => Pattern.fromToken(tokenAA, FOUR_FOUR, patterns)).toThrow();
-  expect(() => Pattern.fromToken(readA, TWO_TWO, patterns)).toThrow();
-  expect(() => Pattern.fromToken(readB, FOUR_FOUR, patterns)).toThrow();
 });
 
 test("prases tab", () => {
@@ -150,14 +126,12 @@ test("prases tab", () => {
 });
 
 test("prases tab from token", () => {
-  const patterns = new Map<string, Pattern>();
   const tab = Pattern.fromToken(
     new Token(TokenType.TabEnv, "tab", undefined, [
       new Token(TokenType.TabLine, undefined, "|1-2-|"),
       new Token(TokenType.TabLine, undefined, "|-3-4|"),
     ]),
-    FOUR_FOUR,
-    patterns
+    FOUR_FOUR
   );
   // Internally, we start with the lowest string.
   expect(tab.toString(0)).toEqual("|-3-4|");

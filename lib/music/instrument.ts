@@ -8,9 +8,9 @@ import { Token, TokenType } from "./token";
 
 export const INSTRUMENT_RE = new RegExp(
   String.raw`^(\w[-\(\) \w]*)\s+` +
-    String.raw`(${Object.values(InstrumentType)
+    String.raw`\[?(${Object.values(InstrumentType)
       .map((type) => escapeRegExp(type))
-      .join("|")})` +
+      .join("|")})\]?` +
     String.raw`(?:\s+tuning((?:\s+${PITCHED_NOTE_PATTERN})+))?` +
     String.raw`(?:\s+(${Object.values(SoundType).join("|")}))?$`
 );

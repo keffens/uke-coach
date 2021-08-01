@@ -40,7 +40,7 @@ test("prases instruments", () => {
   expect(Instrument.parse("lead guitar guitar electric")).toEqual(
     new Instrument("lead guitar", InstrumentType.Guitar, SoundType.Electric)
   );
-  expect(Instrument.parse("bass ukulele tuning G2 C2 E2 A2 bass")).toEqual(
+  expect(Instrument.parse("bass [ukulele] tuning G2 C2 E2 A2 bass")).toEqual(
     new Instrument(
       "bass",
       InstrumentType.Ukulele,
