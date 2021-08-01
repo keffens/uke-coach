@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-112,0)">
+        <g id="percursion" transform="matrix(1,0,0,1,112,0)">
+            <rect x="0" y="0" width="48" height="48" style="fill:none;"/>
+            <g transform="matrix(0.707107,0.707107,-0.707107,0.707107,-55.196,-87.7229)">
+                <path d="M140,4C140,3.47 139.789,2.961 139.414,2.586C139.039,2.211 138.53,2 138,2L132,2C131.47,2 130.961,2.211 130.586,2.586C130.211,2.961 130,3.47 130,4L130,42C130,42.53 130.211,43.039 130.586,43.414C130.961,43.789 131.47,44 132,44L138,44C138.53,44 139.039,43.789 139.414,43.414C139.789,43.039 140,42.53 140,42C140,34.918 140,11.082 140,4Z"/>
+            </g>
+            <g transform="matrix(-0.707107,0.707107,-0.707107,-0.707107,135.723,-55.196)">
+                <path d="M140,4C140,3.47 139.789,2.961 139.414,2.586C139.039,2.211 138.53,2 138,2L132,2C131.47,2 130.961,2.211 130.586,2.586C130.211,2.961 130,3.47 130,4L130,42C130,42.53 130.211,43.039 130.586,43.414C130.961,43.789 131.47,44 132,44L138,44C138.53,44 139.039,43.789 139.414,43.414C139.789,43.039 140,42.53 140,42C140,34.918 140,11.082 140,4Z"/>
+            </g>
+        </g>
+    </g>
+</svg>

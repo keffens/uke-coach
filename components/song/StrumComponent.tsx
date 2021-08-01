@@ -1,10 +1,11 @@
 import React from "react";
 import {
-  FaLongArrowAltDown,
-  FaLongArrowAltUp,
-  FaTimes,
-  FaExchangeAlt,
-} from "react-icons/fa";
+  ArpeggioDown,
+  DownStrum,
+  Percursion,
+  Tremolo,
+  UpStrum,
+} from "../icons";
 import { Chord, ChordLib, Strum, StrumType } from "../../lib/music";
 import styles from "./Strum.module.scss";
 
@@ -68,39 +69,15 @@ export default function StrumComponent({
 
   switch (strum.type) {
     case StrumType.Down:
-      return (
-        <div className={classes.join(" ")}>
-          <FaLongArrowAltDown />
-        </div>
-      );
+      return <DownStrum className={classes.join(" ")} />;
     case StrumType.Up:
-      return (
-        <div className={classes.join(" ")}>
-          <FaLongArrowAltUp className={classes.join(" ")} />
-        </div>
-      );
+      return <UpStrum className={classes.join(" ")} />;
     case StrumType.Percursion:
-      return (
-        <div className={classes.join(" ")}>
-          <FaTimes className={classes.join(" ")} />
-        </div>
-      );
+      return <Percursion className={classes.join(" ")} />;
     case StrumType.Arpeggio:
-      return (
-        <div className={classes.join(" ")}>
-          <FaLongArrowAltDown
-            style={{ transform: "scale(1.2) rotate(-30deg)" }}
-          />
-        </div>
-      );
+      return <ArpeggioDown className={classes.join(" ")} />;
     case StrumType.Tremolo:
-      return (
-        <div className={classes.join(" ")}>
-          <FaExchangeAlt
-            style={{ transform: "rotate(-90deg) scaleX(0.9) scaleY(-1.1)" }}
-          />
-        </div>
-      );
+      return <Tremolo className={classes.join(" ")} />;
     case StrumType.Plugged:
       return <PluggedStrum strum={strum} chord={chord} chordLib={chordLib} />;
     case StrumType.Tab:

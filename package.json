@@ -21,6 +21,7 @@
     "tone": "^14.7.77"
   },
   "devDependencies": {
+    "@svgr/webpack": "^5.5.0",
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.34",
     "@types/react": "^17.0.3",
