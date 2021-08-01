@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "./templates.scss";
 
 .chord {
@@ -6,7 +7,7 @@
   font-weight: bold;
   text-align: center;
   height: 1.3em;
-  width: $strumSize / 1.1 + 2em;
+  width: math.div($strumSize, 1.1) + 2em;
   margin: 0 -1em;
 
   sup {

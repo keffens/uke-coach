@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "../../styles/variables.scss";
 $borderWidth: 2px;
 $borderStyle: $borderWidth solid $grey-lighter;
@@ -5,8 +6,8 @@ $borderStyle: $borderWidth solid $grey-lighter;
 .gridTemplate {
   display: grid;
   position: absolute;
-  bottom: #{-$borderWidth/2};
-  left: #{-$borderWidth/2};
+  bottom: math.div(-$borderWidth, 2);
+  left: math.div(-$borderWidth, 2);
   width: calc(100% + #{$borderWidth});
   height: calc(100% + #{$borderWidth});
   z-index: -1;
