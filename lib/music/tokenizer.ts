@@ -226,7 +226,8 @@ function parseLine(
         );
       }
     } catch (e) {
-      throw new Error(`Line ${lineNr}, pos ${pos + 1}: ${e.message}`);
+      const message = e instanceof Error ? e.message : e;
+      throw new Error(`Line ${lineNr}, pos ${pos + 1}: ${message}`);
     }
     pos += match[0].length || 1;
   }

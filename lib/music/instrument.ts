@@ -115,7 +115,8 @@ export class Instrument {
     try {
       return Instrument.parse(token.value);
     } catch (e) {
-      throw token.error(e.message);
+      if (e instanceof Error) throw token.error(e.message);
+      throw e;
     }
   }
 

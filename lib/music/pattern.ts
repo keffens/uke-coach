@@ -181,7 +181,8 @@ export class Pattern {
         return Pattern.parseTab(lines, time, token.value);
       }
     } catch (e) {
-      throw token.error(e.message);
+      if (e instanceof Error) throw token.error(e.message);
+      throw e;
     }
     throw token.error("expected pattern or tab token");
   }
@@ -196,6 +197,11 @@ export class Pattern {
 
   get ticksPerBar(): number {
     return this.time.beats * TICKS_PER_BEAT;
+  }
+
+  /** Returns the note value of a single strum. */
+  get strumNoteLength(): number {
+    return 1 / (this.strumsPerBeat * this.time.noteValue);
   }
 
   /** Returns a copy of this pattern. */

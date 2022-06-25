@@ -16,6 +16,7 @@ import SmallIconButton from "../elements/SmallIconButton";
 import ToggleIcon from "../elements/ToggleIcon";
 import { Song } from "../../lib/music";
 import { Player } from "../../lib/player";
+import { useWakeLock } from "react-screen-wake-lock";
 
 interface PlayerComponentProps {
   song: Song;
@@ -23,11 +24,24 @@ interface PlayerComponentProps {
 
 export default function PlayerComponent({ song }: PlayerComponentProps) {
   const [playing, setPlaying] = useState(false);
+  const screenLock = useWakeLock({
+    onRequest: () => console.log("Screen Wake Lock: requested!"),
+    onError: () => console.error("Screen Wake Lock: An error happened 💥"),
+    onRelease: () => console.log("Screen Wake Lock: released!"),
+  });
   useEffect(() => {
     Player.loadSong(song);
     Player.onSongFinishes = () => setPlaying(false);
     return () => Player.cleanup();
   }, []);
+  useEffect(() => {
+    if (!screenLock.isSupported) return;
+    if (playing) {
+      screenLock.request();
+    } else {
+      screenLock.release();
+    }
+  }, [playing]);
   return (
     <div className={styles.player}>
       <BpmSelect

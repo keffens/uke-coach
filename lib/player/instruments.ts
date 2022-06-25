@@ -123,8 +123,7 @@ export class SamplerInstrument extends InstrumentPlayer {
       const strum = pattern.getStrum(i, barIdx);
       if (strum.type === StrumType.Tremolo) {
         const noteLength =
-          pattern.strumLength(i, barIdx) /
-          (pattern.strumsPerBeat * pattern.time.noteValue);
+          pattern.strumLength(i, barIdx) * pattern.strumNoteLength;
         this.playTremolo(chord, time + i * strumDuration, noteLength);
       } else {
         this.playChord(chord, strum, time + i * strumDuration, strumDuration);

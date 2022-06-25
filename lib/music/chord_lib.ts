@@ -213,7 +213,8 @@ export class ChordLib {
       }
       return this.defineChordIfCompatible(chord, frets);
     } catch (e) {
-      throw token.error(e.message);
+      if (e instanceof Error) throw token.error(e.message);
+      throw e;
     }
   }
 

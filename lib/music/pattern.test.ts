@@ -71,6 +71,15 @@ test("computes strums per beat", () => {
   expect(Pattern.makeEmpty(TWO_TWO, 0, 0).strumsPerBeat).toBeNaN();
 });
 
+test("computes strum note length", () => {
+  expect(Pattern.parse("|dd|", TWO_TWO).strumNoteLength).toEqual(1 / 2);
+  expect(Pattern.parse("|d-du|", TWO_TWO).strumNoteLength).toEqual(1 / 4);
+  expect(Pattern.parse("|d-dudu|", TWO_TWO).strumNoteLength).toBeCloseTo(1 / 6);
+  expect(Pattern.parse("|d-du|", FOUR_FOUR).strumNoteLength).toEqual(1 / 4);
+  expect(Pattern.parse("|d-du-udu|", FOUR_FOUR).strumNoteLength).toEqual(1 / 8);
+  expect(Pattern.parse("|d-du-u|", THREE_FOUR).strumNoteLength).toEqual(1 / 8);
+});
+
 test("gets strums", () => {
   const pattern = Pattern.parse("|1234|dudu|", FOUR_FOUR);
   expect(pattern.getStrum(0)).toEqual(Strum.plugged([1]));
