@@ -17,34 +17,52 @@ import { ModalCardTitle } from "bloomer/lib/components/Modal/Card/ModalCardTitle
 import { Delete } from "bloomer/lib/elements/Delete";
 import { ModalCardBody } from "bloomer/lib/components/Modal/Card/ModalCardBody";
 import { ModalCardFooter } from "bloomer/lib/components/Modal/Card/ModalCardFooter";
+import { Field } from "bloomer/lib/elements/Form/Field/Field";
+import { Label } from "bloomer/lib/elements/Form/Label";
+import { Control } from "bloomer/lib/elements/Form/Control";
+import { Input } from "bloomer/lib/elements/Form/Input";
 
 interface UserButtonProps {
+  isLoading: boolean;
   onClick: () => void;
-  isSignedIn: boolean;
+  user: firebase.User | null;
 }
 
-function UserButton({ onClick, isSignedIn }: UserButtonProps) {
+function UserButton({ isLoading, onClick, user }: UserButtonProps) {
+  let icon = <TbUserOff className="icon" />;
+  if (user) {
+    if (user.photoURL) {
+      icon = (
+        <img
+          src={user.photoURL}
+          style={{ minWidth: "36px", minHeight: "36px", borderRadius: "18px" }}
+        ></img>
+      );
+    } else {
+      icon = <TbUser className="icon" />;
+    }
+  }
+
   return (
     <Button
       className="is-rounded"
-      style={{ padding: "0 1em" }}
+      style={{ height: "40px", width: "40px", padding: 0 }}
       onClick={onClick}
+      isLoading={isLoading}
     >
-      {isSignedIn ? (
-        <TbUser className="icon" />
-      ) : (
-        <TbUserOff className="icon" />
-      )}
+      {icon}
     </Button>
   );
 }
 
 interface SignInDialogProps {
-  user: firebase.User | null;
   closeDialog: () => void;
+  user: firebase.User | null;
 }
 
-function SignInDialog({ user, closeDialog }: SignInDialogProps) {
+function SignInDialog({ closeDialog, user }: SignInDialogProps) {
+  const [displayName, setDisplayName] = useState(user?.displayName ?? "");
+
   // Configure FirebaseUI.
   const uiConfig = {
     signInFlow: "popup",
@@ -63,13 +81,28 @@ function SignInDialog({ user, closeDialog }: SignInDialogProps) {
       <ModalBackground />
       <ModalCard>
         <ModalCardHeader>
-          <ModalCardTitle>Sign in</ModalCardTitle>
+          <ModalCardTitle>
+            {user
+              ? `You're signed in as ${user.displayName}`
+              : "Register or sign in"}
+          </ModalCardTitle>
           <Delete onClick={closeDialog} />
         </ModalCardHeader>
         <ModalCardBody>
           {user ? (
             <>
-              You're logged in as <b>{user.displayName}</b>.
+              <Field>
+                <Label>Display name</Label>
+                <Control>
+                  <Input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) =>
+                      setDisplayName((e.target as HTMLInputElement).value)
+                    }
+                  />
+                </Control>
+              </Field>
             </>
           ) : (
             <StyledFirebaseAuth
@@ -80,14 +113,28 @@ function SignInDialog({ user, closeDialog }: SignInDialogProps) {
         </ModalCardBody>
         <ModalCardFooter>
           {user && (
-            <Button
-              onClick={() => {
-                firebase.auth().signOut();
-                closeDialog();
-              }}
-            >
-              sign out
-            </Button>
+            <>
+              <Button
+                isColor="primary"
+                disabled={
+                  !displayName || displayName.trim() === user.displayName
+                }
+                onClick={() => {
+                  user.updateProfile({ displayName: displayName.trim() });
+                  closeDialog();
+                }}
+              >
+                save
+              </Button>
+              <Button
+                onClick={() => {
+                  firebase.auth().signOut();
+                  closeDialog();
+                }}
+              >
+                sign out
+              </Button>
+            </>
           )}
         </ModalCardFooter>
       </ModalCard>
@@ -96,8 +143,12 @@ function SignInDialog({ user, closeDialog }: SignInDialogProps) {
 }
 
 export default function NavbarComponent() {
+  const [isLoading, setLoading] = useState(true);
   const [showSignInDialog, openSignInDialog] = useState(false);
-  const user = useFirebaseUser(() => openSignInDialog(false));
+  const user = useFirebaseUser(() => {
+    openSignInDialog(false);
+    setLoading(false);
+  });
 
   return (
     <>
@@ -111,7 +162,8 @@ export default function NavbarComponent() {
           <NavbarItem isHidden="desktop">
             <UserButton
               onClick={() => openSignInDialog(true)}
-              isSignedIn={!!user}
+              isLoading={isLoading}
+              user={user}
             />
           </NavbarItem>
         </NavbarBrand>
@@ -120,7 +172,8 @@ export default function NavbarComponent() {
             <NavbarItem>
               <UserButton
                 onClick={() => openSignInDialog(true)}
-                isSignedIn={!!user}
+                isLoading={isLoading}
+                user={user}
               />
             </NavbarItem>
           </NavbarEnd>
