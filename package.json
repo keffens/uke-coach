@@ -11,10 +11,13 @@
   "dependencies": {
     "bloomer": "^0.6.5",
     "bulma": "^0.9.4",
+    "firebase": "^9.8.4",
+    "firebase-admin": "^11.0.0",
     "fs": "0.0.1-security",
     "next": "10.0.8",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "react-firebaseui": "^6.0.0",
     "react-icons": "^4.4.0",
     "react-screen-wake-lock": "^2.0.0",
     "react-tooltip": "^4.2.21",
