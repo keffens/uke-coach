@@ -9,6 +9,7 @@ import VolumeToggle from "../elements/VolumeToggle";
 import VolumeIcon from "../elements/VolumeIcon";
 import InstrumentChordsComponent from "./InstrumentChordsComponent";
 import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
+import { Box } from "bloomer/lib/elements/Box";
 
 interface InstrumentIconProps {
   instrument: Instrument;
@@ -63,7 +64,7 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
     name += ` - ${instrument.type}`;
   }
   return (
-    <>
+    <Box>
       <Title tag="h3" className="mb-3">
         {name}{" "}
         <VisibilityToggle
@@ -83,7 +84,7 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
       </Title>
       <InstrumentChordsComponent chordLib={instrument.chordLib} />
       <InstrumentPatternsComponent instrument={instrument} />
-    </>
+    </Box>
   );
 }
 

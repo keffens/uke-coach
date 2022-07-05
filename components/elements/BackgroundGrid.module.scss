@@ -10,7 +10,6 @@ $borderStyle: $borderWidth solid $grey-lighter;
   left: math.div(-$borderWidth, 2);
   width: calc(100% + #{$borderWidth});
   height: calc(100% + #{$borderWidth});
-  z-index: -1;
 }
 
 .grid {

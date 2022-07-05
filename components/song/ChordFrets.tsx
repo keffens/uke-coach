@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import { Chord, ChordInput, ChordLib } from "../../lib/music";
 import { assert } from "../../lib/util";
 import BackgroundGrid from "../elements/BackgroundGrid";
@@ -33,10 +34,15 @@ function Fret({ string, fret, min, char }: FretProps) {
 export interface ChordFretsProps {
   chord: ChordInput;
   chordLib: ChordLib;
+  style?: CSSProperties;
 }
 
 // TODO: Properly display the chord frets.
-export default function ChordFrets({ chord, chordLib }: ChordFretsProps) {
+export default function ChordFrets({
+  chord,
+  chordLib,
+  style,
+}: ChordFretsProps) {
   if (typeof chord === "string") {
     chord = Chord.parse(chord)!;
   }
@@ -63,7 +69,7 @@ export default function ChordFrets({ chord, chordLib }: ChordFretsProps) {
   const height = `${16 * rows}px`;
 
   return (
-    <div className={styles.chordFrets}>
+    <div className={styles.chordFrets} style={style}>
       <div className={`${styles.chord} mb-2`}>
         {chord.base}
         {chord.sup ? <sup>{chord.sup}</sup> : null}

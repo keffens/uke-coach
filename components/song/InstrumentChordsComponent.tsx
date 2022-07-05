@@ -20,7 +20,11 @@ export default function InstrumentChordsComponent({
       <Columns isMultiline isMobile>
         {chords.map((chord) => (
           <Column key={chord} style={{ minWidth: "max-content" }}>
-            <ChordFrets chord={chord} chordLib={chordLib} />
+            <ChordFrets
+              chord={chord}
+              chordLib={chordLib}
+              style={{ margin: "auto" }}
+            />
           </Column>
         ))}
       </Columns>

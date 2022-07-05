@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -11,18 +12,23 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_APP_ID,
 };
 
-export function initFirebase() {
+let firebaseApp: FirebaseApp | undefined = undefined;
+
+export function initFirebase(): FirebaseApp {
+  if (firebaseApp) return firebaseApp;
+  // `react-firebaseui` requires the compat mode.
   firebase.initializeApp(firebaseConfig);
+  return initializeApp(firebaseConfig);
 }
 
-export function useFirebaseUser(onStateChange: () => any) {
-  const [user, setUser] = useState<firebase.User | null>(null);
+export function useFirebaseUser(onStateChange?: () => any) {
+  const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
     initFirebase();
     // Listen to the Firebase Auth state and set the local state.
-    const unregisterAuthObserver = firebase.auth().onAuthStateChanged((u) => {
+    const unregisterAuthObserver = onAuthStateChanged(getAuth(), (u) => {
       setUser(u);
-      onStateChange();
+      if (onStateChange) onStateChange();
     });
     // Make sure we un-register Firebase observers when the component unmounts.
     return () => unregisterAuthObserver();

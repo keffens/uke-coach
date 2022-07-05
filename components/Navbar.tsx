@@ -21,11 +21,18 @@ import { Field } from "bloomer/lib/elements/Form/Field/Field";
 import { Label } from "bloomer/lib/elements/Form/Label";
 import { Control } from "bloomer/lib/elements/Form/Control";
 import { Input } from "bloomer/lib/elements/Form/Input";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signOut,
+  updateProfile,
+  User,
+} from "firebase/auth";
 
 interface UserButtonProps {
   isLoading: boolean;
   onClick: () => void;
-  user: firebase.User | null;
+  user: User | null;
 }
 
 function UserButton({ isLoading, onClick, user }: UserButtonProps) {
@@ -57,7 +64,7 @@ function UserButton({ isLoading, onClick, user }: UserButtonProps) {
 
 interface SignInDialogProps {
   closeDialog: () => void;
-  user: firebase.User | null;
+  user: User | null;
 }
 
 function SignInDialog({ closeDialog, user }: SignInDialogProps) {
@@ -69,7 +76,7 @@ function SignInDialog({ closeDialog, user }: SignInDialogProps) {
     // signInSuccess: closeDialog,
     // We will display Google and Facebook as auth providers.
     signInOptions: [
-      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      GoogleAuthProvider.PROVIDER_ID,
       // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
       // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
       // firebase.auth.EmailAuthProvider.PROVIDER_ID,
@@ -120,7 +127,7 @@ function SignInDialog({ closeDialog, user }: SignInDialogProps) {
                   !displayName || displayName.trim() === user.displayName
                 }
                 onClick={() => {
-                  user.updateProfile({ displayName: displayName.trim() });
+                  updateProfile(user, { displayName: displayName.trim() });
                   closeDialog();
                 }}
               >
@@ -128,7 +135,7 @@ function SignInDialog({ closeDialog, user }: SignInDialogProps) {
               </Button>
               <Button
                 onClick={() => {
-                  firebase.auth().signOut();
+                  signOut(getAuth());
                   closeDialog();
                 }}
               >
