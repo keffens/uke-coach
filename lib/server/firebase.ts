@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from "firebase-admin";
 import { NextApiRequest } from "next";
-import { HtmlError } from "./error";
+import { HtmlError, Unauthorized } from "./error";
 
 const adminConfig: ServiceAccount = {
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
@@ -28,6 +28,6 @@ export async function authenticateUser(
     const token = await admin.auth().verifyIdToken(idToken);
     return token.uid;
   } catch {
-    throw new HtmlError(401, "Failed to authenticate the user");
+    throw new Unauthorized("Failed to authenticate the user");
   }
 }

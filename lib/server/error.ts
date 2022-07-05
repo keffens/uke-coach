@@ -6,6 +6,24 @@ export class HtmlError extends Error {
   }
 }
 
+export class BadRequest extends HtmlError {
+  constructor(message: string) {
+    super(400, message);
+  }
+}
+
+export class Unauthorized extends HtmlError {
+  constructor(message: string) {
+    super(401, message);
+  }
+}
+
+export class Forbidden extends HtmlError {
+  constructor(message: string) {
+    super(403, message);
+  }
+}
+
 export function handleError(e: any, res: NextApiResponse) {
   if (e instanceof HtmlError) {
     res.status(e.status).json({ error: e.message });

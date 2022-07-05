@@ -21,6 +21,15 @@ export function initFirebase(): FirebaseApp {
   return initializeApp(firebaseConfig);
 }
 
+export function userIdToken(): Promise<string> {
+  initFirebase();
+  const auth = getAuth();
+  if (!auth.currentUser) {
+    throw new Error("You are not logged in");
+  }
+  return auth.currentUser.getIdToken();
+}
+
 export function useFirebaseUser(onStateChange?: () => any) {
   const [user, setUser] = useState<User | null>(null);
   useEffect(() => {

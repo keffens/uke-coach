@@ -5,7 +5,8 @@ import { Pattern } from "./pattern";
 import { SongMetadata } from "./metadata";
 import { SongPart } from "./song_part";
 import { Token } from "./token";
-import { setUnion } from "../util";
+import { delUndefined, setUnion } from "../util";
+import { SongData } from "../firebase";
 
 export class Song {
   constructor(
@@ -24,6 +25,18 @@ export class Song {
     const instrumentLib = new InstrumentLib();
     const parts = SongPart.fromTokens(env, metadata, instrumentLib);
     return new Song(metadata, parts, instrumentLib);
+  }
+
+  /** Returns a SongData object with added fields from song metadata. */
+  toSongData(id: string, ownerId: string, chordPro: string): SongData {
+    return delUndefined({
+      artist: this.metadata.artist,
+      chordPro,
+      id,
+      ownerId,
+      sorttitle: this.metadata.sorttitle,
+      title: this.metadata.title,
+    });
   }
 
   /** Returns all bars of the parts. */

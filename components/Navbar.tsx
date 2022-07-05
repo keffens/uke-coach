@@ -131,7 +131,7 @@ function SignInDialog({ closeDialog, user }: SignInDialogProps) {
                   closeDialog();
                 }}
               >
-                save
+                Save
               </Button>
               <Button
                 onClick={() => {
@@ -139,7 +139,7 @@ function SignInDialog({ closeDialog, user }: SignInDialogProps) {
                   closeDialog();
                 }}
               >
-                sign out
+                Sign out
               </Button>
             </>
           )}

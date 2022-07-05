@@ -1,31 +1,29 @@
-import { assert } from "../util";
+import { assert, delUndefined, isString, toStringOrUndef } from "../util";
 
 export interface SongData {
+  chordPro: string;
   id: string;
   ownerId: string;
-  // Song metadata
   title: string;
-  sorttitle?: string;
+  // Optional
   artist?: string;
-  composer?: string;
-  lyricist?: string;
-  copyright?: string;
-  album?: string;
-  year?: number;
-  key?: string;
-  time?: string;
-  tempo?: number;
-
-  // Serialized song
-  chordPro: string;
+  sorttitle?: string;
 }
 
 export function toSongData(data: any): SongData {
   assert(
-    typeof data.id === "string" &&
-      typeof data.title === "string" &&
-      typeof data.chordPro === "string",
-    `Conversion to SongData failed`
+    isString(data.id) &&
+      isString(data.ownerId) &&
+      isString(data.title) &&
+      isString(data.chordPro),
+    "Input cannot be converted to SongData"
   );
-  return data as SongData;
+  return delUndefined({
+    chordPro: data.chordPro,
+    id: data.id,
+    ownerId: data.ownerId,
+    title: data.title,
+    sorttitle: toStringOrUndef(data.sorttitle),
+    artist: toStringOrUndef(data.sorttitle),
+  });
 }
