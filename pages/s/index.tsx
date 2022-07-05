@@ -37,7 +37,7 @@ export default function SongPage({ songs }: SongPageProps) {
 export const getStaticProps: GetStaticProps = async () => {
   initFirebaseAdmin();
   const query = await getFirestore().collection("songs").get();
-  const songs = query.docs.map(toSongData);
+  const songs = query.docs.map((s) => toSongData(s.data()));
   songs.sort((lhs, rhs) => {
     const titleComp = (lhs.sorttitle || lhs.title).localeCompare(
       rhs.sorttitle || rhs.title

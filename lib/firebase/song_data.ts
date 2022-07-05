@@ -25,7 +25,7 @@ export function toSongData(data: any): SongData {
     typeof data.id === "string" &&
       typeof data.title === "string" &&
       typeof data.chordPro === "string",
-    `Conversion to SongData failed: ${data}`
+    `Conversion to SongData failed`
   );
   return data as SongData;
 }

@@ -25,7 +25,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       await getFirestore().collection("songs").doc(context.params.id).get()
     ).data()
   );
-  return { props: { song } };
+  return { props: song };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
