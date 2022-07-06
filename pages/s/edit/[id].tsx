@@ -86,7 +86,7 @@ function SongEditor({ song, setSong }: SongEditorProps) {
             onClick={() => {
               if (parseSong()) setSuccess("Validation successful!");
             }}
-            disabled={song.chordPro === songCrd}
+            disabled={song.chordPro === songCrd || isSaving}
           >
             Validate
           </Button>
@@ -103,7 +103,7 @@ function SongEditor({ song, setSong }: SongEditorProps) {
         </Control>
         <Control>
           <Link href={songLink(song.id)}>
-            <Button isColor="light" isLink>
+            <Button isColor="light" isLink disabled={isSaving}>
               Go to song
             </Button>
           </Link>
