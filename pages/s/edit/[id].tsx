@@ -12,8 +12,9 @@ import {
 import { Button, Control, Field, Label, Notification, TextArea } from "bloomer";
 import { Song, tokenize } from "../../../lib/music";
 import SongMetadataComponent from "../../../components/song/SongMetadataComponent";
-import { assert, isString } from "../../../lib/util";
+import { assert } from "../../../lib/util";
 import Link from "next/link";
+import { songLink } from "../../../lib/router";
 
 interface SongEditorProps {
   song: SongData;
@@ -24,12 +25,14 @@ function SongEditor({ song, setSong }: SongEditorProps) {
   const [songCrd, setSongCrd] = useState(song.chordPro);
   const [parsedSong, setParsedSong] = useState<Song>();
   const [error, setError] = useState<string>();
+  const [success, setSuccess] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
 
   const parseSong = (message?: string) => {
+    setSuccess("");
+    setError("");
     try {
       setParsedSong(Song.fromTokens(tokenize(songCrd)));
-      setError("");
       return true;
     } catch (e) {
       message = message ? `${message}: ` : "";
@@ -43,13 +46,13 @@ function SongEditor({ song, setSong }: SongEditorProps) {
   };
 
   const saveSong = async () => {
-    if (!parseSong("Saving failed")) return false;
+    if (!parseSong("Saving failed")) return;
     setIsSaving(true);
     const { songData, errorMessage } = await callSaveSong(song.id, songCrd);
     if (songData) {
       setSong(songData);
       setSongCrd(songData.chordPro);
-      setError("");
+      setSuccess("Song saved and deployed! ");
     } else {
       setError(`Saving failed: ${errorMessage}`);
     }
@@ -75,14 +78,14 @@ function SongEditor({ song, setSong }: SongEditorProps) {
         </Control>
       </Field>
       {error && <Notification isColor="danger">{error}</Notification>}
-      {!error && (
-        <Notification isColor="success">Validation succeeded!</Notification>
-      )}
+      {success && <Notification isColor="success">{success}</Notification>}
       <Field isGrouped>
         <Control>
           <Button
             isColor="warning"
-            onClick={() => parseSong()}
+            onClick={() => {
+              if (parseSong()) setSuccess("Validation successful!");
+            }}
             disabled={song.chordPro === songCrd}
           >
             Validate
@@ -99,7 +102,7 @@ function SongEditor({ song, setSong }: SongEditorProps) {
           </Button>
         </Control>
         <Control>
-          <Link href={`/s/${song.id}`}>
+          <Link href={songLink(song.id)}>
             <Button isColor="light" isLink>
               Go to song
             </Button>
@@ -118,9 +121,7 @@ export default function SongEditorPage() {
   const [loading, setLoading] = useState(true);
 
   const user = useFirebaseUser(() => setLoading(false));
-  const pageTitle = song
-    ? `Ukulele Coach - Edit ${song.title} ${song.artist ?? ""}`
-    : "Ukulele Coach - Editor";
+  const pageTitle = song ? `Edit ${song.title} ${song.artist ?? ""}` : "Editor";
 
   useEffect(() => {
     if (!songId) return;

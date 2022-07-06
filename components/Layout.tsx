@@ -5,11 +5,12 @@ import Navbar from "./Navbar";
 import { Container, Content, Footer } from "bloomer";
 
 interface LayoutProps {
-  title: string;
+  title?: string;
   children: ReactNode;
 }
 
 export default function Layout({ title, children }: LayoutProps) {
+  title = title ? `Ukulele Coach - ${title}` : "Ukulele Coach";
   return (
     <>
       <Head>

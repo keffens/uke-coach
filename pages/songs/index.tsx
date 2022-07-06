@@ -33,7 +33,7 @@ interface SongPageProps {
 
 export default function SongPage({ songs }: SongPageProps) {
   return (
-    <Layout title={`Ukulele Coach`}>
+    <Layout>
       <ul>
         {songs.map((song) => (
           <SongRow key={song.id} {...song} />

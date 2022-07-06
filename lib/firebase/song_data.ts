@@ -16,7 +16,8 @@ export function toSongData(data: any): SongData {
       isString(data.ownerId) &&
       isString(data.title) &&
       isString(data.chordPro),
-    "Input cannot be converted to SongData"
+    "Input cannot be converted to SongData",
+    data
   );
   return delUndefined({
     chordPro: data.chordPro,
@@ -25,5 +26,14 @@ export function toSongData(data: any): SongData {
     title: data.title,
     sorttitle: toStringOrUndef(data.sorttitle),
     artist: toStringOrUndef(data.sorttitle),
+  });
+}
+
+export function sortSongs(songs: SongData[]): SongData[] {
+  return songs.sort((lhs, rhs) => {
+    const titleComp = (lhs.sorttitle || lhs.title).localeCompare(
+      rhs.sorttitle || rhs.title
+    );
+    return titleComp || (lhs.artist || "").localeCompare(rhs.artist || "");
   });
 }

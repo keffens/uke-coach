@@ -1,14 +1,20 @@
 import Link from "next/link";
-import { getFirestore } from "firebase-admin/firestore";
 import Layout from "../../components/Layout";
-import { GetStaticProps } from "next";
-import { initFirebaseAdmin } from "../../lib/server";
-import { SongData, toSongData } from "../../lib/firebase";
+import {
+  initFirebase,
+  SongData,
+  sortSongs,
+  toSongData,
+} from "../../lib/firebase";
+import { useEffect, useState } from "react";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { Notification } from "bloomer/lib/elements/Notification";
+import { songLink } from "../../lib/router";
 
 function SongRow({ id, title, artist }: SongData) {
   return (
     <li>
-      <Link href={`/s/${id}`}>
+      <Link href={songLink(id)}>
         <a>
           <strong>{title}</strong>
           {artist ? ` by ${artist}` : ""}
@@ -18,13 +24,28 @@ function SongRow({ id, title, artist }: SongData) {
   );
 }
 
-interface SongPageProps {
-  songs: SongData[];
-}
+// TODO: Add paginagion, page-wise lookups, and search functionality once
+//       there are enough songs.
+export default function SongPage() {
+  const [songs, setSongs] = useState<SongData[]>();
 
-export default function SongPage({ songs }: SongPageProps) {
+  useEffect(() => {
+    initFirebase();
+    getDocs(collection(getFirestore(), "songs")).then((snapshot) => {
+      setSongs(sortSongs(snapshot.docs.map((s) => toSongData(s.data()))));
+    });
+  }, []);
+
+  if (!songs) {
+    return (
+      <Layout>
+        <Notification isColor="primary">Loading...</Notification>
+      </Layout>
+    );
+  }
+
   return (
-    <Layout title={`Ukulele Coach`}>
+    <Layout>
       <ul>
         {songs.map((song) => (
           <SongRow key={song.id} {...song} />
@@ -33,16 +54,3 @@ export default function SongPage({ songs }: SongPageProps) {
     </Layout>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  initFirebaseAdmin();
-  const query = await getFirestore().collection("songs").get();
-  const songs = query.docs.map((s) => toSongData(s.data()));
-  songs.sort((lhs, rhs) => {
-    const titleComp = (lhs.sorttitle || lhs.title).localeCompare(
-      rhs.sorttitle || rhs.title
-    );
-    return titleComp || (lhs.artist || "").localeCompare(rhs.artist || "");
-  });
-  return { props: { songs } };
-};

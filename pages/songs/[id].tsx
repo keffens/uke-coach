@@ -14,9 +14,11 @@ interface SongPageProps {
 
 export default function SongPage({ songCrd }: SongPageProps) {
   const song = Song.fromTokens(tokenize(songCrd));
-  const artist = song.metadata.artist ? ` by ${song.metadata.artist}` : "";
+  const title = song.metadata.artist
+    ? `${song.metadata.title} by ${song.metadata.artist}`
+    : song.metadata.title;
   return (
-    <Layout title={`Ukulele Coach - ${song.metadata.title}${artist}`}>
+    <Layout title={title}>
       <SongComponent song={song} />
     </Layout>
   );

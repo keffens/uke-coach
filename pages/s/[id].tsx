@@ -9,9 +9,11 @@ import { SongData, toSongData } from "../../lib/firebase";
 
 export default function SongPage({ chordPro }: SongData) {
   const song = Song.fromTokens(tokenize(chordPro));
-  const artist = song.metadata.artist ? ` by ${song.metadata.artist}` : "";
+  const title = song.metadata.artist
+    ? `${song.metadata.title} by ${song.metadata.artist}`
+    : song.metadata.title;
   return (
-    <Layout title={`Ukulele Coach - ${song.metadata.title}${artist}`}>
+    <Layout title={title}>
       <SongComponent song={song} />
     </Layout>
   );
