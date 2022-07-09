@@ -24,6 +24,18 @@ export class Forbidden extends HtmlError {
   }
 }
 
+export class NotFound extends HtmlError {
+  constructor(message: string) {
+    super(404, message);
+  }
+}
+
+export class NotImplemented extends HtmlError {
+  constructor(message: string) {
+    super(501, message);
+  }
+}
+
 export function handleError(e: any, res: NextApiResponse) {
   if (e instanceof HtmlError) {
     res.status(e.status).json({ error: e.message });

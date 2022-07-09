@@ -26,13 +26,21 @@ function SongRow({ id, title, artist }: SongData) {
 
 // TODO: Add paginagion, page-wise lookups, and search functionality once
 //       there are enough songs.
+// TODO: Filtering should be done in the backend to not leak undeplyed songs.
+//       Owns songs should be excempt from filtering.
 export default function SongPage() {
   const [songs, setSongs] = useState<SongData[]>();
 
   useEffect(() => {
     initFirebase();
     getDocs(collection(getFirestore(), "songs")).then((snapshot) => {
-      setSongs(sortSongs(snapshot.docs.map((s) => toSongData(s.data()))));
+      setSongs(
+        sortSongs(
+          snapshot.docs
+            .map((s) => toSongData(s.data()))
+            .filter((s) => s.deployed)
+        )
+      );
     });
   }, []);
 

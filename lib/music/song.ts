@@ -1,5 +1,4 @@
 import { Bar } from "./bar";
-import { Chord } from "./chord";
 import { InstrumentLib } from "./instrument_lib";
 import { Pattern } from "./pattern";
 import { SongMetadata } from "./metadata";
@@ -27,11 +26,19 @@ export class Song {
     return new Song(metadata, parts, instrumentLib);
   }
 
+  // TODO: Support conversion to string (or tokens and then string).
+
   /** Returns a SongData object with added fields from song metadata. */
-  toSongData(id: string, ownerId: string, chordPro: string): SongData {
+  toSongData(
+    id: string,
+    ownerId: string,
+    chordPro: string,
+    deployed = false
+  ): SongData {
     return delUndefined({
       artist: this.metadata.artist,
       chordPro,
+      deployed,
       id,
       ownerId,
       sorttitle: this.metadata.sorttitle,

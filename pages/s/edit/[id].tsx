@@ -3,18 +3,48 @@ import { useEffect, useState } from "react";
 import Layout from "../../../components/Layout";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import {
-  callSaveSong,
+  createSong,
   initFirebase,
   SongData,
   toSongData,
+  updateSong,
   useFirebaseUser,
 } from "../../../lib/firebase";
-import { Button, Control, Field, Label, Notification, TextArea } from "bloomer";
+import {
+  Button,
+  Content,
+  Control,
+  Field,
+  Label,
+  Notification,
+  TextArea,
+} from "bloomer";
 import { Song, tokenize } from "../../../lib/music";
 import SongMetadataComponent from "../../../components/song/SongMetadataComponent";
 import { assert } from "../../../lib/util";
 import Link from "next/link";
-import { songLink } from "../../../lib/router";
+import { NEW_SONG_ID, songLink, songRawEditorLink } from "../../../lib/router";
+
+const NEW_SONG: SongData = {
+  chordPro: "",
+  chordProDraft:
+    "{title: <NEW SONG>}\n" +
+    "{artist: <ARTIST (optional)>}\n\n" +
+    "{key: C}\n" +
+    "{tempo: 100}\n" +
+    "{time: 4/4}\n",
+  deployed: false,
+  id: NEW_SONG_ID,
+  ownerId: "",
+  title: "<NEW SONG>",
+  artist: "<ARTIST (optional)>",
+};
+
+enum SavingState {
+  NotSaving = 0,
+  Draft = 1,
+  Deploy = 2,
+}
 
 interface SongEditorProps {
   song: SongData;
@@ -22,11 +52,11 @@ interface SongEditorProps {
 }
 
 function SongEditor({ song, setSong }: SongEditorProps) {
-  const [songCrd, setSongCrd] = useState(song.chordPro);
+  const [songCrd, setSongCrd] = useState(song.chordProDraft || song.chordPro);
   const [parsedSong, setParsedSong] = useState<Song>();
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState<string>();
-  const [isSaving, setIsSaving] = useState(false);
+  const [saving, setSaving] = useState(SavingState.NotSaving);
 
   const parseSong = (message?: string) => {
     setSuccess("");
@@ -45,40 +75,41 @@ function SongEditor({ song, setSong }: SongEditorProps) {
     return false;
   };
 
-  const saveSong = async () => {
+  const saveSong = async (deploy: boolean) => {
     if (!parseSong("Saving failed")) return;
-    setIsSaving(true);
-    const { songData, errorMessage } = await callSaveSong(song.id, songCrd);
+    setSaving(deploy ? SavingState.Deploy : SavingState.Draft);
+    const { songData, errorMessage } = await (song.id === NEW_SONG_ID
+      ? createSong(songCrd, deploy)
+      : updateSong(song.id, songCrd, deploy));
     if (songData) {
       setSong(songData);
-      setSongCrd(songData.chordPro);
-      setSuccess("Song saved and deployed! ");
+      setSongCrd(songData.chordProDraft || songData.chordPro);
+      setSuccess(deploy ? "Song saved and deployed!" : "Draft saved!");
     } else {
       setError(`Saving failed: ${errorMessage}`);
     }
-    setIsSaving(false);
+    setSaving(SavingState.NotSaving);
   };
 
   useEffect(() => {
     parseSong();
   }, []);
   return (
-    <>
+    <Content>
       {parsedSong && <SongMetadataComponent metadata={parsedSong.metadata} />}
       <Field>
         <Label>Chord Pro</Label>
         <Control>
           <TextArea
             value={songCrd}
-            style={{ height: "800px" }}
+            style={{ height: "40em", maxHeight: "none" }}
             onChange={(e) =>
               setSongCrd((e.target as HTMLTextAreaElement).value)
             }
+            disabled={!!saving}
           />
         </Control>
       </Field>
-      {error && <Notification isColor="danger">{error}</Notification>}
-      {success && <Notification isColor="success">{success}</Notification>}
       <Field isGrouped>
         <Control>
           <Button
@@ -86,7 +117,7 @@ function SongEditor({ song, setSong }: SongEditorProps) {
             onClick={() => {
               if (parseSong()) setSuccess("Validation successful!");
             }}
-            disabled={song.chordPro === songCrd || isSaving}
+            disabled={!!saving}
           >
             Validate
           </Button>
@@ -94,22 +125,50 @@ function SongEditor({ song, setSong }: SongEditorProps) {
         <Control>
           <Button
             isColor="primary"
-            onClick={saveSong}
-            isLoading={isSaving}
-            disabled={song.chordPro === songCrd}
+            onClick={() => saveSong(/*deploy=*/ false)}
+            isLoading={saving == SavingState.Draft}
+            disabled={
+              (song.chordProDraft || song.chordPro) === songCrd || !!saving
+            }
+          >
+            Save draft
+          </Button>
+        </Control>
+        <Control>
+          <Button
+            onClick={() => setSongCrd(song.chordPro)}
+            disabled={!song.deployed || songCrd === song.chordPro || !!saving}
+          >
+            Reset to deployed
+          </Button>
+        </Control>
+      </Field>
+      <Field isGrouped>
+        <Control>
+          <Button
+            isColor="primary"
+            onClick={() => saveSong(/*deploy=*/ true)}
+            isLoading={saving == SavingState.Deploy}
+            disabled={song.chordPro === songCrd || !!saving}
           >
             Save & deploy
           </Button>
         </Control>
         <Control>
           <Link href={songLink(song.id)}>
-            <Button isColor="light" isLink disabled={isSaving}>
+            <Button
+              isColor="light"
+              isLink
+              disabled={!song.deployed || !!saving}
+            >
               Go to song
             </Button>
           </Link>
         </Control>
       </Field>
-    </>
+      {error && <Notification isColor="danger">{error}</Notification>}
+      {success && <Notification isColor="success">{success}</Notification>}
+    </Content>
   );
 }
 
@@ -130,6 +189,11 @@ export default function SongEditorPage() {
       return;
     }
     initFirebase();
+    if (songId === NEW_SONG_ID) {
+      setSong(NEW_SONG);
+      setError("");
+      return;
+    }
     getDoc(doc(getFirestore(), "songs", songId))
       .then((s) => {
         if (!s.data()) {
@@ -149,6 +213,9 @@ export default function SongEditorPage() {
     if (!song) return;
     if (!user?.uid) {
       setError("Please log in to use the editor.");
+    } else if (song.id === NEW_SONG_ID && !song.ownerId) {
+      setSong({ ...song, ownerId: user.uid });
+      setError("");
     } else if (user.uid != song?.ownerId) {
       setError("You don't have permission to edit this song.");
     } else {
@@ -173,7 +240,15 @@ export default function SongEditorPage() {
   assert(song, "Missing song data");
   return (
     <Layout title={pageTitle}>
-      <SongEditor song={song} setSong={setSong} />
+      <SongEditor
+        song={song}
+        setSong={(s) => {
+          if (songId === NEW_SONG_ID) {
+            router.push(songRawEditorLink(s.id), undefined, { shallow: true });
+          }
+          setSong(s);
+        }}
+      />
     </Layout>
   );
 }

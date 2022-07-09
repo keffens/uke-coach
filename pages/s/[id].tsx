@@ -32,7 +32,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   initFirebaseAdmin();
-  const songs = await getFirestore().collection("songs").get();
+  const songs = await getFirestore()
+    .collection("songs")
+    .where("deployed", "==", true)
+    .get();
   return {
     paths: songs.docs.map((song) => ({ params: { id: song.id } })),
     fallback: false,
