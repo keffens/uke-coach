@@ -1,6 +1,6 @@
 import admin, { ServiceAccount } from "firebase-admin";
 import { NextApiRequest } from "next";
-import { HtmlError, Unauthorized } from "./error";
+import { Unauthorized } from "./error";
 
 const adminConfig: ServiceAccount = {
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID,

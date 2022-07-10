@@ -61,7 +61,7 @@ export async function createSong(
   if (response) {
     return { songData: response.songData };
   }
-  return { errorMessage: `${status} Failed to join room: ${statusText}` };
+  return { errorMessage: `${status} Failed to create song: ${statusText}` };
 }
 
 /** Saves the song to firebase and, depending on flags, deploys it. */
@@ -79,5 +79,5 @@ export async function updateSong(
   if (response) {
     return { songData: response.songData };
   }
-  return { errorMessage: `${status} Failed to join room: ${statusText}` };
+  return { errorMessage: `${status} Failed to update song: ${statusText}` };
 }

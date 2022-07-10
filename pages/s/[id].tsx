@@ -38,6 +38,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
     .get();
   return {
     paths: songs.docs.map((song) => ({ params: { id: song.id } })),
-    fallback: false,
+    fallback: "blocking", // Allow generation on demand for new pages.
   };
 };
