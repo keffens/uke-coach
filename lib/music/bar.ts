@@ -14,7 +14,8 @@ export class Bar {
     public patterns: Pattern[],
     public patternIdxs: number[],
     public lyrics: string[] = [],
-    public anacrusis: string = ""
+    public anacrusis: string = "",
+    public previousChord: Chord | null = null
   ) {
     assert(
       this.patterns.length === this.patternIdxs.length,
@@ -42,10 +43,12 @@ export class Bar {
     let beatValue =
       ((strumIdx + 1) * this.patterns[instrumentIdx].time.beats) /
       this.patterns[instrumentIdx].strumsPerBar;
+    let activeChord = this.previousChord;
     for (let i = 0; i < this.beats.length; i++) {
       beatValue -= this.beats[i];
+      activeChord = this.chords[i] ?? activeChord;
       if (beatValue <= Number.EPSILON) {
-        return this.chords[i];
+        return activeChord;
       }
     }
     return null;
@@ -113,6 +116,8 @@ export class BarParagraphBuilder {
   private chords = new Array<Chord | null>();
   private lyrics = new Array<string>();
   private anacrusis: string = "";
+  private activeChord: Chord | null = null;
+  private chordBeforeParagraph: Chord | null = null;
 
   constructor(private patterns: Pattern[], private time: TimeSignature) {
     this.patternIdxs = new Array(patterns.length).fill(0);
@@ -148,6 +153,7 @@ export class BarParagraphBuilder {
     }
     this.beats.push(beat);
     this.chords.push(chord);
+    this.activeChord = chord ?? this.activeChord;
   }
 
   newLine(): void {
@@ -218,7 +224,8 @@ export class BarParagraphBuilder {
         [...this.patterns],
         [...this.patternIdxs],
         this.lyrics,
-        this.anacrusis
+        this.anacrusis,
+        this.chordBeforeParagraph
       )
     );
     this.chords = [];
@@ -226,6 +233,7 @@ export class BarParagraphBuilder {
     this.patternIdxs = this.patternIdxs.map((idx) => idx + 1);
     this.lyrics = [];
     this.anacrusis = "";
+    this.chordBeforeParagraph = this.activeChord;
     return true;
   }
 }

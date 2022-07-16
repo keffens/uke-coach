@@ -22,12 +22,11 @@ export default function SongPage({ chordPro }: SongData) {
 export const getStaticProps: GetStaticProps = async (context) => {
   assert(typeof context.params?.id === "string", "context.params.id not valid");
   initFirebaseAdmin();
-  const song = toSongData(
-    (
-      await getFirestore().collection("songs").doc(context.params.id).get()
-    ).data()
-  );
-  return { props: song };
+  const data = (
+    await getFirestore().collection("songs").doc(context.params.id).get()
+  ).data();
+  if (!data) return { notFound: true };
+  return { props: toSongData(data) };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {

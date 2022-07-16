@@ -52,6 +52,7 @@ function PluggedStrum({ strum, chord, chordLib }: StrumComponentProps) {
             bottom: stringHeight(string),
           }}
         >
+          {/* TODO: Make sure this works on other browsers / systems. */}
           {frets[i] ?? <span style={{ fontSize: "80%" }}>⬤</span>}
         </div>
       ))}
