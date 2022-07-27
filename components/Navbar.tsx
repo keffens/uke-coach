@@ -1,26 +1,9 @@
-import { Navbar, NavbarBrand, NavbarEnd, NavbarItem } from "bloomer";
-import { NavbarMenu } from "bloomer/lib/components/Navbar/NavbarMenu";
-import { Button } from "bloomer/lib/elements/Button";
 import { useState } from "react";
 import { FaGuitar } from "react-icons/fa";
-import { TbUser, TbUserOff } from "react-icons/tb";
 import { useFirebaseUser } from "../lib/firebase";
-import styles from "./Navbar.module.scss";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { Modal } from "bloomer/lib/components/Modal/Modal";
-import { ModalBackground } from "bloomer/lib/components/Modal/ModalBackground";
-import { ModalCard } from "bloomer/lib/components/Modal/Card/ModalCard";
-import { ModalCardHeader } from "bloomer/lib/components/Modal/Card/ModalCardHeader";
-import { ModalCardTitle } from "bloomer/lib/components/Modal/Card/ModalCardTitle";
-import { Delete } from "bloomer/lib/elements/Delete";
-import { ModalCardBody } from "bloomer/lib/components/Modal/Card/ModalCardBody";
-import { ModalCardFooter } from "bloomer/lib/components/Modal/Card/ModalCardFooter";
-import { Field } from "bloomer/lib/elements/Form/Field/Field";
-import { Label } from "bloomer/lib/elements/Form/Label";
-import { Control } from "bloomer/lib/elements/Form/Control";
-import { Input } from "bloomer/lib/elements/Form/Input";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -28,6 +11,26 @@ import {
   updateProfile,
   User,
 } from "firebase/auth";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  TextField,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { AccountCircle } from "@mui/icons-material";
+
+export const NAVBAR_HEIGHT = "64px";
 
 interface UserButtonProps {
   isLoading: boolean;
@@ -36,29 +39,30 @@ interface UserButtonProps {
 }
 
 function UserButton({ isLoading, onClick, user }: UserButtonProps) {
-  let icon = <TbUserOff className="icon" />;
+  let avatar = <AccountCircle fontSize="inherit" />;
+  let toolTip = "Sign in";
+  let sx = {};
   if (user) {
+    toolTip = "User settings";
     if (user.photoURL) {
-      icon = (
-        <img
-          src={user.photoURL}
-          style={{ minWidth: "36px", minHeight: "36px", borderRadius: "18px" }}
-        ></img>
+      avatar = (
+        <Avatar alt={user.displayName || "your avatar"} src={user.photoURL} />
       );
-    } else {
-      icon = <TbUser className="icon" />;
+      sx = { p: 0, outline: "solid white 2px" };
     }
   }
-
   return (
-    <Button
-      className="is-rounded"
-      style={{ height: "40px", width: "40px", padding: 0 }}
-      onClick={onClick}
-      isLoading={isLoading}
-    >
-      {icon}
-    </Button>
+    <Tooltip title={toolTip}>
+      <IconButton
+        disabled={isLoading}
+        color="inherit"
+        onClick={onClick}
+        size="large"
+        sx={sx}
+      >
+        {avatar}
+      </IconButton>
+    </Tooltip>
   );
 }
 
@@ -84,68 +88,64 @@ function SignInDialog({ closeDialog, user }: SignInDialogProps) {
   };
 
   return (
-    <Modal isActive>
-      <ModalBackground />
-      <ModalCard>
-        <ModalCardHeader>
-          <ModalCardTitle>
-            {user
-              ? `You're signed in as ${user.displayName}`
-              : "Register or sign in"}
-          </ModalCardTitle>
-          <Delete onClick={closeDialog} />
-        </ModalCardHeader>
-        <ModalCardBody>
+    <Dialog
+      disableScrollLock={true}
+      open
+      onClose={closeDialog}
+      sx={{ minWidth: "320px" }}
+    >
+      <DialogTitle>
+        {user
+          ? `You're signed in as ${user.displayName}`
+          : "Register or sign in"}
+      </DialogTitle>
+      <DialogContent sx={{ minWidth: { sm: "480px" } }}>
+        <DialogContentText>
           {user ? (
-            <>
-              <Field>
-                <Label>Display name</Label>
-                <Control>
-                  <Input
-                    type="text"
-                    value={displayName}
-                    onChange={(e) =>
-                      setDisplayName((e.target as HTMLInputElement).value)
-                    }
-                  />
-                </Control>
-              </Field>
-            </>
+            <Box component="form" pt={1}>
+              <TextField
+                error={!displayName.trim()}
+                fullWidth
+                label="Display name"
+                type="text"
+                value={displayName}
+                onChange={(e) =>
+                  setDisplayName((e.target as HTMLInputElement).value)
+                }
+              />
+            </Box>
           ) : (
             <StyledFirebaseAuth
               uiConfig={uiConfig}
               firebaseAuth={firebase.auth()}
             />
           )}
-        </ModalCardBody>
-        <ModalCardFooter>
-          {user && (
-            <>
-              <Button
-                isColor="primary"
-                disabled={
-                  !displayName || displayName.trim() === user.displayName
-                }
-                onClick={() => {
-                  updateProfile(user, { displayName: displayName.trim() });
-                  closeDialog();
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                onClick={() => {
-                  signOut(getAuth());
-                  closeDialog();
-                }}
-              >
-                Sign out
-              </Button>
-            </>
-          )}
-        </ModalCardFooter>
-      </ModalCard>
-    </Modal>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        {user && (
+          <>
+            <Button
+              disabled={!displayName || displayName.trim() === user.displayName}
+              onClick={() => {
+                updateProfile(user, { displayName: displayName.trim() });
+                closeDialog();
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              onClick={() => {
+                signOut(getAuth());
+                closeDialog();
+              }}
+            >
+              Sign out
+            </Button>
+          </>
+        )}
+      </DialogActions>
+    </Dialog>
   );
 }
 
@@ -159,33 +159,50 @@ export default function NavbarComponent() {
 
   return (
     <>
-      <Navbar className={styles.navbar}>
-        <NavbarBrand>
-          <NavbarItem>
-            <FaGuitar className="mr-2" />
-            <b>Uke Coach</b>
-          </NavbarItem>
-          <NavbarItem isHidden="desktop" style={{ flexGrow: 1 }}></NavbarItem>
-          <NavbarItem isHidden="desktop">
-            <UserButton
-              onClick={() => openSignInDialog(true)}
-              isLoading={isLoading}
-              user={user}
-            />
-          </NavbarItem>
-        </NavbarBrand>
-        <NavbarMenu isActive={false}>
-          <NavbarEnd>
-            <NavbarItem>
+      <AppBar
+        sx={{
+          position: { color: "#fff", xs: "relative", sm: "sticky" },
+        }}
+      >
+        <Container maxWidth={false}>
+          <Toolbar disableGutters={false} sx={{ height: NAVBAR_HEIGHT }}>
+            <IconButton
+              color="inherit"
+              href="/"
+              size="large"
+              sx={{ mr: 2, ":hover": { color: "inherit" } }}
+            >
+              <FaGuitar />
+            </IconButton>
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              href="/"
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                letterSpacing: ".1rem",
+                color: "inherit",
+                textDecoration: "none",
+                ":hover": { color: "inherit" },
+              }}
+            >
+              Uke Coach
+            </Typography>
+
+            <Box sx={{ flexGrow: 1 }}> </Box>
+
+            <Box sx={{ flexGrow: 0 }}>
               <UserButton
                 onClick={() => openSignInDialog(true)}
                 isLoading={isLoading}
                 user={user}
               />
-            </NavbarItem>
-          </NavbarEnd>
-        </NavbarMenu>
-      </Navbar>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+
       {showSignInDialog && (
         <SignInDialog user={user} closeDialog={() => openSignInDialog(false)} />
       )}

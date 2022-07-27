@@ -2,7 +2,13 @@
 
 @import "variables.scss";
 
-// Use only what you need from Bulma.
+// Roboto font.
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/roboto/700.css';
+
+// TODO: Remove all references to Bulma.
 @import "../node_modules/bulma/sass/utilities/_all";
 @import "../node_modules/bulma/sass/base/_all";
 @import "../node_modules/bulma/sass/elements/_all";

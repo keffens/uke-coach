@@ -5,10 +5,10 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:400,700,900");
 
 // Define colors.
-$turquoise: #61dafb;
+$turquoise: #00b8d4;
 
 // Override Bulma's initial variables.
-$family-sans-serif: "Lato", sans-serif;
+$family-sans-serif: "Roboto", sans-serif;
 $primary: $turquoise;
 
 @import "../node_modules/bulma/sass/utilities/derived-variables.sass";
@@ -18,5 +18,5 @@ $link: $info;
 $link-hover: $info-dark;
 
 // Custom spacing
-$navbarHeight: 52px;
-$phone: 640px;
+$navbarHeight: 64px;
+$phone: 600px;
