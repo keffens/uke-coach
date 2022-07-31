@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
-import ReactTooltip from "react-tooltip";
-import {
-  FaPlay,
-  FaPause,
-  FaStepBackward,
-  FaStepForward,
-  FaStop,
-} from "react-icons/fa";
-import { GiMetronome, GiSnail } from "react-icons/gi";
-import { BiCaretDownSquare } from "react-icons/bi";
-import styles from "./Player.module.scss";
+import { GiMetronome } from "react-icons/gi";
 import BpmSelect from "../elements/BpmSelect";
-import IconButton from "../elements/IconButton";
-import SmallIconButton from "../elements/SmallIconButton";
 import ToggleIcon from "../elements/ToggleIcon";
 import { Song } from "../../lib/music";
 import { Player } from "../../lib/player";
 import { useWakeLock } from "react-screen-wake-lock";
+import {
+  ArrowDropDownCircleOutlined,
+  PauseCircleFilled,
+  PlayCircleFilled,
+  SkipNext,
+  SkipPrevious,
+  Speed,
+  StopCircle,
+} from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+import { Box } from "@mui/system";
+import { NAVBAR_STICKY_HEIGHT } from "../Navbar";
+import { calcRootMx } from "../Layout";
 
 interface PlayerComponentProps {
   song: Song;
@@ -25,9 +26,7 @@ interface PlayerComponentProps {
 export default function PlayerComponent({ song }: PlayerComponentProps) {
   const [playing, setPlaying] = useState(false);
   const screenLock = useWakeLock({
-    onRequest: () => console.log("Screen Wake Lock: requested!"),
-    onError: () => console.error("Screen Wake Lock: An error happened 💥"),
-    onRelease: () => console.log("Screen Wake Lock: released!"),
+    onError: () => console.error("Screen Wake Lock: An error happened!"),
   });
   useEffect(() => {
     Player.loadSong(song);
@@ -43,59 +42,82 @@ export default function PlayerComponent({ song }: PlayerComponentProps) {
     }
   }, [playing]);
   return (
-    <div className={styles.player}>
+    /**
+     * The player spreads over the entire width of the screen and is sticky
+     * below the navar. */
+    <Box
+      bgcolor="white"
+      boxShadow={3}
+      mx={calcRootMx(-1)}
+      p={0.5}
+      position="sticky"
+      textAlign="center"
+      top={NAVBAR_STICKY_HEIGHT}
+      zIndex={1}
+      sx={{ "> *": { m: 2, verticalAlign: "middle", whiteSpace: "nowrap" } }}
+    >
       <BpmSelect
         initialBpm={song.metadata.tempo}
         onChange={(bpm) => {
           Player.bpm = bpm;
         }}
       />
-      <span className="m-2" style={{ whiteSpace: "nowrap" }}>
-        <SmallIconButton
+      <span>
+        <IconButton
           disabled={playing}
+          size="large"
           onClick={() => Player.goToPrevPart()}
+          sx={{ p: 0.25 }}
         >
-          <FaStepBackward />
-        </SmallIconButton>
+          <SkipPrevious sx={{ fontSize: "1.75rem" }} />
+        </IconButton>
         {playing ? (
           <IconButton
-            isColor="primary"
+            color="primary"
+            size="large"
             onClick={() => {
               Player.pause();
               setPlaying(false);
             }}
+            sx={{ p: 0.25 }}
           >
-            <FaPause />
+            <PauseCircleFilled sx={{ fontSize: "2.5rem" }} />
           </IconButton>
         ) : (
           <IconButton
-            isColor="primary"
+            color="primary"
+            size="large"
             onClick={async () => {
               await Player.init();
               Player.play();
               setPlaying(true);
             }}
+            sx={{ p: 0.25 }}
           >
-            <FaPlay />
+            <PlayCircleFilled sx={{ fontSize: "2.5rem" }} />
           </IconButton>
         )}
         <IconButton
-          isColor="light"
+          color="default"
+          size="large"
           onClick={() => {
             Player.stop();
             setPlaying(false);
           }}
+          sx={{ p: 0.25 }}
         >
-          <FaStop />
+          <StopCircle sx={{ fontSize: "2.5rem" }} />
         </IconButton>
-        <SmallIconButton
+        <IconButton
           disabled={playing}
+          size="large"
           onClick={() => Player.goToNextPart()}
+          sx={{ p: 0.25 }}
         >
-          <FaStepForward />
-        </SmallIconButton>
+          <SkipNext sx={{ fontSize: "1.75rem" }} />
+        </IconButton>
       </span>
-      <span style={{ whiteSpace: "nowrap" }}>
+      <span>
         <ToggleIcon
           initialState={Player.metronomeEnabled}
           onClick={(enable: boolean) => (Player.metronomeEnabled = enable)}
@@ -108,17 +130,16 @@ export default function PlayerComponent({ song }: PlayerComponentProps) {
           onClick={(enable: boolean) => (Player.autoScroll = enable)}
           tooltip="Auto-scroll while palying."
         >
-          <BiCaretDownSquare />
+          <ArrowDropDownCircleOutlined fontSize="inherit" />
         </ToggleIcon>
         <ToggleIcon
           initialState={Player.resrouceSavingEnabled}
           onClick={(enable: boolean) => (Player.resrouceSavingEnabled = enable)}
           tooltip="Use less resources for playback. Sound quality may suffer."
         >
-          <GiSnail />
+          <Speed fontSize="inherit" />
         </ToggleIcon>
-        <ReactTooltip className={styles.tooltip} />
       </span>
-    </div>
+    </Box>
   );
 }

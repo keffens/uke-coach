@@ -4,6 +4,10 @@ import Navbar from "./Navbar";
 import { Box, createTheme, ThemeProvider } from "@mui/material";
 import { cyan, grey, pink } from "@mui/material/colors";
 
+export function calcRootMx(factor = 1) {
+  return { xs: 2 * factor, sm: 4 * factor, md: `${5 * factor}vw` };
+}
+
 const theme = createTheme({
   palette: {
     primary: { main: cyan["A700"] },
@@ -28,7 +32,7 @@ export default function Layout({ title, children }: LayoutProps) {
       <ThemeProvider theme={theme}>
         <Box minHeight="100vh" pb={24} position="relative">
           <Navbar />
-          <Box mx={{ xs: 2, sm: 4, md: "5%" }} my={{ xs: 4, md: 8 }}>
+          <Box mx={calcRootMx()} my={{ xs: 4, md: 8 }}>
             {children}
           </Box>
           <Box

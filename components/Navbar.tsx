@@ -30,7 +30,8 @@ import {
 } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 
-export const NAVBAR_HEIGHT = "64px";
+const NAVBAR_HEIGHT = "64px";
+export const NAVBAR_STICKY_HEIGHT = { xs: 0, sm: NAVBAR_HEIGHT };
 
 interface UserButtonProps {
   isLoading: boolean;
