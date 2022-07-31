@@ -1,20 +1,26 @@
+import {
+  VolumeDownOutlined,
+  VolumeOffOutlined,
+  VolumeUpOutlined,
+} from "@mui/icons-material";
+import { SxProps } from "@mui/material";
+import { Theme } from "@mui/system";
 import React from "react";
-import { FiVolume1, FiVolume2, FiVolumeX } from "react-icons/fi";
 import { VolumeSetting } from "../../lib/music";
 
 export interface VolumeIconProps {
   vol: VolumeSetting;
-  style?: React.CSSProperties;
-  className?: string;
+  fontSize?: "small" | "inherit" | "large" | "medium";
+  sx?: SxProps<Theme>;
 }
 
-export default function VolumeIcon({ vol, style, className }: VolumeIconProps) {
+export default function VolumeIcon({ vol, fontSize, sx }: VolumeIconProps) {
   switch (vol) {
     case VolumeSetting.High:
-      return <FiVolume2 style={style} className={className} />;
+      return <VolumeUpOutlined fontSize={fontSize} sx={sx} />;
     case VolumeSetting.Low:
-      return <FiVolume1 style={style} className={className} />;
+      return <VolumeDownOutlined fontSize={fontSize} sx={sx} />;
     case VolumeSetting.Mute:
-      return <FiVolumeX style={style} className={className} />;
+      return <VolumeOffOutlined fontSize={fontSize} sx={sx} />;
   }
 }

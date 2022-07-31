@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button } from "bloomer";
-import { BiHide, BiShow } from "react-icons/bi";
+import { IconButton } from "@mui/material";
+import { VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
 
 interface VisibilityToggleProps {
   initialVisibility: boolean;
@@ -13,21 +13,16 @@ export default function VisibilityToggle({
 }: VisibilityToggleProps) {
   const [isVisible, setVisibility] = useState(initialVisibility);
   return (
-    <Button
-      style={{ verticalAlign: "middle" }}
-      className="is-white"
+    <IconButton
+      aria-label="toggle visibility of the instrument"
+      color="primary"
       onClick={() => {
         setVisibility(!isVisible);
         if (onChange) onChange(!isVisible);
       }}
+      sx={{ p: 0.5 }}
     >
-      <span className="icon has-text-primary-dark">
-        {isVisible ? (
-          <BiShow style={{ fontSize: "2em" }} />
-        ) : (
-          <BiHide style={{ fontSize: "2em" }} />
-        )}
-      </span>
-    </Button>
+      {isVisible ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
+    </IconButton>
   );
 }

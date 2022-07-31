@@ -1,6 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { Tab, Tabs, TabList, TabLink, Title } from "bloomer";
-import { BiHide } from "react-icons/bi";
 import { FaGuitar } from "react-icons/fa";
 import { GiGuitar, GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
 import { Instrument, InstrumentLib, InstrumentType } from "../../lib/music";
@@ -10,6 +9,7 @@ import VolumeIcon from "../elements/VolumeIcon";
 import InstrumentChordsComponent from "./InstrumentChordsComponent";
 import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
 import { Box } from "bloomer/lib/elements/Box";
+import { VisibilityOffOutlined } from "@mui/icons-material";
 
 interface InstrumentIconProps {
   instrument: Instrument;
@@ -45,8 +45,12 @@ function IntrumentButton({
       <TabLink onClick={() => setInstrument(isActive ? null : instrument)}>
         <InstrumentIcon instrument={instrument} />
         <span className="ml-2">{instrument.name}</span>
-        {instrument.show ? <></> : <BiHide className="ml-2" />}
-        <VolumeIcon vol={instrument.volume} className="ml-2" />
+        {instrument.show ? (
+          <></>
+        ) : (
+          <VisibilityOffOutlined fontSize="small" sx={{ ml: 1 }} />
+        )}
+        <VolumeIcon vol={instrument.volume} fontSize="small" sx={{ ml: 1 }} />
       </TabLink>
     </Tab>
   );

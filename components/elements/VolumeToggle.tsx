@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Button } from "bloomer";
 import VolumeIcon from "./VolumeIcon";
 import { toggleVolume, VolumeSetting } from "../../lib/music";
+import { IconButton } from "@mui/material";
 
 interface VolumeToggleProps {
   initialVolume: VolumeSetting;
@@ -14,18 +14,17 @@ export default function VolumeToggle({
 }: VolumeToggleProps) {
   const [vol, setVolume] = useState(initialVolume);
   return (
-    <Button
-      style={{ verticalAlign: "middle" }}
-      className="is-white"
+    <IconButton
+      aria-label="toggle volume of the instrument"
+      color="primary"
       onClick={() => {
         const newVol = toggleVolume(vol);
         setVolume(newVol);
         if (onChange) onChange(newVol);
       }}
+      sx={{ p: 0.5 }}
     >
-      <span className="icon has-text-primary-dark">
-        <VolumeIcon vol={vol} style={{ fontSize: "2em" }} />
-      </span>
-    </Button>
+      <VolumeIcon vol={vol} />
+    </IconButton>
   );
 }
