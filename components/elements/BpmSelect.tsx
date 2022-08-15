@@ -1,50 +1,119 @@
-import React, { useState } from "react";
-import { Control, Input } from "bloomer";
+import {
+  Box,
+  InputAdornment,
+  OutlinedInput,
+  Popper,
+  Slider,
+  Typography,
+} from "@mui/material";
+import React, { useRef, useState } from "react";
 
 interface BpmSelectProps {
   initialBpm: number;
   onChange: (bpm: number) => void;
 }
 
-// TODO: When selected, offer a slider for fast bpm change
 export default function BpmSelect({ initialBpm, onChange }: BpmSelectProps) {
-  const [bpm, setState] = useState(`${initialBpm}`);
-  return (
-    <Control
-      className="my-2"
-      style={{ display: "inline-block", width: "4.5em" }}
-      hasIcons="right"
-    >
-      <Input
-        onChange={(event) => {
-          const value = (event.target as HTMLInputElement).value.replace(
-            /\D/g,
-            ""
-          );
-          let newBpm = parseInt(value);
+  const [bpm, setBpm] = useState(initialBpm);
+  const [hasFocus, setFocus] = useState(false);
+  const input = useRef(null);
 
-          if (newBpm >= 20) {
-            newBpm = Math.min(newBpm, 400);
-            setState(`${newBpm}`);
-            onChange(newBpm);
-          } else {
-            setState(value);
-          }
-        }}
+  const marks = [
+    {
+      value: Math.floor(0.5 * initialBpm),
+      label: "0.5x",
+    },
+    {
+      value: Math.floor(0.75 * initialBpm),
+      label: "0.75x",
+    },
+    {
+      value: initialBpm,
+      label: "1.0x",
+    },
+    {
+      value: Math.floor(1.25 * initialBpm),
+      label: "1.25x",
+    },
+    {
+      value: Math.floor(1.5 * initialBpm),
+      label: "1.5x",
+    },
+  ];
+  const min = Math.max(20, marks[0].value);
+  const max = Math.min(400, marks[marks.length - 1].value);
+
+  const updateBpm = (value: number | string, sticky = false) => {
+    if (typeof value === "string") {
+      value = parseInt(value.replace(/\D/g, ""));
+    }
+
+    if (sticky) {
+      const stickyRange = (max - min) / 20;
+      for (const { value: mark } of marks) {
+        if (mark - stickyRange <= value && value <= mark + stickyRange) {
+          value = mark;
+          break;
+        }
+      }
+    }
+
+    if (value >= 20) {
+      value = Math.min(value, 400);
+      setBpm(value);
+      onChange(value);
+    } else {
+      setBpm(value || 0);
+    }
+  };
+  return (
+    <Box
+      display="inline-block"
+      onFocus={() => setFocus(true)}
+      onBlur={() => setFocus(false)}
+    >
+      <OutlinedInput
+        onChange={(e) => updateBpm(e.target.value)}
+        aria-label="set bpm"
+        endAdornment={
+          <InputAdornment position="end">
+            <Typography fontSize="small" fontWeight="bold">
+              bpm
+            </Typography>
+          </InputAdornment>
+        }
+        ref={input}
+        size="small"
+        sx={{ width: "90px" }}
         value={bpm}
-        style={{
-          height: "2em",
-          padding: "0.5em",
-          paddingRight: "2em",
-          textAlign: "right",
-        }}
       />
-      <span
-        className="icon is-right"
-        style={{ fontSize: "80%", fontWeight: "bold", marginTop: "2px" }}
+      <Popper
+        anchorEl={input.current}
+        placement="bottom"
+        open={hasFocus}
+        sx={{ zIndex: 10 }}
       >
-        bpm
-      </span>
-    </Control>
+        <Box
+          bgcolor="background.paper"
+          borderRadius={2}
+          boxShadow={4}
+          m={1}
+          px={3}
+          py={0.5}
+          width="320px"
+        >
+          <Slider
+            min={min}
+            max={max}
+            marks={marks}
+            step={1}
+            value={bpm}
+            onChange={(_e, val) => {
+              updateBpm(val as number, /*sticky=*/ true);
+            }}
+          />
+        </Box>
+      </Popper>
+    </Box>
   );
 }
