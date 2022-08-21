@@ -1,8 +1,7 @@
 import React from "react";
-import { Column, Columns, Title } from "bloomer";
 import { ChordLib } from "../../lib/music";
 import ChordFrets from "./ChordFrets";
-import { Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 
 export interface InstrumentChordsComponentProps {
   chordLib: ChordLib;
@@ -15,20 +14,18 @@ export default function InstrumentChordsComponent({
   if (!chords.length) return null;
   return (
     <>
-      <Typography variant="h4" mb={1}>
-        Chords
-      </Typography>
-      <Columns isMultiline isMobile>
+      <Typography variant="h4">Chords</Typography>
+      <Grid container mb={2}>
         {chords.map((chord) => (
-          <Column key={chord} style={{ minWidth: "max-content" }}>
+          <Grid key={chord} item xs px={1}>
             <ChordFrets
               chord={chord}
               chordLib={chordLib}
               style={{ margin: "auto" }}
             />
-          </Column>
+          </Grid>
         ))}
-      </Columns>
+      </Grid>
     </>
   );
 }

@@ -1,20 +1,21 @@
+import { Box, SxProps, Theme } from "@mui/material";
 import React, { ReactNode } from "react";
 
 export interface SpacedGridRowProps {
   children: ReactNode;
-  className?: string;
   spacing: number[];
+  sx?: SxProps<Theme>;
 }
 
 export default function SpacedGridRow({
   children,
-  className,
   spacing,
+  sx,
 }: SpacedGridRowProps) {
   const gridTemplateColumns = spacing.map((s) => `${s}fr`).join(" ");
   return (
-    <div style={{ display: "grid", gridTemplateColumns }} className={className}>
+    <Box display="grid" gridTemplateColumns={gridTemplateColumns} sx={sx}>
       {children}
-    </div>
+    </Box>
   );
 }

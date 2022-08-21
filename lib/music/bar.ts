@@ -63,6 +63,15 @@ export class BarParagraph {
     return this.bars.some((bar) => bar.patterns[instrumentIdx].useTab());
   }
 
+  /** Returns the maximum number that any pattern has in this bar. */
+  get maxStrumsPerBar(): number {
+    return Math.max(
+      ...this.bars.map((b) =>
+        Math.max(...b.patterns.map((p) => p.strumsPerBar))
+      )
+    );
+  }
+
   /** Returns the number of ticks per bar. */
   get ticksPerBar(): number {
     return this.bars[0]?.patterns[0].ticksPerBar ?? NaN;

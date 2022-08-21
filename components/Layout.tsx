@@ -16,15 +16,15 @@ export function calcRootMx(factor = 1) {
 const theme = responsiveFontSizes(
   createTheme({
     palette: {
-      primary: { main: cyan["A700"] },
+      primary: { main: cyan["A700"], light: cyan["100"] },
       secondary: { main: pink["A200"] },
     },
     typography: {
       h1: { fontSize: "2.5rem", fontWeight: "700", textAlign: "center" },
-      h2: { fontSize: "2rem", fontWeight: "500", textAlign: "center" },
+      h2: { fontSize: "2rem", fontWeight: "400", textAlign: "center" },
       h3: { fontSize: "1.75rem", fontWeight: "500" },
       h4: { fontSize: "1.5rem", fontWeight: "500" },
-      h5: { fontSize: "1.25rem", fontWeight: "300" },
+      h5: { fontSize: "1.1rem", fontWeight: "400" },
     },
   })
 );

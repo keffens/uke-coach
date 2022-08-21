@@ -1,5 +1,5 @@
 import React from "react";
-import { Column, Columns, Title } from "bloomer";
+import { Column, Columns } from "bloomer";
 import PatternWithCountComponent from "./PatternWithCountComponent";
 import { Instrument } from "../../lib/music";
 import { Typography } from "@mui/material";

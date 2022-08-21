@@ -3,6 +3,7 @@ import PatternComponent from "./PatternComponent";
 import { Pattern, Instrument } from "../../lib/music";
 import { range } from "../../lib/util";
 import styles from "./PatternWithCount.module.scss";
+import { Typography } from "@mui/material";
 
 export interface PatternWithCountComponentProps {
   pattern: Pattern;
@@ -16,9 +17,7 @@ export default function PatternWithCountComponent({
   const beats = range(1, pattern.time.beats + 1);
   return (
     <div className="block">
-      <Title tag="h5" isSize={6} isMarginless>
-        {pattern.name}
-      </Title>
+      <Typography variant="h5">{pattern.name}</Typography>
       {range(pattern.bars).map((idx) => (
         <div key={idx} className={styles.barContainer}>
           <div className={styles.beatCount}>
