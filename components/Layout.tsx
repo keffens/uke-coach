@@ -1,19 +1,33 @@
 import { ReactNode } from "react";
 import Head from "next/head";
 import Navbar from "./Navbar";
-import { Box, createTheme, ThemeProvider } from "@mui/material";
+import {
+  Box,
+  createTheme,
+  responsiveFontSizes,
+  ThemeProvider,
+} from "@mui/material";
 import { cyan, grey, pink } from "@mui/material/colors";
 
 export function calcRootMx(factor = 1) {
   return { xs: 2 * factor, sm: 4 * factor, md: `${5 * factor}vw` };
 }
 
-const theme = createTheme({
-  palette: {
-    primary: { main: cyan["A700"] },
-    secondary: { main: pink["A200"] },
-  },
-});
+const theme = responsiveFontSizes(
+  createTheme({
+    palette: {
+      primary: { main: cyan["A700"] },
+      secondary: { main: pink["A200"] },
+    },
+    typography: {
+      h1: { fontSize: "2.5rem", fontWeight: "700", textAlign: "center" },
+      h2: { fontSize: "2rem", fontWeight: "500", textAlign: "center" },
+      h3: { fontSize: "1.75rem", fontWeight: "500" },
+      h4: { fontSize: "1.5rem", fontWeight: "500" },
+      h5: { fontSize: "1.25rem", fontWeight: "300" },
+    },
+  })
+);
 
 interface LayoutProps {
   title?: string;
@@ -28,7 +42,6 @@ export default function Layout({ title, children }: LayoutProps) {
         <title>{title}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* <div className={styles.content}> */}
       <ThemeProvider theme={theme}>
         <Box minHeight="100vh" pb={24} position="relative">
           <Navbar />
@@ -48,7 +61,6 @@ export default function Layout({ title, children }: LayoutProps) {
           </Box>
         </Box>
       </ThemeProvider>
-      {/* </div> */}
     </>
   );
 }

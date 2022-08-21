@@ -10,20 +10,13 @@ import {
   updateSong,
   useFirebaseUser,
 } from "../../../lib/firebase";
-import {
-  Button,
-  Content,
-  Control,
-  Field,
-  Label,
-  Notification,
-  TextArea,
-} from "bloomer";
+import { Button, Content, Control, Field, Label, TextArea } from "bloomer";
 import { Song, tokenize } from "../../../lib/music";
 import SongMetadataComponent from "../../../components/song/SongMetadataComponent";
 import { assert } from "../../../lib/util";
 import Link from "next/link";
 import { NEW_SONG_ID, songLink, songRawEditorLink } from "../../../lib/router";
+import { Alert } from "@mui/material";
 
 const NEW_SONG: SongData = {
   chordPro: "",
@@ -166,8 +159,8 @@ function SongEditor({ song, setSong }: SongEditorProps) {
           </Link>
         </Control>
       </Field>
-      {error && <Notification isColor="danger">{error}</Notification>}
-      {success && <Notification isColor="success">{success}</Notification>}
+      {error && <Alert severity="error">{error}</Alert>}
+      {success && <Alert severity="success">{success}</Alert>}
     </Content>
   );
 }
@@ -226,14 +219,14 @@ export default function SongEditorPage() {
   if (loading || (!song && !error)) {
     return (
       <Layout title={pageTitle}>
-        <Notification isColor="primary">Loading...</Notification>
+        <Alert severity="info">Loading...</Alert>
       </Layout>
     );
   }
   if (error) {
     return (
       <Layout title={pageTitle}>
-        <Notification isColor="danger">{error}</Notification>
+        <Alert severity="error">{error}</Alert>
       </Layout>
     );
   }

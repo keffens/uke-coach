@@ -1,7 +1,7 @@
 import React from "react";
-import { Title } from "bloomer";
 import BarParagraphComponent from "./BarParagraphComponent";
 import { InstrumentLib, SongPart } from "../../lib/music";
+import { Typography } from "@mui/material";
 
 export interface SongPartComponentProps {
   part: SongPart;
@@ -15,9 +15,9 @@ export default function SongPartComponent({
   return (
     <>
       {part.header ? (
-        <Title tag="h4" isMarginless className="mt-4 mb-2">
+        <Typography variant="h4" mt={2} mb={1}>
           {part.header}
-        </Title>
+        </Typography>
       ) : (
         <div className="mt-5"></div>
       )}

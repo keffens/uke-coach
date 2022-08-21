@@ -2,6 +2,7 @@ import React from "react";
 import { Column, Columns, Title } from "bloomer";
 import { ChordLib } from "../../lib/music";
 import ChordFrets from "./ChordFrets";
+import { Typography } from "@mui/material";
 
 export interface InstrumentChordsComponentProps {
   chordLib: ChordLib;
@@ -14,9 +15,9 @@ export default function InstrumentChordsComponent({
   if (!chords.length) return null;
   return (
     <>
-      <Title tag="h4" className="mb-2">
+      <Typography variant="h4" mb={1}>
         Chords
-      </Title>
+      </Typography>
       <Columns isMultiline isMobile>
         {chords.map((chord) => (
           <Column key={chord} style={{ minWidth: "max-content" }}>

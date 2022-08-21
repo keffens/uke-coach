@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { Tab, Tabs, TabList, TabLink, Title } from "bloomer";
+import { Tab, Tabs, TabList, TabLink } from "bloomer";
 import { FaGuitar } from "react-icons/fa";
 import { GiGuitar, GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
 import { Instrument, InstrumentLib, InstrumentType } from "../../lib/music";
@@ -8,8 +8,9 @@ import VolumeToggle from "../elements/VolumeToggle";
 import VolumeIcon from "../elements/VolumeIcon";
 import InstrumentChordsComponent from "./InstrumentChordsComponent";
 import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
-import { Box } from "bloomer/lib/elements/Box";
 import { VisibilityOffOutlined } from "@mui/icons-material";
+import { Typography } from "@mui/material";
+import OutlinedBox from "../elements/OutlinedBox";
 
 interface InstrumentIconProps {
   instrument: Instrument;
@@ -68,8 +69,8 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
     name += ` - ${instrument.type}`;
   }
   return (
-    <Box>
-      <Title tag="h3" className="mb-3">
+    <OutlinedBox>
+      <Typography variant="h3" mb={2}>
         {name}{" "}
         <VisibilityToggle
           initialVisibility={instrument.show}
@@ -85,10 +86,10 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
             onChange(false);
           }}
         />
-      </Title>
+      </Typography>
       <InstrumentChordsComponent chordLib={instrument.chordLib} />
       <InstrumentPatternsComponent instrument={instrument} />
-    </Box>
+    </OutlinedBox>
   );
 }
 

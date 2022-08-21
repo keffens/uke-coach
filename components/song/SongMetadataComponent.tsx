@@ -1,4 +1,5 @@
-import { Column, Columns, Title, Subtitle } from "bloomer";
+import { Box, Typography } from "@mui/material";
+import { Column, Columns } from "bloomer";
 import { SongMetadata } from "../../lib/music";
 
 interface SubtitleProps {
@@ -7,11 +8,7 @@ interface SubtitleProps {
 
 function SongSubtitle({ artist }: SubtitleProps) {
   if (!artist) return null;
-  return (
-    <Subtitle tag="h2" hasTextAlign="centered">
-      by {artist}
-    </Subtitle>
-  );
+  return <Typography variant="h2">by {artist}</Typography>;
 }
 
 interface MetadataColumnProps {
@@ -39,10 +36,10 @@ export default function SongMetadataComponent({
 }: SongMetadataComponentProps) {
   return (
     <>
-      <Title tag="h1" hasTextAlign="centered">
-        {metadata.title}
-      </Title>
-      <SongSubtitle artist={metadata.artist} />
+      <Box mb={{ xs: 1, md: 2 }}>
+        <Typography variant="h1">{metadata.title}</Typography>
+        <SongSubtitle artist={metadata.artist} />
+      </Box>
       <Columns isMultiline isMobile>
         <MetadataColumn name="composer" value={metadata.composer} />
         <MetadataColumn name="lyricist" value={metadata.lyricist} />

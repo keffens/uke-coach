@@ -7,6 +7,10 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useRef, useState } from "react";
+import OutlinedBox from "./OutlinedBox";
+
+const GLOBAL_MIN = 20;
+const GLOBAL_MAX = 400;
 
 interface BpmSelectProps {
   initialBpm: number;
@@ -40,8 +44,8 @@ export default function BpmSelect({ initialBpm, onChange }: BpmSelectProps) {
       label: "1.5x",
     },
   ];
-  const min = Math.max(20, marks[0].value);
-  const max = Math.min(400, marks[marks.length - 1].value);
+  const min = Math.max(GLOBAL_MIN, marks[0].value);
+  const max = Math.min(GLOBAL_MAX, marks[marks.length - 1].value);
 
   const updateBpm = (value: number | string, sticky = false) => {
     if (typeof value === "string") {
@@ -66,11 +70,22 @@ export default function BpmSelect({ initialBpm, onChange }: BpmSelectProps) {
       setBpm(value || 0);
     }
   };
+
+  const onBlur = () => {
+    console.log("onBlur", bpm);
+    if (bpm < GLOBAL_MIN) {
+      setBpm(GLOBAL_MIN);
+      onChange(GLOBAL_MIN);
+    }
+    setFocus(false);
+  };
+
   return (
     <Box
       display="inline-block"
+      my={1}
       onFocus={() => setFocus(true)}
-      onBlur={() => setFocus(false)}
+      onBlur={onBlur}
     >
       <OutlinedInput
         onChange={(e) => updateBpm(e.target.value)}
@@ -84,8 +99,9 @@ export default function BpmSelect({ initialBpm, onChange }: BpmSelectProps) {
         }
         ref={input}
         size="small"
-        sx={{ width: "90px" }}
         value={bpm}
+        sx={{ width: "90px" }}
+        inputProps={{ style: { textAlign: "right" } }}
       />
       <Popper
         anchorEl={input.current}
@@ -93,15 +109,7 @@ export default function BpmSelect({ initialBpm, onChange }: BpmSelectProps) {
         open={hasFocus}
         sx={{ zIndex: 10 }}
       >
-        <Box
-          bgcolor="background.paper"
-          borderRadius={2}
-          boxShadow={4}
-          m={1}
-          px={3}
-          py={0.5}
-          width="320px"
-        >
+        <OutlinedBox sx={{ px: 3, py: 0.5, width: "320px" }}>
           <Slider
             min={min}
             max={max}
@@ -112,7 +120,7 @@ export default function BpmSelect({ initialBpm, onChange }: BpmSelectProps) {
               updateBpm(val as number, /*sticky=*/ true);
             }}
           />
-        </Box>
+        </OutlinedBox>
       </Popper>
     </Box>
   );

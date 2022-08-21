@@ -8,8 +8,8 @@ import {
 } from "../../lib/firebase";
 import { useEffect, useState } from "react";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
-import { Notification } from "bloomer/lib/elements/Notification";
 import { songLink } from "../../lib/router";
+import { Alert, CircularProgress } from "@mui/material";
 
 function SongRow({ id, title, artist }: SongData) {
   return (
@@ -44,10 +44,12 @@ export default function SongPage() {
     });
   }, []);
 
+  // TODO: Replace loading alert with a Skeleton
+  // https://mui.com/material-ui/react-skeleton/
   if (!songs) {
     return (
       <Layout>
-        <Notification isColor="primary">Loading...</Notification>
+        <Alert severity="info">Loading...</Alert>
       </Layout>
     );
   }

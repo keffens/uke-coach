@@ -18,6 +18,7 @@ import { IconButton } from "@mui/material";
 import { Box } from "@mui/system";
 import { NAVBAR_STICKY_HEIGHT } from "../Navbar";
 import { calcRootMx } from "../Layout";
+import OutlinedBox from "../elements/OutlinedBox";
 
 interface PlayerComponentProps {
   song: Song;
@@ -45,16 +46,17 @@ export default function PlayerComponent({ song }: PlayerComponentProps) {
     /**
      * The player spreads over the entire width of the screen and is sticky
      * below the navar. */
-    <Box
-      bgcolor="white"
-      boxShadow={3}
-      mx={calcRootMx(-1)}
-      p={0.5}
-      position="sticky"
-      textAlign="center"
-      top={NAVBAR_STICKY_HEIGHT}
-      zIndex={1}
-      sx={{ "> *": { m: 2, verticalAlign: "middle", whiteSpace: "nowrap" } }}
+    <OutlinedBox
+      sx={{
+        borderRadius: 0,
+        mx: calcRootMx(-1),
+        p: 0,
+        position: "sticky",
+        textAlign: "center",
+        top: NAVBAR_STICKY_HEIGHT,
+        zIndex: 1,
+        "> *": { m: 2, verticalAlign: "middle", whiteSpace: "nowrap" },
+      }}
     >
       <BpmSelect
         initialBpm={song.metadata.tempo}
@@ -140,6 +142,6 @@ export default function PlayerComponent({ song }: PlayerComponentProps) {
           <Speed fontSize="inherit" />
         </ToggleIcon>
       </span>
-    </Box>
+    </OutlinedBox>
   );
 }

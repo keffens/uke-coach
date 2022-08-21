@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Content } from "bloomer";
 import InstrumentsComponent from "./InstrumentsComponent";
 import PlayerComponent from "./PlayerComponent";
 import SongMetadataComponent from "./SongMetadataComponent";
@@ -13,7 +12,7 @@ export interface SongComponentProps {
 export default function SongComponent({ song }: SongComponentProps) {
   const [update, forceUpdate] = useState(0);
   return (
-    <Content>
+    <>
       <SongMetadataComponent metadata={song.metadata} />
       <InstrumentsComponent
         instrumentLib={song.instrumentLib}
@@ -29,6 +28,6 @@ export default function SongComponent({ song }: SongComponentProps) {
           instrumentLib={song.instrumentLib}
         />
       ))}
-    </Content>
+    </>
   );
 }
