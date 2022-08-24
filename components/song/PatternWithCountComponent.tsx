@@ -1,4 +1,3 @@
-import { Title } from "bloomer";
 import PatternComponent from "./PatternComponent";
 import { Pattern, Instrument } from "../../lib/music";
 import { range } from "../../lib/util";
