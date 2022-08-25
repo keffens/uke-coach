@@ -3,6 +3,7 @@ import { Chord, ChordInput, ChordLib } from "../../lib/music";
 import { assert } from "../../lib/util";
 import BackgroundGrid from "../elements/BackgroundGrid";
 import styles from "./Chord.module.scss";
+import ChordComponent from "./ChordComponent";
 
 interface FretProps {
   string: number;
@@ -70,10 +71,7 @@ export default function ChordFrets({
 
   return (
     <div className={styles.chordFrets} style={style}>
-      <div className={`${styles.chord} mb-2`}>
-        {chord.base}
-        {chord.sup ? <sup>{chord.sup}</sup> : null}
-      </div>
+      <ChordComponent chord={chord} sx={{ mb: 1 }} />
       <div style={{ width, height, position: "relative" }}>
         <BackgroundGrid cols={cols} rows={rows} />
         {frets.map((f, i) => (

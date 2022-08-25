@@ -1,8 +1,8 @@
 import PatternComponent from "./PatternComponent";
 import { Pattern, Instrument } from "../../lib/music";
 import { range } from "../../lib/util";
-import styles from "./PatternWithCount.module.scss";
-import { Typography } from "@mui/material";
+import { Grid, Stack, Typography } from "@mui/material";
+import ChordComponent from "./ChordComponent";
 
 export interface PatternWithCountComponentProps {
   pattern: Pattern;
@@ -15,24 +15,28 @@ export default function PatternWithCountComponent({
 }: PatternWithCountComponentProps) {
   const beats = range(1, pattern.time.beats + 1);
   return (
-    <div className="block">
+    <>
       <Typography variant="h5">{pattern.name}</Typography>
-      {range(pattern.bars).map((idx) => (
-        <div key={idx} className={styles.barContainer}>
-          <div className={styles.beatCount}>
-            {beats.map((beat) => (
-              <span key={beat}>{beat}</span>
-            ))}
-          </div>
-          <PatternComponent
-            pattern={pattern}
-            patternIdx={idx}
-            showStringLabels={idx === 0}
-            instrument={instrument}
-            alwaysShow
-          />
-        </div>
-      ))}
-    </div>
+      <Stack direction="row">
+        {range(pattern.bars).map((idx) => (
+          <Stack key={idx}>
+            <Grid container>
+              {beats.map((beat) => (
+                <Grid item key={beat} xs>
+                  <ChordComponent base={beat} />
+                </Grid>
+              ))}
+            </Grid>
+            <PatternComponent
+              pattern={pattern}
+              patternIdx={idx}
+              showStringLabels={idx === 0}
+              instrument={instrument}
+              alwaysShow
+            />
+          </Stack>
+        ))}
+      </Stack>
+    </>
   );
 }

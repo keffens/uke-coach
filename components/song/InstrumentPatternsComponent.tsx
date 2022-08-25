@@ -1,8 +1,7 @@
 import React from "react";
-import { Column, Columns } from "bloomer";
 import PatternWithCountComponent from "./PatternWithCountComponent";
 import { Instrument } from "../../lib/music";
-import { Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 
 export interface InstrumentPatternsComponentProps {
   instrument: Instrument;
@@ -18,17 +17,16 @@ export default function InstrumentPatternsComponent({
       <Typography variant="h4" mb={1}>
         Patterns
       </Typography>
-      <Columns isMultiline isMobile style={{ width: "100%", overflow: "auto" }}>
+      <Grid container rowSpacing={2} columnSpacing={4} overflow="auto">
         {patterns.map((pattern, i) => (
-          <Column key={i} style={{ minWidth: "max-content" }}>
+          <Grid item key={i} xs="auto" minWidth="max-content">
             <PatternWithCountComponent
-              key={i}
               pattern={pattern}
               instrument={instrument}
             />
-          </Column>
+          </Grid>
         ))}
-      </Columns>
+      </Grid>
     </>
   );
 }

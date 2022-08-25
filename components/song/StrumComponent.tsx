@@ -10,6 +10,7 @@ import { Chord, ChordLib, Strum, StrumType } from "../../lib/music";
 import styles from "./Strum.module.scss";
 
 export const STRING_SEP = 0.4;
+export const STRUM_SIZE_PX = 20;
 
 function fretToString(fret?: number): string {
   if (fret == null) return "";
