@@ -121,7 +121,7 @@ function BarComponent({
             isSoloAnacrusis
           />
         </Grid>
-        <Grid item xs position="relative">
+        <Grid item xs position="relative" ref={barRef}>
           {highlightState && <Highlight />}
           <SpacedGridRow spacing={bar.beats}>
             {bar.chords.map((chord, i) => (
@@ -148,7 +148,7 @@ function BarComponent({
     );
   }
   return (
-    <Box position="relative">
+    <Box position="relative" ref={barRef}>
       {highlightState && <Highlight />}
       <SpacedGridRow spacing={bar.beats}>
         {bar.chords.map((chord, i) => (
