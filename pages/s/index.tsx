@@ -6,7 +6,6 @@ import SongTable from "../../components/index/SongTable";
 
 // TODO: Add search functionality once there are enough songs.
 // TODO: Filtering should be done in the backend to not leak undeplyed songs.
-//       Own songs should be excempt from filtering.
 export default function SongPage() {
   const [songs, setSongs] = useState<SongData[]>([]);
   const [loading, setLoading] = useState(true);

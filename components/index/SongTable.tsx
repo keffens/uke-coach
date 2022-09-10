@@ -1,4 +1,3 @@
-import { Box } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
 import { SongData, sortSongs } from "../../lib/firebase";
@@ -39,20 +38,18 @@ export default function SongTable({ songs, loading }: SongTableProps) {
   );
 
   return (
-    <Box height="600px" width="100%">
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        rowHeight={40}
-        headerHeight={40}
-        hideFooter
-        loading={loading}
-        initialState={{
-          sorting: {
-            sortModel: [{ field: "sorttitle", sort: "asc" }],
-          },
-        }}
-      />
-    </Box>
+    <DataGrid
+      rows={rows}
+      columns={columns}
+      autoHeight
+      pageSize={25}
+      rowHeight={40}
+      loading={loading}
+      initialState={{
+        sorting: {
+          sortModel: [{ field: "sorttitle", sort: "asc" }],
+        },
+      }}
+    />
   );
 }
