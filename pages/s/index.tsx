@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { songLink } from "../../lib/router";
-import { Alert, CircularProgress } from "@mui/material";
+import { Alert } from "@mui/material";
 
 function SongRow({ id, title, artist }: SongData) {
   return (

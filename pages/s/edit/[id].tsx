@@ -10,13 +10,12 @@ import {
   updateSong,
   useFirebaseUser,
 } from "../../../lib/firebase";
-import { Button, Content, Control, Field, Label, TextArea } from "bloomer";
 import { Song, tokenize } from "../../../lib/music";
 import SongMetadataComponent from "../../../components/song/SongMetadataComponent";
 import { assert } from "../../../lib/util";
-import Link from "next/link";
 import { NEW_SONG_ID, songLink, songRawEditorLink } from "../../../lib/router";
-import { Alert } from "@mui/material";
+import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 const NEW_SONG: SongData = {
   chordPro: "",
@@ -88,25 +87,22 @@ function SongEditor({ song, setSong }: SongEditorProps) {
     parseSong();
   }, []);
   return (
-    <Content>
+    <>
       {parsedSong && <SongMetadataComponent metadata={parsedSong.metadata} />}
-      <Field>
-        <Label>Chord Pro</Label>
-        <Control>
-          <TextArea
-            value={songCrd}
-            style={{ height: "40em", maxHeight: "none" }}
-            onChange={(e) =>
-              setSongCrd((e.target as HTMLTextAreaElement).value)
-            }
-            disabled={!!saving}
-          />
-        </Control>
-      </Field>
-      <Field isGrouped>
-        <Control>
+      <Stack mt={2} spacing={2}>
+        <Typography variant="h3">Chord Pro</Typography>
+        <TextField
+          multiline
+          value={songCrd}
+          onChange={(e) => setSongCrd((e.target as HTMLTextAreaElement).value)}
+          disabled={!!saving}
+          fullWidth
+          rows={40}
+        />
+        <Stack direction="row" spacing={2}>
           <Button
-            isColor="warning"
+            color="secondary"
+            variant="contained"
             onClick={() => {
               if (parseSong()) setSuccess("Validation successful!");
             }}
@@ -114,54 +110,45 @@ function SongEditor({ song, setSong }: SongEditorProps) {
           >
             Validate
           </Button>
-        </Control>
-        <Control>
-          <Button
-            isColor="primary"
+          <LoadingButton
+            variant="contained"
             onClick={() => saveSong(/*deploy=*/ false)}
-            isLoading={saving == SavingState.Draft}
+            loading={saving == SavingState.Draft}
             disabled={
               (song.chordProDraft || song.chordPro) === songCrd || !!saving
             }
           >
             Save draft
-          </Button>
-        </Control>
-        <Control>
+          </LoadingButton>
           <Button
+            variant="outlined"
             onClick={() => setSongCrd(song.chordPro)}
             disabled={!song.deployed || songCrd === song.chordPro || !!saving}
           >
             Reset to deployed
           </Button>
-        </Control>
-      </Field>
-      <Field isGrouped>
-        <Control>
-          <Button
-            isColor="primary"
+        </Stack>
+        <Stack direction="row" spacing={2}>
+          <LoadingButton
+            variant="contained"
             onClick={() => saveSong(/*deploy=*/ true)}
-            isLoading={saving == SavingState.Deploy}
+            loading={saving == SavingState.Deploy}
             disabled={song.chordPro === songCrd || !!saving}
           >
             Save & deploy
+          </LoadingButton>
+          <Button
+            variant="outlined"
+            href={songLink(song.id)}
+            disabled={!song.deployed || !!saving}
+          >
+            Go to song
           </Button>
-        </Control>
-        <Control>
-          <Link href={songLink(song.id)}>
-            <Button
-              isColor="light"
-              isLink
-              disabled={!song.deployed || !!saving}
-            >
-              Go to song
-            </Button>
-          </Link>
-        </Control>
-      </Field>
-      {error && <Alert severity="error">{error}</Alert>}
-      {success && <Alert severity="success">{success}</Alert>}
-    </Content>
+        </Stack>
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
+      </Stack>
+    </>
   );
 }
 

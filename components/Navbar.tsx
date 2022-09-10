@@ -52,17 +52,21 @@ function UserButton({ isLoading, onClick, user }: UserButtonProps) {
       sx = { p: 0, outline: "solid white 2px" };
     }
   }
+  // The span wrapper is necessary because the Tooltip cannot wrap a disabled
+  // button.
   return (
     <Tooltip title={toolTip}>
-      <IconButton
-        disabled={isLoading}
-        color="inherit"
-        onClick={onClick}
-        size="large"
-        sx={sx}
-      >
-        {avatar}
-      </IconButton>
+      <span>
+        <IconButton
+          disabled={isLoading}
+          color="inherit"
+          onClick={onClick}
+          size="large"
+          sx={sx}
+        >
+          {avatar}
+        </IconButton>
+      </span>
     </Tooltip>
   );
 }
