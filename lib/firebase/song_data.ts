@@ -32,19 +32,23 @@ export function toSongData(data: any): SongData {
     ownerId: data.ownerId,
     title: data.title,
     chorProDraft: toStringOrUndef(data.chordProDraft),
-    artist: toStringOrUndef(data.sorttitle),
+    artist: toStringOrUndef(data.artist),
     sorttitle: toStringOrUndef(data.sorttitle),
   });
 }
 
 /** Sorts songs by sorttitle, and artist as a tiebreaker. */
 export function sortSongs(songs: SongData[]): SongData[] {
-  return songs.sort((lhs, rhs) => {
-    const titleComp = (lhs.sorttitle || lhs.title).localeCompare(
-      rhs.sorttitle || rhs.title
-    );
-    return titleComp || (lhs.artist || "").localeCompare(rhs.artist || "");
-  });
+  return songs.sort(
+    (lhs, rhs) =>
+      compareSongTitles(lhs, rhs) ||
+      (lhs.artist || "").localeCompare(rhs.artist || "")
+  );
+}
+
+/** Sorts songs by sorttitle. */
+export function compareSongTitles(lhs: SongData, rhs: SongData): number {
+  return (lhs.sorttitle || lhs.title).localeCompare(rhs.sorttitle || rhs.title);
 }
 
 /** Saves the song to firebase and, depending on flags, deploys it. */

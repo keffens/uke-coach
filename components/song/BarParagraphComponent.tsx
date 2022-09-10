@@ -202,7 +202,7 @@ export default function BarParagraphComponent({
         </Box>
       ))}
       {/* Adding empty items, fixes the stretching of the last row. */}
-      {range(7).map((i) => (
+      {range(15).map((i) => (
         <Box
           key={i}
           flexGrow={1}
