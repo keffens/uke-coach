@@ -1,3 +1,4 @@
+import { Box, SxProps, Theme } from "@mui/material";
 import ArpeggioDownIcon from "./arpeggio-down.svg";
 import ArpeggioUpIcon from "./arpeggio-up.svg";
 import DownStrumIcon from "./down-strum.svg";
@@ -9,20 +10,20 @@ import UpStrumIcon from "./up-strum.svg";
 interface FullIconProps {
   children: React.ReactNode;
   className?: string;
-  style?: React.CSSProperties;
+  sx?: SxProps<Theme>;
 }
 
-function Icon({ children, className, style }: FullIconProps) {
+function Icon({ children, className, sx }: FullIconProps) {
   return (
-    <div className={className} style={style}>
+    <Box className={className} sx={sx}>
       {children}
-    </div>
+    </Box>
   );
 }
 
 export interface IconProps {
   className?: string;
-  style?: React.CSSProperties;
+  sx?: SxProps<Theme>;
 }
 
 export const ArpeggioDown = (props: IconProps) =>

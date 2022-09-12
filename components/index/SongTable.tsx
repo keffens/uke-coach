@@ -39,12 +39,13 @@ export default function SongTable({ songs, loading }: SongTableProps) {
 
   return (
     <DataGrid
-      rows={rows}
-      columns={columns}
       autoHeight
-      pageSize={25}
-      rowHeight={40}
+      columns={columns}
+      disableSelectionOnClick
       loading={loading}
+      pageSize={25}
+      rows={rows}
+      rowHeight={40}
       initialState={{
         sorting: {
           sortModel: [{ field: "sorttitle", sort: "asc" }],

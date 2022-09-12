@@ -1,7 +1,5 @@
 @charset "utf-8";
 
-@import "variables.scss";
-
 // Roboto font.
 @import '@fontsource/roboto/300.css';
 @import '@fontsource/roboto/400.css';
@@ -10,11 +8,13 @@
 @import '@fontsource/roboto/900.css';
 
 // TODO: Remove all references to Bulma.
-@import "../node_modules/bulma/sass/utilities/_all";
 @import "../node_modules/bulma/sass/base/_all";
-@import "../node_modules/bulma/sass/elements/_all";
-@import "../node_modules/bulma/sass/components/_all";
 
 html {
   overflow: auto;
+}
+
+body {
+  margin: 0;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 }

@@ -1,7 +1,7 @@
 @use "sass:math";
-@import "../../styles/variables.scss";
 $borderWidth: 2px;
-$borderStyle: $borderWidth solid $grey-lighter;
+$grey400: #bdbdbd;
+$borderStyle: $borderWidth solid $grey400; 
 
 .gridTemplate {
   display: grid;
@@ -19,8 +19,8 @@ $borderStyle: $borderWidth solid $grey-lighter;
   border-left: $borderStyle;
 
   div {
-    margin-left: -1px;
-    margin-bottom: -1px;
+    margin-left: math.div(-$borderWidth, 2);
+    margin-bottom: math.div(-$borderWidth, 2);
     border-top: $borderStyle;
     border-right: $borderStyle;
   }
@@ -34,7 +34,7 @@ $borderStyle: $borderWidth solid $grey-lighter;
 
   div {
     height: 50%;
-    margin: 0 -1px;
+    margin: 0 math.div(-$borderWidth, 2);
     border-bottom: $borderStyle;
   }
 }
