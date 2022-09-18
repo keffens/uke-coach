@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, forwardRef, SetStateAction, useState } from "react";
 import { FaGuitar } from "react-icons/fa";
 import { GiGuitar, GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
 import { Instrument, InstrumentLib, InstrumentType } from "../../lib/music";
@@ -8,7 +8,15 @@ import VolumeIcon from "../elements/VolumeIcon";
 import InstrumentChordsComponent from "./InstrumentChordsComponent";
 import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
 import { VisibilityOffOutlined } from "@mui/icons-material";
-import { Box, Typography, ButtonGroup, Button, Stack } from "@mui/material";
+import {
+  Box,
+  Typography,
+  ButtonGroup,
+  Button,
+  Stack,
+  Tabs,
+  Tab,
+} from "@mui/material";
 import OutlinedBox from "../elements/OutlinedBox";
 import { TabContext, TabPanel } from "@mui/lab";
 
@@ -36,25 +44,27 @@ interface IntrumentButtonProps {
   setInstrument: Dispatch<SetStateAction<Instrument | null>>;
 }
 
-function IntrumentButton({
-  instrument,
-  isActive,
-  setInstrument,
-}: IntrumentButtonProps) {
-  return (
-    <Button
-      variant={isActive ? "contained" : "outlined"}
-      onClick={() => setInstrument(isActive ? null : instrument)}
-    >
-      <Stack direction="row" spacing={1} alignItems="center">
-        <InstrumentIcon instrument={instrument} />
-        <Box pt={0.5}>{instrument.name}</Box>
-        {!instrument.show && <VisibilityOffOutlined fontSize="small" />}
-        <VolumeIcon vol={instrument.volume} fontSize="small" />
-      </Stack>
-    </Button>
-  );
-}
+const IntrumentButton = forwardRef(
+  (
+    { instrument, isActive, setInstrument }: IntrumentButtonProps,
+    ref: React.ForwardedRef<HTMLButtonElement>
+  ) => {
+    return (
+      <Button
+        variant={isActive ? "contained" : "outlined"}
+        onClick={() => setInstrument(isActive ? null : instrument)}
+        ref={ref}
+      >
+        <Stack direction="row" spacing={1} alignItems="center">
+          <InstrumentIcon instrument={instrument} />
+          <Box pt={0.5}>{instrument.name}</Box>
+          {!instrument.show && <VisibilityOffOutlined fontSize="small" />}
+          <VolumeIcon vol={instrument.volume} fontSize="small" />
+        </Stack>
+      </Button>
+    );
+  }
+);
 
 interface InstrumentTabProps {
   instrument: Instrument | null;
@@ -121,6 +131,18 @@ export default function InstrumentsComponent({
         ))}
       </ButtonGroup>
       <TabContext value={activeInstrument?.name || ""}>
+        <Tabs>
+          {instrumentLib.instruments.map((instrument) => (
+            <Tab
+              component={IntrumentButton}
+              key={instrument.name}
+              value={instrument.name}
+              instrument={instrument}
+              isActive={activeInstrument === instrument}
+              setInstrument={setInstrument}
+            />
+          ))}
+        </Tabs>
         <InstrumentTab
           key={activeInstrument?.name}
           instrument={activeInstrument}
