@@ -1,7 +1,7 @@
 import React from "react";
 import BarParagraphComponent from "./BarParagraphComponent";
 import { InstrumentLib, SongPart } from "../../lib/music";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export interface SongPartComponentProps {
   part: SongPart;
@@ -19,7 +19,7 @@ export default function SongPartComponent({
           {part.header}
         </Typography>
       ) : (
-        <div className="mt-5"></div>
+        <Box mt={2} />
       )}
       {part.paragraphs.map((paragraph, i) => (
         <BarParagraphComponent

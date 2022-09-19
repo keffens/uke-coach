@@ -1,4 +1,10 @@
-import React, { Dispatch, forwardRef, SetStateAction, useState } from "react";
+import React, {
+  Dispatch,
+  forwardRef,
+  ReactNode,
+  SetStateAction,
+  useState,
+} from "react";
 import { FaGuitar } from "react-icons/fa";
 import { GiGuitar, GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
 import { Instrument, InstrumentLib, InstrumentType } from "../../lib/music";
@@ -8,7 +14,7 @@ import VolumeIcon from "../elements/VolumeIcon";
 import InstrumentChordsComponent from "./InstrumentChordsComponent";
 import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
 import { VisibilityOffOutlined } from "@mui/icons-material";
-import { Box, Typography, Button, Stack, Tabs, Tab } from "@mui/material";
+import { Box, Button, Typography, Stack, Tabs, Tab } from "@mui/material";
 import OutlinedBox from "../elements/OutlinedBox";
 
 interface InstrumentIconProps {
@@ -32,24 +38,26 @@ function InstrumentIcon({ instrument }: InstrumentIconProps) {
 interface IntrumentButtonProps {
   instrument: Instrument;
   isActive: boolean;
+  children?: ReactNode;
   setInstrument: Dispatch<SetStateAction<Instrument | null>>;
 }
 
 const IntrumentButton = forwardRef(
   (
-    { instrument, isActive, setInstrument }: IntrumentButtonProps,
+    { instrument, isActive, children, setInstrument }: IntrumentButtonProps,
     ref: React.ForwardedRef<HTMLButtonElement>
   ) => {
     return (
       <Button
-        color={isActive ? "primary" : "inherit"}
+        color={isActive ? "primary" : "info"}
         onClick={() => setInstrument(isActive ? null : instrument)}
         ref={ref}
+        size="large"
         sx={{ mx: { md: 1 }, minWidth: "max-content" }}
       >
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mx: 1 }}>
           <InstrumentIcon instrument={instrument} />
-          <Box pt={0.5}>{instrument.name}</Box>
+          <Box pt={0.5}>{children}</Box>
           {!instrument.show && <VisibilityOffOutlined fontSize="small" />}
           <VolumeIcon vol={instrument.volume} fontSize="small" />
         </Stack>
@@ -121,6 +129,7 @@ export default function InstrumentsComponent({
             component={IntrumentButton}
             key={instrument.name}
             value={instrument.name}
+            label={instrument.name}
             instrument={instrument}
             isActive={activeInstrument === instrument}
             setInstrument={setInstrument}

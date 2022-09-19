@@ -8,8 +8,8 @@ $borderStyle: $borderWidth solid $grey400;
   position: absolute;
   bottom: math.div(-$borderWidth, 2);
   left: math.div(-$borderWidth, 2);
-  width: calc(100% + #{$borderWidth});
-  height: calc(100% + #{$borderWidth});
+  width: 100%;
+  height: 100%;
 }
 
 .grid {
@@ -31,10 +31,12 @@ $borderStyle: $borderWidth solid $grey400;
 
   border-left: $borderStyle;
   border-right: $borderStyle;
+  width: calc(100% - $borderWidth);
+  height: calc(100% + $borderWidth);
 
   div {
     height: 50%;
-    margin: 0 math.div(-$borderWidth, 2);
+    margin-top: math.div(-$borderWidth, 2);
     border-bottom: $borderStyle;
   }
 }

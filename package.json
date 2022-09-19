@@ -16,8 +16,6 @@
     "@mui/lab": "^5.0.0-alpha.98",
     "@mui/material": "^5.9.2",
     "@mui/x-data-grid": "^5.17.2",
-    "bloomer": "^0.6.3",
-    "bulma": "^0.9.4",
     "firebase": "^9.8.4",
     "firebase-admin": "^11.0.0",
     "fs": "0.0.1-security",
@@ -28,7 +26,6 @@
     "react-firebaseui": "^6.0.0",
     "react-icons": "^4.4.0",
     "react-screen-wake-lock": "^2.0.0",
-    "react-tooltip": "^4.2.21",
     "sass": "^1.53.0",
     "tone": "^14.7.77"
   },

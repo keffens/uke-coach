@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./Lyrics.module.scss";
 import SpacedGridRow from "../elements/SpacedGridRow";
+import { Box } from "@mui/material";
 
 interface LyricsCellComponentProps {
   lyric?: string;
@@ -21,29 +22,27 @@ function LyricsCellComponent({
   if (lyric && !nextAnacrusis) {
     return (
       <div className={styles.lyrics}>
-        <div className={`${styles.streched} ${lyric[0] === " " ? "pl-5" : ""}`}>
+        <Box className={styles.streched} pl={lyric[0] === " " ? 4 : 0}>
           {lyric}
           {lyric.slice(-1) === "-" ? null : <> &zwnj;</>}
-        </div>
+        </Box>
       </div>
     );
   }
   return (
     <div className={styles.lyrics}>
       {lyric ? (
-        <div className={styles.left + ` ${lyric[0] === " " ? "pl-5" : ""}`}>
+        <Box className={styles.left} pl={lyric[0] === " " ? 4 : 0}>
           {lyric}
-        </div>
+        </Box>
       ) : null}
-      <div
-        className={
-          styles.right +
-          ` ${nextAnacrusis.slice(-1) === "-" ? "" : "pr-1"}` +
-          ` ${isSoloAnacrusis ? "" : "ml-3"}`
-        }
+      <Box
+        className={styles.right}
+        pr={nextAnacrusis.slice(-1) === "-" ? 0 : 1}
+        ml={isSoloAnacrusis ? 0 : 4}
       >
         {nextAnacrusis}
-      </div>
+      </Box>
     </div>
   );
 }

@@ -7,7 +7,7 @@ import {
   responsiveFontSizes,
   ThemeProvider,
 } from "@mui/material";
-import { cyan, grey, pink } from "@mui/material/colors";
+import { cyan, grey, pink, blueGrey } from "@mui/material/colors";
 
 export function calcRootMx(factor = 1) {
   return { xs: 2 * factor, sm: 4 * factor, md: `${5 * factor}vw` };
@@ -16,8 +16,9 @@ export function calcRootMx(factor = 1) {
 const theme = responsiveFontSizes(
   createTheme({
     palette: {
-      primary: { main: cyan["A700"], light: cyan["100"] },
+      primary: { main: cyan["A700"], light: cyan[100] },
       secondary: { main: pink["A200"] },
+      info: { main: blueGrey[600] },
     },
     typography: {
       h1: { fontSize: "2.5rem", fontWeight: "700", textAlign: "center" },
