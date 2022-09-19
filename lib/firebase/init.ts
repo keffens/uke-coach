@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import firebase from "firebase/compat/app";
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -16,8 +15,6 @@ let firebaseApp: FirebaseApp | undefined = undefined;
 
 export function initFirebase(): FirebaseApp {
   if (firebaseApp) return firebaseApp;
-  // `react-firebaseui` requires the compat mode.
-  firebase.initializeApp(firebaseConfig);
   return initializeApp(firebaseConfig);
 }
 

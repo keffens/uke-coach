@@ -15,7 +15,6 @@ import {
   StopCircle,
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import { Box } from "@mui/system";
 import { NAVBAR_STICKY_HEIGHT } from "../Navbar";
 import { calcRootMx } from "../Layout";
 import OutlinedBox from "../elements/OutlinedBox";

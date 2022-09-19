@@ -1,16 +1,8 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { FaGuitar } from "react-icons/fa";
 import { useFirebaseUser } from "../lib/firebase";
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signOut,
-  updateProfile,
-  User,
-} from "firebase/auth";
+import { getAuth, signOut, updateProfile, User } from "firebase/auth";
 import {
   AppBar,
   Avatar,
@@ -29,6 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
+import FirebaseAuth from "./FirebaseAuth";
 
 const NAVBAR_HEIGHT = "64px";
 export const NAVBAR_STICKY_HEIGHT = { xs: 0, sm: NAVBAR_HEIGHT };
@@ -78,20 +71,6 @@ interface SignInDialogProps {
 
 function SignInDialog({ closeDialog, user }: SignInDialogProps) {
   const [displayName, setDisplayName] = useState(user?.displayName ?? "");
-
-  // Configure FirebaseUI.
-  const uiConfig = {
-    signInFlow: "popup",
-    // signInSuccess: closeDialog,
-    // We will display Google and Facebook as auth providers.
-    signInOptions: [
-      GoogleAuthProvider.PROVIDER_ID,
-      // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-      // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-      // firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    ],
-  };
-
   return (
     <Dialog
       disableScrollLock={true}
@@ -114,16 +93,13 @@ function SignInDialog({ closeDialog, user }: SignInDialogProps) {
                 label="Display name"
                 type="text"
                 value={displayName}
-                onChange={(e) =>
-                  setDisplayName((e.target as HTMLInputElement).value)
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setDisplayName(e.target.value)
                 }
               />
             </Box>
           ) : (
-            <StyledFirebaseAuth
-              uiConfig={uiConfig}
-              firebaseAuth={firebase.auth()}
-            />
+            <FirebaseAuth />
           )}
         </DialogContentText>
       </DialogContent>
