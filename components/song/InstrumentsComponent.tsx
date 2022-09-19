@@ -8,17 +8,8 @@ import VolumeIcon from "../elements/VolumeIcon";
 import InstrumentChordsComponent from "./InstrumentChordsComponent";
 import InstrumentPatternsComponent from "./InstrumentPatternsComponent";
 import { VisibilityOffOutlined } from "@mui/icons-material";
-import {
-  Box,
-  Typography,
-  ButtonGroup,
-  Button,
-  Stack,
-  Tabs,
-  Tab,
-} from "@mui/material";
+import { Box, Typography, Button, Stack, Tabs, Tab } from "@mui/material";
 import OutlinedBox from "../elements/OutlinedBox";
-import { TabContext, TabPanel } from "@mui/lab";
 
 interface InstrumentIconProps {
   instrument: Instrument;
@@ -51,11 +42,12 @@ const IntrumentButton = forwardRef(
   ) => {
     return (
       <Button
-        variant={isActive ? "contained" : "outlined"}
+        color={isActive ? "primary" : "inherit"}
         onClick={() => setInstrument(isActive ? null : instrument)}
         ref={ref}
+        sx={{ mx: { md: 1 }, minWidth: "max-content" }}
       >
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mx: 1 }}>
           <InstrumentIcon instrument={instrument} />
           <Box pt={0.5}>{instrument.name}</Box>
           {!instrument.show && <VisibilityOffOutlined fontSize="small" />}
@@ -78,29 +70,27 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
     name += ` - ${instrument.type}`;
   }
   return (
-    <TabPanel value={instrument.name} sx={{ p: 0 }}>
-      <OutlinedBox>
-        <Typography variant="h3" mb={2}>
-          {name}{" "}
-          <VisibilityToggle
-            initialVisibility={instrument.show}
-            onChange={(visibility) => {
-              instrument.show = visibility;
-              onChange(true);
-            }}
-          />
-          <VolumeToggle
-            initialVolume={instrument.volume}
-            onChange={(vol) => {
-              instrument.volume = vol;
-              onChange(false);
-            }}
-          />
-        </Typography>
-        <InstrumentChordsComponent chordLib={instrument.chordLib} />
-        <InstrumentPatternsComponent instrument={instrument} />
-      </OutlinedBox>
-    </TabPanel>
+    <OutlinedBox sx={{ mt: 0 }}>
+      <Typography variant="h3" mb={2}>
+        {name}{" "}
+        <VisibilityToggle
+          initialVisibility={instrument.show}
+          onChange={(visibility) => {
+            instrument.show = visibility;
+            onChange(true);
+          }}
+        />
+        <VolumeToggle
+          initialVolume={instrument.volume}
+          onChange={(vol) => {
+            instrument.volume = vol;
+            onChange(false);
+          }}
+        />
+      </Typography>
+      <InstrumentChordsComponent chordLib={instrument.chordLib} />
+      <InstrumentPatternsComponent instrument={instrument} />
+    </OutlinedBox>
   );
 }
 
@@ -120,38 +110,31 @@ export default function InstrumentsComponent({
 
   return (
     <>
-      <ButtonGroup>
+      <Tabs
+        value={activeInstrument?.name || ""}
+        variant="scrollable"
+        scrollButtons="auto"
+        allowScrollButtonsMobile
+      >
         {instrumentLib.instruments.map((instrument) => (
-          <IntrumentButton
+          <Tab
+            component={IntrumentButton}
             key={instrument.name}
+            value={instrument.name}
             instrument={instrument}
             isActive={activeInstrument === instrument}
             setInstrument={setInstrument}
           />
         ))}
-      </ButtonGroup>
-      <TabContext value={activeInstrument?.name || ""}>
-        <Tabs>
-          {instrumentLib.instruments.map((instrument) => (
-            <Tab
-              component={IntrumentButton}
-              key={instrument.name}
-              value={instrument.name}
-              instrument={instrument}
-              isActive={activeInstrument === instrument}
-              setInstrument={setInstrument}
-            />
-          ))}
-        </Tabs>
-        <InstrumentTab
-          key={activeInstrument?.name}
-          instrument={activeInstrument}
-          onChange={(propagate: boolean) => {
-            forceUpdate(update + 1);
-            if (propagate) onVisibilityChange();
-          }}
-        />
-      </TabContext>
+      </Tabs>
+      <InstrumentTab
+        key={activeInstrument?.name}
+        instrument={activeInstrument}
+        onChange={(propagate: boolean) => {
+          forceUpdate(update + 1);
+          if (propagate) onVisibilityChange();
+        }}
+      />
     </>
   );
 }
