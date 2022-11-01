@@ -31,6 +31,7 @@ export default function ChordComponent({
       mx="-16px"
       textAlign="center"
       width={`${32 + STRUM_SIZE_PX}px`}
+      height="20px" // Some fonts have different sizes for ♯ and ♭.
       sx={sx}
     >
       {base}
