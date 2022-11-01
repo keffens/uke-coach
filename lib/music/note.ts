@@ -19,6 +19,35 @@ export enum Note {
   Bflat = "Bb",
 }
 
+/**
+ * Helpre function for noteCompare. The returned values are only meaningful
+ * relative to each other.
+ */
+function noteToInt(note: Note): number {
+  const v = note.charCodeAt(0) * 3;
+  if (isFlat(note)) return v - 1;
+  if (isSharp(note)) return v + 1;
+  return v;
+}
+
+/**
+ * Returns a negative number if `lhs` is smaller than `rhs`, a positive number
+ * if `lhs` is larger than `rhs`, and 0 if they are identical. Note that `C#` is
+ * considered smaller than `Db`.
+ */
+export function noteCompare(
+  lhs: Note,
+  rhs: Note,
+  firstNote: Note = Note.C
+): number {
+  let lhsVal = noteToInt(lhs);
+  let rhsVal = noteToInt(rhs);
+  const firstVal = noteToInt(firstNote);
+  if (lhsVal < firstVal) lhsVal += 12 * 3;
+  if (rhsVal < firstVal) rhsVal += 12 * 3;
+  return lhsVal - rhsVal;
+}
+
 /** Identity between sharp and flat notes. */
 export const NOTE_IDENTITY = new Map<Note, Note>([
   [Note.Csharp, Note.Dflat],

@@ -148,7 +148,7 @@ function BarComponent({
     );
   }
   return (
-    <Box position="relative" ref={barRef}>
+    <Box position="relative" ref={barRef} height="100%">
       {highlightState && <Highlight />}
       <SpacedGridRow spacing={bar.beats}>
         {bar.chords.map((chord, i) => (

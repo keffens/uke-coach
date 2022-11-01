@@ -7,7 +7,12 @@ import React, {
 } from "react";
 import { FaGuitar } from "react-icons/fa";
 import { GiGuitar, GiGuitarBassHead, GiGuitarHead } from "react-icons/gi";
-import { Instrument, InstrumentLib, InstrumentType } from "../../lib/music";
+import {
+  Instrument,
+  InstrumentLib,
+  InstrumentType,
+  Note,
+} from "../../lib/music";
 import VisibilityToggle from "../elements/VisibilityToggle";
 import VolumeToggle from "../elements/VolumeToggle";
 import VolumeIcon from "../elements/VolumeIcon";
@@ -69,9 +74,10 @@ const IntrumentButton = forwardRef(
 interface InstrumentTabProps {
   instrument: Instrument | null;
   onChange: (propagate: boolean) => void;
+  songKey?: Note;
 }
 
-function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
+function InstrumentTab({ instrument, onChange, songKey }: InstrumentTabProps) {
   if (!instrument) return <></>;
   let name = instrument.name;
   if (instrument.name !== instrument.type) {
@@ -96,7 +102,10 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
           }}
         />
       </Typography>
-      <InstrumentChordsComponent chordLib={instrument.chordLib} />
+      <InstrumentChordsComponent
+        chordLib={instrument.chordLib}
+        songKey={songKey}
+      />
       <InstrumentPatternsComponent instrument={instrument} />
     </OutlinedBox>
   );
@@ -105,11 +114,13 @@ function InstrumentTab({ instrument, onChange }: InstrumentTabProps) {
 export interface InstrumentsComponentProps {
   instrumentLib: InstrumentLib;
   onVisibilityChange: () => void;
+  songKey?: Note;
 }
 
 export default function InstrumentsComponent({
   instrumentLib,
   onVisibilityChange,
+  songKey,
 }: InstrumentsComponentProps) {
   const [activeInstrument, setInstrument] = useState<Instrument | null>(
     instrumentLib.instruments[0] ?? null
@@ -143,6 +154,7 @@ export default function InstrumentsComponent({
           forceUpdate(update + 1);
           if (propagate) onVisibilityChange();
         }}
+        songKey={songKey}
       />
     </>
   );

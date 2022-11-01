@@ -22,7 +22,7 @@ const KEY_ALIAS = new Map([
 
 const TEXT_RE = String.raw`(?:[^\[\]\{\}\\#]|\\\[|\\\]|\\\{|\\\}|\\\\|\\#)+`;
 // This allows a lot more than valid chords.
-const CHORD_RE = String.raw`[\w_.,:;'"/*]*`;
+const CHORD_RE = String.raw`[\w#_.,:;'"/*]*`;
 const KEY_RE = String.raw`[A-Za-z_]+`;
 const FIRST_TOKEN = new RegExp(
   String.raw`^(?:(${TEXT_RE})|\[(${CHORD_RE})\]|` +

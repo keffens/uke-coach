@@ -109,7 +109,7 @@ export class SamplerInstrument extends InstrumentPlayer {
     const strumDuration = Tone.Time("1m").toSeconds() / pattern.strumsPerBar;
     const strumBeats = 1 / pattern.strumsPerBeat;
     let chordIdx = 0;
-    let chord = undefined;
+    let chord = bar.previousChord;
     let beats = 0;
     for (let i = 0; i < pattern.strumsPerBar; i++) {
       if (beats + Number.EPSILON >= bar.beats[chordIdx]) {

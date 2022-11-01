@@ -5,6 +5,8 @@ enum Qualifier {
   Minor = "m",
   Diminished = "dim",
   Augmented = "aug",
+  Sus2 = "sus2",
+  Sus4 = "sus4",
 }
 
 enum Extension {
@@ -31,6 +33,12 @@ function chordIntervals(
       return extension === Extension.Seven ? [0, 3, 6, 9] : [0, 3, 6];
     case Qualifier.Augmented:
       return extension === Extension.Seven ? [0, 4, 8, 10] : [0, 4, 8];
+    case Qualifier.Sus2:
+      semitones = [0, 2, 7];
+      break;
+    case Qualifier.Sus4:
+      semitones = [0, 5, 7];
+      break;
   }
   switch (extension) {
     case Extension.Six:
@@ -52,6 +60,7 @@ const CHORD_RE = new RegExp(
   `^(${Object.values(Note).join("|")})` +
     `(${Object.values(Qualifier).join("|")})` +
     `(${Object.values(Extension).join("|")})` +
+    `(${Object.values(Qualifier).join("|")})` +
     `${BEAT_LENGTHS_PATTERN}$`
 );
 
@@ -75,6 +84,15 @@ export class Chord {
     if (match == null) {
       throw new Error(`Failed to parse chord from ${chord}.`);
     }
+    if (match[4]) {
+      if (match[2]) {
+        throw new Error(
+          `Failed to parse chord from ${chord}: ` +
+            `Got 2 qualifiers ${match[2]} and ${match[4]}.`
+        );
+      }
+      match[2] = match[4];
+    }
     return new Chord(
       match[1] as Note,
       match[2] as Qualifier,
@@ -85,6 +103,12 @@ export class Chord {
   /** Returns the string representation of the chord. */
   toString(): string {
     if (!this.root) return "";
+    if (
+      this.qualifier === Qualifier.Sus2 ||
+      this.qualifier === Qualifier.Sus4
+    ) {
+      return this.root + this.extension + this.qualifier;
+    }
     return this.root + this.qualifier + this.extension;
   }
 
@@ -104,7 +128,7 @@ export class Chord {
 
   /** In HTML the chord is diplayed as `base`<sup>`sup`</sup> */
   get sup(): string {
-    let sup = this.qualifier === Qualifier.Diminished ? "o" : "";
+    let sup = "";
     switch (this.extension) {
       case Extension.Six:
       case Extension.Seven:
@@ -115,6 +139,15 @@ export class Chord {
         break;
       case Extension.AddNine:
         sup += "add9";
+        break;
+    }
+    switch (this.qualifier) {
+      case Qualifier.Diminished:
+        sup = "o" + sup;
+        break;
+      case Qualifier.Sus2:
+      case Qualifier.Sus4:
+        sup += this.qualifier;
         break;
     }
     return sup;

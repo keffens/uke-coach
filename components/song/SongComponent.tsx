@@ -19,6 +19,7 @@ export default function SongComponent({ song }: SongComponentProps) {
         onVisibilityChange={() => {
           forceUpdate(update + 1);
         }}
+        songKey={song.metadata.key?.note}
       />
       <PlayerComponent song={song} />
       {song.parts.map((part, i) => (

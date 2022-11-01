@@ -21,7 +21,7 @@ export default function ChordComponent({
     base = chord.base;
     sup = chord.sup;
   }
-  if (base == null || base === "") return null;
+  base = base || "\u200b"; // Add a zero width space to force line height.
   sup = sup ?? null;
 
   return (

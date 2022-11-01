@@ -1,11 +1,12 @@
 import React, { ReactNode, useState } from "react";
-import { IconButton, Tooltip } from "@mui/material";
+import { IconButton, SxProps, Theme, Tooltip } from "@mui/material";
 
 interface ToggleIconProps {
   children: ReactNode;
   initialState?: boolean;
   onClick: (state: boolean) => void;
   tooltip?: string;
+  sx?: SxProps<Theme>;
 }
 
 export default function ToggleIcon({
@@ -13,6 +14,7 @@ export default function ToggleIcon({
   initialState,
   onClick,
   tooltip,
+  sx,
 }: ToggleIconProps) {
   const [state, setState] = useState(!!initialState);
   return (
@@ -25,7 +27,7 @@ export default function ToggleIcon({
           setState(!state);
           onClick(!state);
         }}
-        sx={{ p: 0.5 }}
+        sx={{ ...sx, p: 0.5 }}
       >
         {children}
       </IconButton>

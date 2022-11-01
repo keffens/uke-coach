@@ -6,7 +6,21 @@ import {
   sumBeats,
   toFlat,
   toSharp,
+  noteCompare,
 } from "./note";
+
+test("compares notes", () => {
+  // First note is C by default
+  expect(noteCompare(Note.C, Note.B)).toBeLessThan(0);
+  expect(noteCompare(Note.C, Note.D)).toBeLessThan(0);
+  expect(noteCompare(Note.E, Note.D)).toBeGreaterThan(0);
+
+  expect(noteCompare(Note.Fsharp, Note.Gflat)).toBeLessThan(0);
+  expect(noteCompare(Note.Gflat, Note.Fsharp)).toBeGreaterThan(0);
+
+  expect(noteCompare(Note.C, Note.D, /*firstNote=*/ Note.D)).toBeGreaterThan(0);
+  expect(noteCompare(Note.C, Note.B, /*firstNote=*/ Note.D)).toBeGreaterThan(0);
+});
 
 test("converts sharp to flat notes", () => {
   expect(toFlat(Note.Csharp)).toEqual(Note.Dflat);
