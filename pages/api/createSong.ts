@@ -6,6 +6,7 @@ import {
   initFirebaseAdmin,
 } from "../../lib/server";
 import { parseSong } from "./updateSong";
+import { songLink } from "../../lib/router";
 
 export default async function createSong(
   req: NextApiRequest,
@@ -26,7 +27,8 @@ export default async function createSong(
     await songRef.update({ ...songData });
 
     if (deploy) {
-      await res.revalidate(`/s/${songData.id}`);
+      console.log(`revalidating ${songLink(songData.id)}`);
+      await res.revalidate(songLink(songData.id));
     }
     res.status(200).json({ songData });
   } catch (e) {

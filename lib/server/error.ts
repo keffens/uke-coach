@@ -37,6 +37,7 @@ export class NotImplemented extends HtmlError {
 }
 
 export function handleError(e: any, res: NextApiResponse) {
+  console.warn(e);
   if (e instanceof HtmlError) {
     res.status(e.status).json({ error: e.message });
   } else {
