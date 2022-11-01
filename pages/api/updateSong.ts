@@ -11,6 +11,7 @@ import {
 import { Song, tokenize } from "../../lib/music";
 import { SongData, toSongData } from "../../lib/firebase";
 import { isString } from "tone";
+import { songLink } from "../../lib/router";
 
 /** Validates the song and returns the Song object. */
 export function parseSong(chordPro: string): Song {
@@ -72,7 +73,8 @@ export default async function updateSong(
     await songRef(songId).update({ ...songData });
 
     if (deploy) {
-      await res.revalidate(`/s/${songData.id}`);
+      console.log(`revalidating song ${songLink(songData.id)}`);
+      res.revalidate(songLink(songData.id));
     }
     res.status(200).json({ songData });
   } catch (e) {

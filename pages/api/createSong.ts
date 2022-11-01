@@ -27,8 +27,8 @@ export default async function createSong(
     await songRef.update({ ...songData });
 
     if (deploy) {
-      console.log(`revalidating ${songLink(songData.id)}`);
-      await res.revalidate(songLink(songData.id));
+      console.log(`creating song ${songLink(songData.id)}`);
+      res.revalidate(songLink(songData.id));
     }
     res.status(200).json({ songData });
   } catch (e) {

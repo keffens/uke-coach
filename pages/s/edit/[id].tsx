@@ -17,14 +17,30 @@ import { NEW_SONG_ID, songLink, songRawEditorLink } from "../../../lib/router";
 import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
+const SAVED_AND_DEPLOYED_MSG =
+  "Song saved and deployed! " +
+  "It can take up to 1 minute until the song pate is updated.";
 const NEW_SONG: SongData = {
   chordPro: "",
-  chordProDraft:
-    "{title: <NEW SONG>}\n" +
-    "{artist: <ARTIST (optional)>}\n\n" +
-    "{key: C}\n" +
-    "{tempo: 100}\n" +
-    "{time: 4/4}\n",
+  chordProDraft: String.raw`{title: <NEW SONG>}
+{artist: <ARTIST (optional)>}
+
+{key: C}
+{tempo: 100}
+{time: 4/4}
+
+{pattern: base pattern |duX-uuX-|}"
+
+[C][F..][G..][C][F..][G..]
+  
+{start_of_verse: Verse 1}
+Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni... [F..][G..]
+{end_of_verse}
+
+{start_of_chorus}
+Porque en el [F]mar quiero pa[G]sar la vida en[C]tera sin record[Am]ar, que existe un ...
+{end_of_chorus}
+`,
   deployed: false,
   id: NEW_SONG_ID,
   ownerId: "",
@@ -76,7 +92,7 @@ function SongEditor({ song, setSong }: SongEditorProps) {
     if (songData) {
       setSong(songData);
       setSongCrd(songData.chordProDraft || songData.chordPro);
-      setSuccess(deploy ? "Song saved and deployed!" : "Draft saved!");
+      setSuccess(deploy ? SAVED_AND_DEPLOYED_MSG : "Draft saved!");
     } else {
       setError(`Saving failed: ${errorMessage}`);
     }
