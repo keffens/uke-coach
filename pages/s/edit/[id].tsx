@@ -32,7 +32,7 @@ const NEW_SONG: SongData = {
 {pattern: base pattern |duX-uuX-|}"
 
 [C][F..][G..][C][F..][G..]
-  
+
 {start_of_verse: Verse 1}
 Na[C]cí un 29 de feb[F..]rero en San [G..]Juan de Wawa[C]ni... [F..][G..]
 {end_of_verse}
