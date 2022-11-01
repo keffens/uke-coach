@@ -1,5 +1,5 @@
+import { Link } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import Link from "next/link";
 import { SongData, sortSongs } from "../../lib/firebase";
 import { songLink } from "../../lib/router";
 
