@@ -31,7 +31,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   //   .where("deployed", "==", true)
   //   .get();
   return {
-    paths: [{ params: { id: "a" } }, { params: { id: "b" } }],
-    fallback: "blocking", // Allow generation on demand for new pages.
+    paths: [],
+    fallback: true,
   };
 };
