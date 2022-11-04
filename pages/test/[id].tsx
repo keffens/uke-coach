@@ -1,7 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from "next";
 import { getFirestore } from "firebase-admin/firestore";
 import Layout from "../../components/Layout";
-import SongComponent from "../../components/song/SongComponent";
 import { Song, tokenize } from "../../lib/music";
 import { initFirebaseAdmin } from "../../lib/server";
 import { assert } from "../../lib/util";
@@ -16,16 +15,20 @@ export default function SongPage({ chordPro }: SongData) {
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  console.log(Date(), "getStaticProps");
   assert(typeof context.params?.id === "string", "context.params.id not valid");
   initFirebaseAdmin();
+  console.log(Date(), "firebase initialized");
   const data = (
     await getFirestore().collection("songs").doc(context.params.id).get()
   ).data();
+  console.log(Date(), "got data");
   if (!data) return { notFound: true };
   return { props: toSongData(data) };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  console.log(Date(), "getStaticPaths");
   initFirebaseAdmin();
   const songs = await getFirestore()
     .collection("songs")
