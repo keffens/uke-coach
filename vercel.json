@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/createSong.ts": {
+      "memory": 4096,
+      "maxDuration": 60
+    },
+    "api/updateSong.ts": {
+      "memory": 4096,
+      "maxDuration": 60
+    },
+    "pages/s/[id].tsx": {
+      "memory": 4096,
+      "maxDuration": 60
+    }
+  }
+}
