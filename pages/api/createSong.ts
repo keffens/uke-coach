@@ -25,11 +25,6 @@ export default async function createSong(
       songData.chordPro = "";
     }
     await songRef.update({ ...songData });
-
-    if (deploy) {
-      console.log(`creating song ${songLink(songData.id)}`);
-      await res.revalidate(songLink(songData.id));
-    }
     res.status(200).json({ songData });
   } catch (e) {
     handleError(e, res);

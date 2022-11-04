@@ -71,11 +71,6 @@ export default async function updateSong(
       songData.chordProDraft = chordPro;
     }
     await songRef(songId).update({ ...songData });
-
-    if (deploy) {
-      console.log(`revalidating song ${songLink(songData.id)}`);
-      await res.revalidate(songLink(songData.id));
-    }
     res.status(200).json({ songData });
   } catch (e) {
     handleError(e, res);

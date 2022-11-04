@@ -1,14 +1,53 @@
-import { GetStaticProps, GetStaticPaths } from "next";
-import { getFirestore } from "firebase-admin/firestore";
+import { useRouter } from "next/router";
 import Layout from "../../components/Layout";
-import SongComponent from "../../components/song/SongComponent";
 import { Song, tokenize } from "../../lib/music";
-import { initFirebaseAdmin } from "../../lib/server";
+import { initFirebase, toSongData } from "../../lib/firebase";
+import { useEffect, useState } from "react";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { Alert, Box, CircularProgress } from "@mui/material";
+import SongComponent from "../../components/song/SongComponent";
 import { assert } from "../../lib/util";
-import { SongData, toSongData } from "../../lib/firebase";
 
-export default function SongPage({ chordPro }: SongData) {
-  const song = Song.fromTokens(tokenize(chordPro));
+export default function SongPage() {
+  const router = useRouter();
+  const songId = router.query.id;
+  const [error, setError] = useState<string>();
+  const [song, setSong] = useState<Song>();
+
+  useEffect(() => {
+    if (!songId || typeof songId !== "string") return;
+    initFirebase();
+    getDoc(doc(getFirestore(), "songs", songId))
+      .then((s) => {
+        assert(s.data(), "s.data() does not exist");
+        const songData = toSongData(s.data());
+        // TODO: An undeployed song should not be retrievable.
+        assert(songData.deployed, "The song is not deployed");
+        setSong(Song.fromTokens(tokenize(songData.chordPro)));
+        setError("");
+      })
+      .catch((e) => {
+        console.log(e);
+        setError(`The song with id "${songId}" was not found.`);
+      });
+  }, [songId]);
+
+  if (error) {
+    return (
+      <Layout>
+        <Alert severity="error">{error}</Alert>
+      </Layout>
+    );
+  }
+  if (!song) {
+    return (
+      <Layout>
+        <Box textAlign="center">
+          <CircularProgress />
+        </Box>
+      </Layout>
+    );
+  }
   const title = song.metadata.artist
     ? `${song.metadata.title} by ${song.metadata.artist}`
     : song.metadata.title;
@@ -18,25 +57,3 @@ export default function SongPage({ chordPro }: SongData) {
     </Layout>
   );
 }
-
-export const getStaticProps: GetStaticProps = async (context) => {
-  assert(typeof context.params?.id === "string", "context.params.id not valid");
-  initFirebaseAdmin();
-  const data = (
-    await getFirestore().collection("songs").doc(context.params.id).get()
-  ).data();
-  if (!data) return { notFound: true };
-  return { props: toSongData(data) };
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  initFirebaseAdmin();
-  const songs = await getFirestore()
-    .collection("songs")
-    .where("deployed", "==", true)
-    .get();
-  return {
-    paths: songs.docs.map((song) => ({ params: { id: song.id } })),
-    fallback: "blocking", // Allow generation on demand for new pages.
-  };
-};
