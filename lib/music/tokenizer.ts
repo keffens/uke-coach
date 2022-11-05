@@ -311,7 +311,7 @@ export function tokenize(content: string): Token {
       );
     }
   }
-  if (back(activeToken.children).type === TokenType.Paragraph) {
+  if (back(activeToken.children)?.type === TokenType.Paragraph) {
     activeToken.children.pop();
   }
   if (stack.length !== 1) {

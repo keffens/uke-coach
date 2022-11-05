@@ -3,7 +3,7 @@ import { InstrumentLib } from "./instrument_lib";
 import { Pattern } from "./pattern";
 import { SongMetadata } from "./metadata";
 import { SongPart } from "./song_part";
-import { Token } from "./token";
+import { Token, TokenType } from "./token";
 import { delUndefined, setUnion } from "../util";
 import { SongData } from "../firebase";
 
@@ -26,7 +26,14 @@ export class Song {
     return new Song(metadata, parts, instrumentLib);
   }
 
-  // TODO: Support conversion to string (or tokens and then string).
+  /** Converts the song back to tokens for storage. */
+  toTokens(): Token {
+    const env = new Token(TokenType.StartEnv, "song");
+    env.children.push(...this.metadata.toTokens());
+    env.children.push(new Token(TokenType.Paragraph));
+    // TODO: tokenize other parts
+    return env;
+  }
 
   /** Returns a SongData object with added fields from song metadata. */
   toSongData(
@@ -35,6 +42,7 @@ export class Song {
     chordPro: string,
     deployed = false
   ): SongData {
+    // TODO: supplying ChordPro is optional once `toTokens` is working.
     return delUndefined({
       artist: this.metadata.artist,
       chordPro,

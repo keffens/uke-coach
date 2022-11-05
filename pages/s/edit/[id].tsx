@@ -17,9 +17,7 @@ import { NEW_SONG_ID, songLink, songRawEditorLink } from "../../../lib/router";
 import { Alert, Button, Stack, TextField, Typography } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
-const SAVED_AND_DEPLOYED_MSG =
-  "Song saved and deployed! " +
-  "It can take up to 1 minute until the song pate is updated.";
+const SAVED_AND_DEPLOYED_MSG = "Song saved and deployed! ";
 const NEW_SONG: SongData = {
   chordPro: "",
   chordProDraft: String.raw`{title: <NEW SONG>}
