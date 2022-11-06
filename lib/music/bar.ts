@@ -5,8 +5,9 @@ import { assert } from "../util";
 import { TimeSignature } from "./signature";
 
 export class Bar {
-  private highlightInternal = false;
   private highlightListener?: (highlight: boolean) => void;
+
+  readonly time: TimeSignature;
 
   constructor(
     public chords: (Chord | null)[],
@@ -17,6 +18,7 @@ export class Bar {
     public anacrusis: string = "",
     public previousChord: Chord | null = null
   ) {
+    assert(this.patterns.length >= 1, "The patterns for the bar are empty");
     assert(
       this.patterns.length === this.patternIdxs.length,
       `Number of patterns ${patterns.length} must match number indexes` +
@@ -25,11 +27,12 @@ export class Bar {
     if (this.lyrics.every((l) => !l)) {
       this.lyrics = [];
     }
+    this.time = patterns[0].time;
   }
 
   set highlight(highlight: boolean) {
-    if (this.highlightInternal !== highlight && this.highlightListener) {
-      this.highlightInternal = highlight;
+    if (this.highlightListener) {
+      console.log("setting highlight", highlight);
       this.highlightListener(highlight);
     }
   }

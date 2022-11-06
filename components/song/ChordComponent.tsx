@@ -6,6 +6,7 @@ export interface ChordComponentProps {
   chord?: Chord | null;
   base?: string | number | null;
   sup?: string | null;
+  highlight?: boolean;
   sx?: SxProps<Theme>;
 }
 
@@ -13,6 +14,7 @@ export default function ChordComponent({
   chord,
   base,
   sup,
+  highlight,
   sx,
 }: ChordComponentProps) {
   const theme = useTheme();
@@ -26,7 +28,11 @@ export default function ChordComponent({
 
   return (
     <Box
-      color={theme.palette.secondary.main}
+      color={
+        highlight
+          ? theme.palette.secondary.contrastText
+          : theme.palette.secondary.main
+      }
       fontWeight="bold"
       mx="-16px"
       textAlign="center"
@@ -34,12 +40,20 @@ export default function ChordComponent({
       height="20px" // Some fonts have different sizes for ♯ and ♭.
       sx={sx}
     >
-      {base}
-      {sup && (
-        <Box component="span" fontSize="65%" sx={{ verticalAlign: "top" }}>
-          {sup}
-        </Box>
-      )}
+      <Box
+        display="inline-block"
+        bgcolor={highlight ? theme.palette.secondary.main : undefined}
+        borderRadius="10px"
+        minWidth="12px"
+        px="4px"
+      >
+        {base}
+        {sup && (
+          <Box component="span" fontSize="65%" sx={{ verticalAlign: "top" }}>
+            {sup}
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 }

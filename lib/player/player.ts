@@ -87,6 +87,17 @@ class PlayerImpl {
     return this.countInDurationSec * 1000;
   }
 
+  /** Returns the duration of one bar in milliseconds. */
+  get barDurationMs(): number {
+    return Tone.Time("1m").toMilliseconds();
+  }
+
+  /** Returns the duration of one beat in milliseconds. */
+  get beatDurationMs(): number {
+    assert(this.song, "The song is not defined.");
+    return this.barDurationMs / this.song.metadata.time.beats;
+  }
+
   /** Whether to enable the metronome. */
   set metronomeEnabled(enable: boolean) {
     this.metronomeIsOn = enable;
@@ -135,6 +146,10 @@ class PlayerImpl {
 
   get bpm(): number {
     return Tone.Transport.bpm.value;
+  }
+
+  get isPlaying(): boolean {
+    return this.playing;
   }
 
   /**
