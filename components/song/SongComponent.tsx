@@ -4,6 +4,8 @@ import PlayerComponent from "./PlayerComponent";
 import SongMetadataComponent from "./SongMetadataComponent";
 import SongPartComponent from "./SongPartComponent";
 import { Song } from "../../lib/music";
+import { BarsPerLine } from "../elements/BarsPerLineSelect";
+import { Box } from "@mui/material";
 
 export interface SongComponentProps {
   song: Song;
@@ -11,6 +13,8 @@ export interface SongComponentProps {
 
 export default function SongComponent({ song }: SongComponentProps) {
   const [update, forceUpdate] = useState(0);
+  const [maxBarsPerLine, setMaxBarsPerLine] = useState<BarsPerLine>(8);
+  const maxWidth = `${maxBarsPerLine * song.maxStrumsPerBar * 32}px`;
   return (
     <>
       <SongMetadataComponent metadata={song.metadata} />
@@ -21,14 +25,17 @@ export default function SongComponent({ song }: SongComponentProps) {
         }}
         songKey={song.metadata.key?.note}
       />
-      <PlayerComponent song={song} />
-      {song.parts.map((part, i) => (
-        <SongPartComponent
-          key={i}
-          part={part}
-          instrumentLib={song.instrumentLib}
-        />
-      ))}
+      <PlayerComponent song={song} onChangeBarsPerLine={setMaxBarsPerLine} />
+      <Box maxWidth={maxWidth} margin="auto">
+        {song.parts.map((part, i) => (
+          <SongPartComponent
+            key={i}
+            part={part}
+            instrumentLib={song.instrumentLib}
+            maxBarsPerLine={maxBarsPerLine}
+          />
+        ))}
+      </Box>
     </>
   );
 }

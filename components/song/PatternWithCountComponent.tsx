@@ -17,7 +17,7 @@ export default function PatternWithCountComponent({
   return (
     <>
       <Typography variant="h5">{pattern.name}</Typography>
-      <Stack direction="row">
+      <Stack direction="row" pl={2}>
         {range(pattern.bars).map((idx) => (
           <Stack key={idx}>
             <Grid container>

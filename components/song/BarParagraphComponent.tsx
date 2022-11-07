@@ -7,59 +7,24 @@ import { Bar, BarParagraph, InstrumentLib, sumBeats } from "../../lib/music";
 import { range } from "../../lib/util";
 import { Player } from "../../lib/player";
 import { Box, Grid, useTheme } from "@mui/material";
+import { BarsPerLine } from "../elements/BarsPerLineSelect";
 
-// TODO: Fiddle a bit with these values.
-const MAX_STRUMS_PER_ROW = {
-  xs: 16,
-  sm: 24,
-  md: 32,
-  lg: 48,
-  xl: 64,
-};
-
-// For each key, percentages are chosen such that key+1 columns won't fit.
-const FLEX_BASE_MAP = {
-  0: "100%", // The minimum is 1 column.
-  2: "35%",
-  3: "26%",
-  4: "21%",
-  6: "14.5%",
-  8: "11.5%",
-  12: "8%",
-  16: "6%",
-};
-
-const MIN_SPACER_WIDTH_MAP = {
-  0: "100%", // The minimum is 1 column.
-  2: "50%",
-  3: "33.3%",
-  4: "25%",
-  6: "16.6%",
-  8: "12.5%",
-  12: "8.3%",
-  16: "6.25%",
-};
-
-/**
- * Returns a mapping from MUI break points to sizes. Intended for use with
- * FLEX_BASE and MIN_SPACER_WIDTH.
- */
-function makeSizeMapping<T>(
-  maxStrumsPerBar: number,
-  map: { [key: number]: string }
-): { [key: string]: string } {
-  const result: { [key: string]: string } = {};
-  for (const [bp, spr] of Object.entries(MAX_STRUMS_PER_ROW)) {
-    const cols = spr / maxStrumsPerBar;
-    for (const c of [16, 12, 8, 6, 4, 3, 2, 0]) {
-      if (c <= cols) {
-        result[bp] = map[c];
-        break;
-      }
-    }
-  }
-  return result;
+// `flexBasis` is chosen such that n+1 columns won't fit.
+interface BarSize {
+  flexBasis: string;
+  minSpacerWidth: string;
 }
+
+export const BAR_SIZES: { [key: BarsPerLine]: BarSize } = {
+  1: { flexBasis: "100%", minSpacerWidth: "100%" },
+  2: { flexBasis: "35%", minSpacerWidth: "50%" },
+  3: { flexBasis: "26%", minSpacerWidth: "33.3%" },
+  4: { flexBasis: "21%", minSpacerWidth: "25%" },
+  6: { flexBasis: "14.5%", minSpacerWidth: "16.6%" },
+  8: { flexBasis: "11.5%", minSpacerWidth: "12.5%" },
+  12: { flexBasis: "8%", minSpacerWidth: "8.3%" },
+  16: { flexBasis: "6%", minSpacerWidth: "6.25%" },
+};
 
 interface ChordRowProps {
   bar: Bar;
@@ -229,21 +194,26 @@ function BarComponent({
 export interface BarParagraphComponentProps {
   paragraph: BarParagraph;
   instrumentLib: InstrumentLib;
+  maxBarsPerLine: BarsPerLine;
 }
 
 export default function BarParagraphComponent({
   paragraph,
   instrumentLib,
+  maxBarsPerLine,
 }: BarParagraphComponentProps) {
   const useTab = range(instrumentLib.length).map((i) => paragraph.useTab(i));
-  const maxStrumsPerPar = paragraph.maxStrumsPerBar;
-  const flexBase = makeSizeMapping(maxStrumsPerPar, FLEX_BASE_MAP);
-  const minSpacerWidth = makeSizeMapping(maxStrumsPerPar, MIN_SPACER_WIDTH_MAP);
+  const barSize = BAR_SIZES[maxBarsPerLine];
 
   return (
     <Grid container>
       {paragraph.bars.map((bar, i) => (
-        <Box key={i} minWidth="max-content" flexGrow={1} flexBasis={flexBase}>
+        <Box
+          key={i}
+          minWidth="max-content"
+          flexGrow={1}
+          flexBasis={barSize.flexBasis}
+        >
           <BarComponent
             bar={bar}
             isFirst={i === 0}
@@ -258,8 +228,8 @@ export default function BarParagraphComponent({
         <Box
           key={i}
           flexGrow={1}
-          flexBasis={flexBase}
-          minWidth={minSpacerWidth}
+          flexBasis={barSize.flexBasis}
+          minWidth={barSize.minSpacerWidth}
           height={0}
         ></Box>
       ))}

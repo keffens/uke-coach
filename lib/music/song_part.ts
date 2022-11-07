@@ -147,6 +147,11 @@ export class SongPart {
     return this.barDuration / 1000;
   }
 
+  /** Returns the maximum number that any pattern has in this part. */
+  get maxStrumsPerBar(): number {
+    return Math.max(...this.paragraphs.map((p) => p.maxStrumsPerBar));
+  }
+
   /** Highlights the specified bar. Any negative value clears all highlights. */
   highlightBar(idx: number): void {
     this.bars.forEach((bar, i) => {

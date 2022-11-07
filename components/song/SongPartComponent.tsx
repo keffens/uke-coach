@@ -2,15 +2,18 @@ import React from "react";
 import BarParagraphComponent from "./BarParagraphComponent";
 import { InstrumentLib, SongPart } from "../../lib/music";
 import { Box, Typography } from "@mui/material";
+import { BarsPerLine } from "../elements/BarsPerLineSelect";
 
 export interface SongPartComponentProps {
   part: SongPart;
   instrumentLib: InstrumentLib;
+  maxBarsPerLine: BarsPerLine;
 }
 
 export default function SongPartComponent({
   part,
   instrumentLib,
+  maxBarsPerLine,
 }: SongPartComponentProps) {
   return (
     <>
@@ -26,6 +29,7 @@ export default function SongPartComponent({
           key={i}
           paragraph={paragraph}
           instrumentLib={instrumentLib}
+          maxBarsPerLine={maxBarsPerLine}
         />
       ))}
     </>

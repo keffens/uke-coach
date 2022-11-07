@@ -64,6 +64,11 @@ export class Song {
     return this.parts.map((p) => p.barsLength).reduce((a, b) => a + b, 0);
   }
 
+  /** Returns the maximum number that any pattern has in this song. */
+  get maxStrumsPerBar(): number {
+    return Math.max(...this.parts.map((p) => p.maxStrumsPerBar));
+  }
+
   /**
    * Returns the patterns used in this part for the given instrument.
    */

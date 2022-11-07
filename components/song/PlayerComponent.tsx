@@ -18,12 +18,17 @@ import { IconButton } from "@mui/material";
 import { NAVBAR_STICKY_HEIGHT } from "../Navbar";
 import { calcRootMx } from "../Layout";
 import OutlinedBox from "../elements/OutlinedBox";
+import BarsPerLineSelect, { BarsPerLine } from "../elements/BarsPerLineSelect";
 
 interface PlayerComponentProps {
   song: Song;
+  onChangeBarsPerLine: (v: BarsPerLine) => void;
 }
 
-export default function PlayerComponent({ song }: PlayerComponentProps) {
+export default function PlayerComponent({
+  song,
+  onChangeBarsPerLine,
+}: PlayerComponentProps) {
   const [playing, setPlaying] = useState(false);
   const screenLock = useWakeLock({
     onError: () => console.error("Screen Wake Lock: An error happened!"),
@@ -141,6 +146,10 @@ export default function PlayerComponent({ song }: PlayerComponentProps) {
           <Speed fontSize="inherit" />
         </ToggleIcon>
       </span>
+      <BarsPerLineSelect
+        maxStrumsPerBar={song.maxStrumsPerBar}
+        onChange={onChangeBarsPerLine}
+      />
     </OutlinedBox>
   );
 }
