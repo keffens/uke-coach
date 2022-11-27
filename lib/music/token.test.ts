@@ -4,8 +4,8 @@ test("converts tokens to strings", () => {
   expect(new Token(TokenType.Text, "key", "value").toString()).toEqual("value");
   expect(new Token(TokenType.Chord, "key", "C7").toString()).toEqual("[C7]");
   expect(
-    new Token(TokenType.ChordDefinition, "Cadd9", "frets 0 2 0 3").toString()
-  ).toEqual("{chord: Cadd9 frets 0 2 0 3}\n");
+    new Token(TokenType.ChordDefinition, "Cadd9", "0 2 0 3").toString()
+  ).toEqual("{chord: Cadd9 0 2 0 3}\n");
   expect(new Token(TokenType.Metadata, "artist", "Esteman").toString()).toEqual(
     "{artist: Esteman}\n"
   );
@@ -63,11 +63,11 @@ test("converts tab environment to string", () => {
 test("converts instrument environment to string", () => {
   expect(
     new Token(TokenType.InstrumentEnv, "instrument", "uke", [
-      new Token(TokenType.ChordDefinition, "Cadd9", "frets 0 2 0 3"),
+      new Token(TokenType.ChordDefinition, "Cadd9", "0 2 0 3"),
     ]).toString()
   ).toEqual(
     "{start_of_instrument: uke}\n" +
-      "{chord: Cadd9 frets 0 2 0 3}\n" +
+      "{chord: Cadd9 0 2 0 3}\n" +
       "{end_of_instrument}\n"
   );
 });

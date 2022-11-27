@@ -140,7 +140,7 @@ export class BarParagraphBuilder {
     if (value.match(/\w$/)) {
       value += "-";
     }
-    value = value.trimRight();
+    value = value.trimEnd();
 
     if (!this.chords.length) {
       // Handle anacrusis.

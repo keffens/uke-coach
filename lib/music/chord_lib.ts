@@ -1,4 +1,4 @@
-import { assert } from "../util";
+import { assert, intArrayToString, parseIntArray } from "../util";
 import { Chord } from "./chord";
 import {
   BASS_GUITAR_CHORD_FRETS,
@@ -204,9 +204,7 @@ export class ChordLib {
         token.type === TokenType.ChordDefinition && chord && token.value,
         "Failed to parse chord from token"
       );
-      const frets = token.value
-        .split(/\s+/)
-        .map((f) => (f === "x" ? -1 : parseInt(f)));
+      const frets = parseIntArray(token.value, { x: -1 });
       if (assertCompatible) {
         this.defineChord(chord, frets);
         return true;
@@ -216,6 +214,16 @@ export class ChordLib {
       if (e instanceof Error) throw token.error(e.message);
       throw e;
     }
+  }
+
+  /** Tokenizes all custom chords. */
+  tokenize(): Token[] {
+    const tokens = [];
+    for (const [name, frets] of this.costumChords) {
+      const value = intArrayToString(frets, { "-1": "x" });
+      tokens.push(new Token(TokenType.ChordDefinition, name, value));
+    }
+    return tokens;
   }
 
   private toPitchedNotes(frets: number[]): Array<PitchedNote | null> {

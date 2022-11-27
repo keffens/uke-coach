@@ -38,6 +38,19 @@ export function getTuning(instrument: InstrumentType): PitchedNote[] {
   return tuning;
 }
 
+/** Returns true if the tuning is the default for this instrument. */
+export function isDefaultTuning(
+  instrument: InstrumentType,
+  tuning: PitchedNote[]
+): boolean {
+  const defaultTuning = getTuning(instrument);
+  if (defaultTuning.length !== tuning.length) return false;
+  for (let i = 0; i < tuning.length; i++) {
+    if (defaultTuning[i].compare(tuning[i]) !== 0) return false;
+  }
+  return true;
+}
+
 /**
  * Returns whether the tuning is equal to the default tuning except for octave
  * switches.

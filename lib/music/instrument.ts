@@ -1,6 +1,11 @@
 import { assert, escapeRegExp } from "../util";
 import { ChordLib } from "./chord_lib";
-import { getDefaultSound, InstrumentType, SoundType } from "./instrument_type";
+import {
+  getDefaultSound,
+  InstrumentType,
+  isDefaultTuning,
+  SoundType,
+} from "./instrument_type";
 import { PitchedNote, PITCHED_NOTE_PATTERN } from "./note";
 import { Pattern } from "./pattern";
 import { StrumType } from "./strum";
@@ -118,6 +123,16 @@ export class Instrument {
       if (e instanceof Error) throw token.error(e.message);
       throw e;
     }
+  }
+
+  /** Returns the corresponding instrument token. */
+  tokenize(): Token {
+    const parts = [this.name, this.type];
+    if (!isDefaultTuning(this.type, this.tuning)) {
+      parts.push("tuning", ...this.tuning.map((n) => n.toString()));
+    }
+    if (this.sound != getDefaultSound(this.type)) parts.push(this.sound);
+    return new Token(TokenType.Instrument, "", parts.join(" "));
   }
 
   /**

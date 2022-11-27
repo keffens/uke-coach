@@ -143,3 +143,49 @@ test("parses an instrument", () => {
   expect(lib.getDefault().name).toEqual("rythm");
   expect(lib.activePatterns).toEqual([Pattern.makeEmpty(time)]);
 });
+
+test("parses instrument and converts back to string", () => {
+  const tokens = [
+    new Token(
+      TokenType.Instrument,
+      undefined,
+      "uke ukulele tuning G5 C5 E5 A5 electric"
+    ),
+    new Token(TokenType.ChordDefinition, "C", "5 4 3 3"),
+    new Token(TokenType.Pattern, "plugged", "|1234----|"),
+    new Token(TokenType.Pattern, "*hidden", "|12341234|"),
+    new Token(TokenType.Paragraph),
+  ];
+
+  const lib = new InstrumentLib();
+  const time = TimeSignature.DEFAULT;
+  for (const token of tokens) {
+    lib.parseToken(token, time);
+  }
+
+  expect(lib.tokenize()).toEqual(tokens);
+});
+
+test("parses 2 instruments and converts back to string as", () => {
+  const tokens = [
+    new Token(TokenType.Instrument, undefined, "uke ukulele"),
+    new Token(TokenType.InstrumentEnv, "instrument", "uke", [
+      new Token(TokenType.Pattern, "plugged", "|1234|"),
+    ]),
+    new Token(TokenType.Paragraph),
+    new Token(TokenType.Instrument, undefined, "guitar guitar"),
+    new Token(TokenType.InstrumentEnv, "instrument", "guitar", [
+      new Token(TokenType.ChordDefinition, "E", "0 2 2 1 0 0"),
+      new Token(TokenType.Pattern, "plugged", "|1234|"),
+    ]),
+    new Token(TokenType.Paragraph),
+  ];
+
+  const lib = new InstrumentLib();
+  const time = TimeSignature.DEFAULT;
+  for (const token of tokens) {
+    lib.parseToken(token, time);
+  }
+
+  expect(lib.tokenize()).toEqual(tokens);
+});

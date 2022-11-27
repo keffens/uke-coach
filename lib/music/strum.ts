@@ -1,4 +1,6 @@
-import { assert, range } from "../util";
+import { assert, intArrayToString, parseIntArray } from "../util";
+
+const TAB_RE = new RegExp(String.raw`^TAB\[([-0-9 ]+)\]`);
 
 export enum StrumType {
   Pause,
@@ -84,6 +86,13 @@ export class Strum {
    * position after the last character that was read.
    */
   static parse(pattern: string, pos: number): [Strum, number] {
+    const match = pattern.substring(pos).match(TAB_RE);
+    if (match) {
+      return [
+        Strum.tab(parseIntArray(match[1], { "-": -1 })),
+        pos + match[0].length,
+      ];
+    }
     switch (pattern[pos].toLowerCase()) {
       case "-":
       case ".":
@@ -154,8 +163,7 @@ export class Strum {
           : `(${this.strings.join("")})`;
       case StrumType.Tab:
         if (string == null) {
-          const frets = range(this.frets.length).map((i) => this.toString(i));
-          return `TAB[${frets.join(" ")}]`;
+          return `TAB[${intArrayToString(this.frets, { "-1": "-" })}]`;
         }
         const fret = this.frets[string];
         if (fret < 0) return "-";

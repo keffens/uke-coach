@@ -130,9 +130,9 @@ test("converts between tokens and patterns", () => {
   const tokenC = new Token(TokenType.Pattern, undefined, "|d---|");
   const patternC = Pattern.fromToken(tokenC, FOUR_FOUR);
 
-  expect(patternA.toToken()).toEqual(tokenA);
-  expect(patternB.toToken()).toEqual(tokenB);
-  expect(patternC.toToken()).toEqual(tokenC);
+  expect(patternA.tokenize()).toEqual(tokenA);
+  expect(patternB.tokenize()).toEqual(tokenB);
+  expect(patternC.tokenize()).toEqual(tokenC);
 });
 
 test("prases tab", () => {

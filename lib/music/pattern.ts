@@ -268,7 +268,8 @@ export class Pattern {
   }
 
   /** Returns the pattern as token. */
-  toToken(): Token {
+  tokenize(): Token {
+    // TODO: support tabs in the tab env
     return new Token(TokenType.Pattern, this.name, this.toString());
   }
 }

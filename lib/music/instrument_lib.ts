@@ -83,9 +83,40 @@ export class InstrumentLib {
         inst.setPattern(Pattern.makeEmpty(time));
         this.addInstrument(inst);
         break;
+      case TokenType.Paragraph:
+        break;
       default:
         throw token.error("Expected pattern, tab or chord definition");
     }
+  }
+
+  /**
+   * Tokenizes the intstrument library including all patterns and custom chords.
+   */
+  tokenize(): Token[] {
+    const tokens = [];
+    for (const instrument of this.instruments) {
+      tokens.push(instrument.tokenize());
+
+      let env = tokens;
+      if (this.instruments.length >= 2) {
+        const envToken = new Token(
+          TokenType.InstrumentEnv,
+          "instrument",
+          instrument.name
+        );
+        tokens.push(envToken);
+        env = envToken.children;
+      }
+
+      env.push(...instrument.chordLib.tokenize());
+      for (const pattern of instrument.getPatterns()) {
+        env.push(pattern.tokenize());
+      }
+
+      tokens.push(new Token(TokenType.Paragraph));
+    }
+    return tokens;
   }
 
   private parseInstrumentEnv(env: Token, time: TimeSignature): void {

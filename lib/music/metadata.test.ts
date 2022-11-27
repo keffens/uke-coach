@@ -14,7 +14,7 @@ test("parses minimal metadata and converts back to string", () => {
     TokenType.StartEnv,
     "song",
     /*value=*/ undefined,
-    metadata.toTokens()
+    metadata.tokenize()
   );
   expect(env.toString()).toEqual(metadataStr);
 });
@@ -41,7 +41,7 @@ test("parses full metadata and converts back to string", () => {
     TokenType.StartEnv,
     "song",
     /*value=*/ undefined,
-    metadata.toTokens()
+    metadata.tokenize()
   );
   expect(env.toString()).toEqual(metadataStr);
 });
@@ -57,7 +57,7 @@ test("parses part metadatas and converts back to string", () => {
   const metadata = SongMetadata.fromTokens(tokenize(metadataStr));
   const partFromParent = PartMetadata.fromTokens(tokenize(""), metadata);
 
-  expect(partFromParent.toTokens(metadata)).toEqual([]);
+  expect(partFromParent.tokenize(metadata)).toEqual([]);
 
   const partMetadataStr = ["{key: Bm}", "{time: 3/4}", "{tempo: 120}", ""].join(
     "\n"
@@ -71,7 +71,7 @@ test("parses part metadatas and converts back to string", () => {
     TokenType.StartEnv,
     "song",
     /*value=*/ undefined,
-    partFromTokens.toTokens(metadata)
+    partFromTokens.tokenize(metadata)
   );
   expect(env.toString()).toEqual(partMetadataStr);
 });

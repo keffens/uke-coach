@@ -136,6 +136,17 @@ test("parses custom chord frets", () => {
   expect(chordLib.getFrets("C")).toEqual([12, 12, 12, -1]);
 });
 
+test("parses chords from tokens and converts back to tokens", () => {
+  const tokens = [
+    new Token(TokenType.ChordDefinition, "D7", "2 0 2 0"),
+    new Token(TokenType.ChordDefinition, "C", "5 4 3 3"),
+    new Token(TokenType.ChordDefinition, "D#", "3 3 3 x"),
+  ];
+  const chordLib = ChordLib.forUkulele();
+  for (const token of tokens) chordLib.parseChord(token);
+  expect(chordLib.tokenize()).toEqual(tokens);
+});
+
 function noteSet(notes: Array<PitchedNote | null> | null): Set<Note> {
   if (!notes) return new Set();
   return new Set(

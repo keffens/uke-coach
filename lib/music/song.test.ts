@@ -8,8 +8,8 @@ const CHORD_PRO = [
   "{tempo: 100}",
   "",
   "{instrument: electric uke ukulele electric}",
+  "{chord: C 5 4 3 3}",
   "{pattern: single plugged |1234----|}",
-  "{chord: C frets 5 4 3 3}",
   "",
   "{start_of_verse: Verse 1}",
   "Un lu[Am]gar para es[C]tar y vi[G]vir lo que se he[Am]reda.",
@@ -37,10 +37,12 @@ test("parses song and converts back to string", () => {
     "{time: 4/4}",
     "{tempo: 100}",
     "",
-    "",
+    "{instrument: electric uke ukulele electric}",
+    "{chord: C 5 4 3 3}",
+    // "{pattern: plugged |1234----|}",
   ].join("\n");
   const song = Song.fromTokens(tokenize(chordPro));
-  expect(song.toTokens().toString()).toEqual(chordPro);
+  expect(song.tokenize().toString().trim()).toEqual(chordPro);
 });
 
 test("converts song to SongData", () => {

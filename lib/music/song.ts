@@ -27,11 +27,13 @@ export class Song {
   }
 
   /** Converts the song back to tokens for storage. */
-  toTokens(): Token {
+  tokenize(): Token {
     const env = new Token(TokenType.StartEnv, "song");
-    env.children.push(...this.metadata.toTokens());
+    env.children.push(...this.metadata.tokenize());
     env.children.push(new Token(TokenType.Paragraph));
-    // TODO: tokenize other parts
+    env.children.push(...this.instrumentLib.tokenize());
+    env.children.push(new Token(TokenType.Paragraph));
+    // TODO: tokenize the song parts
     return env;
   }
 

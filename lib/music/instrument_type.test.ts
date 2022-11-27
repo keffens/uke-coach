@@ -2,6 +2,7 @@ import {
   InstrumentType,
   getTuning,
   compatibleWithDefaultTuning,
+  isDefaultTuning,
 } from "./instrument_type";
 import { PitchedNote } from "./note";
 
@@ -14,6 +15,27 @@ test("non-custom instruments have a tuning", () => {
 });
 
 test("compares to default tunings", () => {
+  expect(
+    isDefaultTuning(
+      InstrumentType.Ukulele,
+      ["G4", "C4", "E4", "A4"].map((s) => PitchedNote.parse(s))
+    )
+  ).toEqual(true);
+  expect(
+    isDefaultTuning(
+      InstrumentType.Ukulele,
+      getTuning(InstrumentType.UkuleleLowG)
+    )
+  ).toEqual(false);
+  expect(
+    isDefaultTuning(
+      InstrumentType.Guitar,
+      ["G4", "C4", "E4"].map((s) => PitchedNote.parse(s))
+    )
+  ).toEqual(false);
+});
+
+test("verifies compatibility to default tunings", () => {
   expect(
     compatibleWithDefaultTuning(
       InstrumentType.Ukulele,

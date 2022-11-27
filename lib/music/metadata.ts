@@ -71,7 +71,7 @@ export class SongMetadata {
     );
   }
 
-  toTokens(): Token[] {
+  tokenize(): Token[] {
     assert(this.title, "The song metadata does not have a title.");
     const tokens = new Array<Token>();
     addToken(tokens, "title", this.title);
@@ -120,7 +120,7 @@ export class PartMetadata {
     );
   }
 
-  toTokens(parentMetadata: SongMetadata | PartMetadata): Token[] {
+  tokenize(parentMetadata: SongMetadata | PartMetadata): Token[] {
     const tokens = new Array<Token>();
     addToken(
       tokens,

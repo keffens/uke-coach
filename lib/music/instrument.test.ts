@@ -1,5 +1,6 @@
 import { ChordLib } from "./chord_lib";
 import { Instrument } from "./instrument";
+import { InstrumentLib } from "./instrument_lib";
 import { InstrumentType, SoundType, getTuning } from "./instrument_type";
 import { PitchedNote } from "./note";
 import { Pattern } from "./pattern";
@@ -60,12 +61,34 @@ test("prases instruments", () => {
   );
 });
 
-test("parses instrument from token", () => {
-  expect(
-    Instrument.fromToken(
-      new Token(TokenType.Instrument, undefined, "rythm (uke) ukulele")
+test("parses instrument from token and back to token", () => {
+  let token = new Token(TokenType.Instrument, undefined, "uke ukulele");
+  let instrument = Instrument.fromToken(token);
+  expect(instrument).toEqual(new Instrument("uke", InstrumentType.Ukulele));
+  expect(instrument.tokenize()).toEqual(token);
+
+  token = new Token(TokenType.Instrument, undefined, "guitar guitar electric");
+  instrument = Instrument.fromToken(token);
+  expect(instrument).toEqual(
+    new Instrument("guitar", InstrumentType.Guitar, SoundType.Electric)
+  );
+  expect(instrument.tokenize()).toEqual(token);
+
+  token = new Token(
+    TokenType.Instrument,
+    undefined,
+    "tiny uke ukulele tuning G5 C5 E5 A5"
+  );
+  instrument = Instrument.fromToken(token);
+  expect(instrument).toEqual(
+    new Instrument(
+      "tiny uke",
+      InstrumentType.Ukulele,
+      undefined,
+      ["G5", "C5", "E5", "A5"].map((s) => PitchedNote.parse(s))
     )
-  ).toEqual(new Instrument("rythm (uke)", InstrumentType.Ukulele));
+  );
+  expect(instrument.tokenize()).toEqual(token);
 });
 
 test("adds patterns and select active pattern", () => {

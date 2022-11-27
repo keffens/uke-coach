@@ -42,7 +42,7 @@ test("converts strums to strings", () => {
 test("converts tabs to string", () => {
   let tab = Strum.tab([-1, 0, 5, 10]);
 
-  expect(tab.toString()).toEqual("TAB[- 0 5 (10)]");
+  expect(tab.toString()).toEqual("TAB[- 0 5 10]");
 
   expect(tab.toString(0)).toEqual("-");
   expect(tab.toString(1)).toEqual("0");
@@ -52,6 +52,13 @@ test("converts tabs to string", () => {
   let pause = Strum.tab([-1, -1]);
   expect(pause.toString(0)).toEqual("-");
   expect(pause.toString(1)).toEqual("-");
+});
+
+test("parses the tab notation", () => {
+  const tab = "TAB[- 0 5 10]-TAB[1 2 3 4]";
+  expect(Strum.parse(tab, 0)).toEqual([Strum.tab([-1, 0, 5, 10]), 13]);
+  expect(Strum.parse(tab, 13)).toEqual([Strum.pause(), 14]);
+  expect(Strum.parse(tab, 14)).toEqual([Strum.tab([1, 2, 3, 4]), tab.length]);
 });
 
 test("returns whether strums use chords", () => {
