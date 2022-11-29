@@ -44,7 +44,6 @@ test("converts verse environment to string", () => {
     new Token(TokenType.StartEnv, "verse", "Verse 1", [
       new Token(TokenType.Chord, undefined, "C"),
       new Token(TokenType.Text, undefined, "la la la"),
-      new Token(TokenType.LineBreak),
     ]).toString()
   ).toEqual(
     "{start_of_verse: Verse 1}\n" + "[C]la la la\n" + "{end_of_verse}\n"

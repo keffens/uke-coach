@@ -59,6 +59,7 @@ export class Token {
           return (
             `{start_of_${this.key}${this.value ? ": " + this.value : ""}}\n` +
             inner +
+            (inner.endsWith("\n") ? "" : "\n") +
             `{end_of_${this.key}}\n`
           );
         }
