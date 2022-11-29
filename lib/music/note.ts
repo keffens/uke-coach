@@ -1,3 +1,5 @@
+import { assert } from "../util";
+
 /** All standard notes. */
 export enum Note {
   C = "C",
@@ -264,6 +266,44 @@ export function parseBeats(values: string, beatsInBar = 4): number {
     }
   }
   return sum || beatsInBar;
+}
+
+const EIGHT_CONVERSION = [
+  { val: 8, ch: "." },
+  { val: 4, ch: "," },
+  { val: 2, ch: ":" },
+  { val: 1, ch: ";" },
+];
+
+/**
+ * Converts beats to their string representation.
+ */
+export function beatsToString(beats: number, beatsInBar = 4): string {
+  if (beats === beatsInBar) return "";
+  let ticks = Math.round(TICKS_PER_BEAT * beats);
+  let thirds = 0;
+  while (ticks % 3 !== 0) {
+    ticks -= 8;
+    thirds += 1;
+  }
+  let eighth = ticks / 3;
+  assert(
+    eighth >= 0 && thirds >= 0 && eighth + thirds >= 1,
+    `Invalid beats value: ${beats}`
+  );
+
+  let res = "_".repeat(Math.floor(eighth / (8 * beatsInBar)));
+  eighth = eighth % (8 * beatsInBar);
+  for (const { val, ch } of EIGHT_CONVERSION) {
+    res += ch.repeat(Math.floor(eighth / val));
+    eighth %= val;
+  }
+
+  // There's at most 1 triplet marker necessary.
+  if (thirds === 2) res += "'";
+  if (thirds === 1) res += '"';
+
+  return res;
 }
 
 /**

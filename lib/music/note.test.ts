@@ -7,6 +7,7 @@ import {
   toFlat,
   toSharp,
   noteCompare,
+  beatsToString,
 } from "./note";
 
 test("compares notes", () => {
@@ -175,6 +176,25 @@ test("parses beats", () => {
   expect(parseBeats("_", /*beatsInBar=*/ 3)).toEqual(3);
 
   expect(parseBeats("C..")).toEqual(2);
+});
+
+test("converts beats to string", () => {
+  expect(beatsToString(1)).toEqual(".");
+  expect(beatsToString(3)).toEqual("...");
+  expect(beatsToString(4)).toEqual("");
+  expect(beatsToString(5)).toEqual("_.");
+  expect(beatsToString(0.5)).toEqual(",");
+  expect(beatsToString(0.25)).toEqual(":");
+  expect(beatsToString(0.125)).toEqual(";");
+  expect(beatsToString(1.875)).toEqual(".,:;");
+
+  expect(beatsToString(2 / 3)).toEqual("'");
+  expect(beatsToString(1 / 3)).toEqual('"');
+  expect(beatsToString(0.25 + 1 / 3)).toEqual(':"');
+  expect(beatsToString(3.5 + 2 / 3)).toEqual("...,'");
+
+  expect(beatsToString(3, /*beatsInBar=*/ 3)).toEqual("");
+  expect(beatsToString(5, /*beatsInBar=*/ 3)).toEqual("_..");
 });
 
 test("sums beats", () => {
