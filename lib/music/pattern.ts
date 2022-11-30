@@ -174,7 +174,8 @@ export class Pattern {
   static fromToken(token: Token, time: TimeSignature): Pattern {
     try {
       if (token.type === TokenType.Pattern) {
-        return Pattern.parse(token.value, time, token.key);
+        const value = token.value.split("@", 2)[0].trim();
+        return Pattern.parse(value, time, token.key);
       }
       if (token.type === TokenType.TabEnv) {
         const lines = token.children.map((line) => line.value).reverse();
@@ -268,8 +269,16 @@ export class Pattern {
   }
 
   /** Returns the pattern as token. */
-  tokenize(): Token {
+  tokenize(onlyNameIfGiven = false, forInstrument?: string): Token {
+    let vParts = [];
+    if (!onlyNameIfGiven || !this.name) vParts.push(this.toString());
+    if (forInstrument) vParts.push(`@ ${forInstrument}`);
+
     // TODO: support tabs in the tab env
-    return new Token(TokenType.Pattern, this.name, this.toString());
+    return new Token(
+      TokenType.Pattern,
+      this.name,
+      vParts.join(" ") || undefined
+    );
   }
 }

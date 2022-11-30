@@ -1,3 +1,4 @@
+import { assert } from "../util";
 import { SONG_METADATA_KEYS } from "./metadata";
 import { ADD_LINEBREAK_AFTER, Token, TokenType } from "./token";
 
@@ -24,6 +25,7 @@ const TEXT_RE = String.raw`(?:[^\[\]\{\}\\#]|\\\[|\\\]|\\\{|\\\}|\\\\|\\#)+`;
 // This allows a lot more than valid chords.
 const CHORD_RE = String.raw`[\w#_.,:;'"/*]*`;
 const KEY_RE = String.raw`[A-Za-z_]+`;
+const NAME_RE = String.raw`[\w ]+`;
 const FIRST_TOKEN = new RegExp(
   String.raw`^(?:(${TEXT_RE})|\[(${CHORD_RE})\]|` +
     String.raw`\{(${KEY_RE})(?::\s*(${TEXT_RE}))?\}|\s*#\s*(.*))`,
@@ -31,7 +33,9 @@ const FIRST_TOKEN = new RegExp(
 );
 const SPLIT_META = new RegExp(String.raw`^(${KEY_RE})\s*(${TEXT_RE})$`, "u");
 const SPLIT_PATTERN = new RegExp(
-  String.raw`^(?:(${TEXT_RE})\s+)?(\|[-.\|\dduxat\(\)*]+\|)$`,
+  String.raw`^(?:(${NAME_RE})\s*)?` +
+    String.raw`((?:\|[-.\|\d duxat\(\)\[\]*]+\|)?` +
+    String.raw`(?:\s*@\s*${TEXT_RE})?)$`,
   "iu"
 );
 const TAB_LINE = /^(?:[-.\|\d ]|\(\d+\))+$/i;
@@ -97,20 +101,11 @@ function tokenizeDirective(
       throw new Error("Found pattern directive without pattern or name.");
     }
     const match = value.match(SPLIT_PATTERN);
-    if (match) {
-      return new Token(
-        TokenType.Pattern,
-        match[1]?.trim(),
-        match[2],
-        /*children=*/ undefined,
-        lineNr,
-        pos
-      );
-    }
+    assert(match, `Failed to parse pattern token with value "${value}"`);
     return new Token(
       TokenType.Pattern,
-      value,
-      /*value=*/ undefined,
+      match[1]?.trim() || undefined,
+      match[2]?.trim() || undefined,
       /*children=*/ undefined,
       lineNr,
       pos

@@ -85,8 +85,16 @@ test("parses patterns", () => {
   );
   lib.parseToken(new Token(TokenType.Pattern, "island", "|D-duxudu|"), time);
   lib.parseToken(new Token(TokenType.Pattern, "plugged", "|12345654|"), time);
+  lib.parseToken(
+    new Token(TokenType.Pattern, "only uke", "|12341234| @ uke"),
+    time
+  );
+
+  expect(uke.getPatterns().map((p) => p.name)).toEqual(["island", "only uke"]);
+  expect(guit.getPatterns().map((p) => p.name)).toEqual(["island", "plugged"]);
+
   expect(lib.activePatterns.map((p) => p.toString())).toEqual([
-    "|d-du-udu|",
+    "|12341234|",
     "|12345654|",
   ]);
 
@@ -99,6 +107,12 @@ test("parses patterns", () => {
   lib.parseToken(new Token(TokenType.Pattern, "plugged"), time);
   expect(lib.activePatterns.map((p) => p.toString())).toEqual([
     "|d-du-udu|",
+    "|12345654|",
+  ]);
+
+  lib.parseToken(new Token(TokenType.Pattern, "only uke"), time);
+  expect(lib.activePatterns.map((p) => p.toString())).toEqual([
+    "|12341234|",
     "|12345654|",
   ]);
 
@@ -153,7 +167,9 @@ test("parses instrument and converts back to string", () => {
     ),
     new Token(TokenType.ChordDefinition, "C", "5 4 3 3"),
     new Token(TokenType.Pattern, "plugged", "|1234----|"),
+    new Token(TokenType.LineBreak),
     new Token(TokenType.Pattern, "*hidden", "|12341234|"),
+    new Token(TokenType.LineBreak),
     new Token(TokenType.Paragraph),
   ];
 
@@ -171,12 +187,14 @@ test("parses 2 instruments and converts back to string as", () => {
     new Token(TokenType.Instrument, undefined, "uke ukulele"),
     new Token(TokenType.InstrumentEnv, "instrument", "uke", [
       new Token(TokenType.Pattern, "plugged", "|1234|"),
+      new Token(TokenType.LineBreak),
     ]),
     new Token(TokenType.Paragraph),
     new Token(TokenType.Instrument, undefined, "guitar guitar"),
     new Token(TokenType.InstrumentEnv, "instrument", "guitar", [
       new Token(TokenType.ChordDefinition, "E", "0 2 2 1 0 0"),
       new Token(TokenType.Pattern, "plugged", "|1234|"),
+      new Token(TokenType.LineBreak),
     ]),
     new Token(TokenType.Paragraph),
   ];

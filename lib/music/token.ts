@@ -41,11 +41,11 @@ export class Token {
       case TokenType.Chord:
         return `[${this.value}]`;
       case TokenType.ChordDefinition:
-        return `{chord: ${this.key} ${this.value}}\n`;
+        return `{chord: ${joinKV(this)}}\n`;
       case TokenType.Metadata:
         return `{${this.key}: ${this.value}}\n`;
       case TokenType.Pattern:
-        return `{pattern: ${this.key} ${this.value}}`;
+        return `{pattern: ${joinKV(this)}}`;
       case TokenType.Instrument:
         return `{instrument: ${this.value}}\n`;
       case TokenType.Directive:
@@ -89,4 +89,8 @@ export class Token {
   error(msg: string): Error {
     return new Error(this.errorMsg(msg));
   }
+}
+
+function joinKV(token: Token): string {
+  return [token.key, token.value].filter((s) => s).join(" ");
 }

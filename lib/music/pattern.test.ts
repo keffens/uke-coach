@@ -129,10 +129,25 @@ test("converts between tokens and patterns", () => {
   const patternB = Pattern.fromToken(tokenB, FOUR_FOUR);
   const tokenC = new Token(TokenType.Pattern, undefined, "|d---|");
   const patternC = Pattern.fromToken(tokenC, FOUR_FOUR);
+  const tokenD = new Token(TokenType.Pattern, "island", "|d-du-udu| @ ukulele");
+  const patternD = Pattern.fromToken(tokenD, FOUR_FOUR);
 
   expect(patternA.tokenize()).toEqual(tokenA);
   expect(patternB.tokenize()).toEqual(tokenB);
   expect(patternC.tokenize()).toEqual(tokenC);
+
+  expect(patternA.tokenize(/*onlyNameIfGiven=*/ true)).toEqual(
+    new Token(TokenType.Pattern, "island")
+  );
+  expect(patternC.tokenize(/*onlyNameIfGiven=*/ true)).toEqual(tokenC);
+
+  expect(patternD.tokenize()).toEqual(tokenA);
+  expect(patternD.tokenize(/*onlyNameIfGiven=*/ false, "ukulele")).toEqual(
+    tokenD
+  );
+  expect(patternD.tokenize(/*onlyNameIfGiven=*/ true, "ukulele")).toEqual(
+    new Token(TokenType.Pattern, "island", "@ ukulele")
+  );
 });
 
 test("prases tab", () => {

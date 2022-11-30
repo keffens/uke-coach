@@ -1,6 +1,6 @@
 import { assert, intArrayToString, parseIntArray } from "../util";
 
-const TAB_RE = new RegExp(String.raw`^TAB\[([-0-9 ]+)\]`);
+const TAB_RE = new RegExp(String.raw`^\[([-0-9 ]+)\]`);
 
 export enum StrumType {
   Pause,
@@ -163,7 +163,7 @@ export class Strum {
           : `(${this.strings.join("")})`;
       case StrumType.Tab:
         if (string == null) {
-          return `TAB[${intArrayToString(this.frets, { "-1": "-" })}]`;
+          return `[${intArrayToString(this.frets, { "-1": "-" })}]`;
         }
         const fret = this.frets[string];
         if (fret < 0) return "-";

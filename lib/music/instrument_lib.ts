@@ -84,6 +84,7 @@ export class InstrumentLib {
         this.addInstrument(inst);
         break;
       case TokenType.Paragraph:
+      case TokenType.LineBreak:
         break;
       default:
         throw token.error("Expected pattern, tab or chord definition");
@@ -110,8 +111,9 @@ export class InstrumentLib {
       }
 
       env.push(...instrument.chordLib.tokenize());
-      for (const pattern of instrument.getPatterns()) {
+      for (const [i, pattern] of instrument.getPatterns().entries()) {
         env.push(pattern.tokenize());
+        env.push(new Token(TokenType.LineBreak));
       }
 
       tokens.push(new Token(TokenType.Paragraph));
@@ -164,9 +166,13 @@ export class InstrumentLib {
   private parsePattern(
     token: Token,
     time: TimeSignature,
-    instrument?: Instrument
+    instrument?: Instrument | null
   ): void {
     const pattern = Pattern.fromToken(token, time);
+    if (!instrument) {
+      const name = token.value.split("@", 2)[1]?.trim();
+      instrument = this.getInstrument(name);
+    }
     if (instrument) {
       instrument.setPattern(pattern);
       return;
