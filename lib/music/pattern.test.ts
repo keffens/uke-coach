@@ -1,4 +1,8 @@
-import { Pattern } from "./pattern";
+import {
+  getPatternInstrumentAnnotation,
+  getPatternString,
+  Pattern,
+} from "./pattern";
 import { TimeSignature } from "./signature";
 import { Strum } from "./strum";
 import { Token, TokenType } from "./token";
@@ -6,6 +10,24 @@ import { Token, TokenType } from "./token";
 const TWO_TWO = new TimeSignature(2, 2);
 const THREE_FOUR = new TimeSignature(3, 4);
 const FOUR_FOUR = new TimeSignature(4, 4);
+
+test("splits pattern and instrument annotation", () => {
+  let token = new Token(TokenType.Pattern, "name");
+  expect(getPatternString(token)).toBe(null);
+  expect(getPatternInstrumentAnnotation(token)).toBe(null);
+
+  token = new Token(TokenType.Pattern, undefined, "|----|");
+  expect(getPatternString(token)).toBe("|----|");
+  expect(getPatternInstrumentAnnotation(token)).toBe(null);
+
+  token = new Token(TokenType.Pattern, undefined, "|----| @ ukulele");
+  expect(getPatternString(token)).toBe("|----|");
+  expect(getPatternInstrumentAnnotation(token)).toBe("ukulele");
+
+  token = new Token(TokenType.Pattern, "name", "@ ukulele");
+  expect(getPatternString(token)).toBe(null);
+  expect(getPatternInstrumentAnnotation(token)).toBe("ukulele");
+});
 
 test("creates empty patterns and converts them to strings", () => {
   expect(Pattern.makeEmpty(TWO_TWO).toString()).toEqual("|----|");
@@ -175,4 +197,13 @@ test("prases tab from token", () => {
   expect(tab.strumsPerBar).toEqual(4);
   expect(tab.strumsPerBeat).toEqual(1);
   expect(tab.useTab()).toEqual(true);
+});
+
+test("prases tab from token and converts back to tab", () => {
+  const token = new Token(TokenType.TabEnv, "tab", "name", [
+    new Token(TokenType.TabLine, undefined, "|8-(10)-   |4-(12)-|"),
+    new Token(TokenType.TabLine, undefined, "|-9-   (11)|---   -|"),
+  ]);
+  const tab = Pattern.fromToken(token, FOUR_FOUR);
+  expect(tab.tokenize()).toEqual(token);
 });

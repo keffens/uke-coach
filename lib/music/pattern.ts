@@ -1,3 +1,4 @@
+import { assert } from "../util";
 import { TICKS_PER_BEAT } from "./note";
 import { TimeSignature } from "./signature";
 import { Strum, StrumType } from "./strum";
@@ -64,6 +65,16 @@ function praseFret(line: string, pos: number, frets: number[]): number {
     throw new Error(`Invalid character in tab: ${line[pos]}`);
   }
   return pos + 1;
+}
+
+/** Returns a pattern's string representation if present. */
+export function getPatternString(token: Token): string | null {
+  return token.value.split("@", 2)[0]?.trim() || null;
+}
+
+/** Returns a pattern's instrument annotation if present. */
+export function getPatternInstrumentAnnotation(token: Token): string | null {
+  return token.value.split("@", 2)[1]?.trim() || null;
 }
 
 /** Represents a strumming pattern over a specified number of bars. */
@@ -174,7 +185,8 @@ export class Pattern {
   static fromToken(token: Token, time: TimeSignature): Pattern {
     try {
       if (token.type === TokenType.Pattern) {
-        const value = token.value.split("@", 2)[0].trim();
+        const value = getPatternString(token);
+        assert(value, "Expected the token to have a pattern value.");
         return Pattern.parse(value, time, token.key);
       }
       if (token.type === TokenType.TabEnv) {
@@ -270,15 +282,71 @@ export class Pattern {
 
   /** Returns the pattern as token. */
   tokenize(onlyNameIfGiven = false, forInstrument?: string): Token {
+    if (this.isTab() && (!onlyNameIfGiven || !this.name)) {
+      const size = this.tabSize();
+      const lines = new Array(size).fill("");
+      for (const [i, s] of this.strums.entries()) {
+        padTabLines(lines, i % this.strumsPerBar === 0);
+        for (let j = 0; j < size; j++) {
+          if (s.frets[j] >= 10) lines[j] += `(${s.frets[j]})`;
+          else if (s.frets[j] >= 0) lines[j] += s.frets[j];
+          else lines[j] += "-";
+        }
+      }
+      padTabLines(lines, true);
+
+      const children = lines
+        .map((l) => new Token(TokenType.TabLine, undefined, l))
+        .reverse();
+      let token = new Token(TokenType.TabEnv, "tab", this.name, children);
+      if (forInstrument) {
+        token = new Token(
+          TokenType.InstrumentEnv,
+          "instrument",
+          forInstrument,
+          [token]
+        );
+      }
+      return token;
+    }
+
     let vParts = [];
     if (!onlyNameIfGiven || !this.name) vParts.push(this.toString());
     if (forInstrument) vParts.push(`@ ${forInstrument}`);
 
-    // TODO: support tabs in the tab env
     return new Token(
       TokenType.Pattern,
       this.name,
       vParts.join(" ") || undefined
     );
+  }
+
+  /** Returns true if the tab can be written as a tab and is not all pauses. */
+  private isTab(): boolean {
+    let hasTab = false;
+    for (const s of this.strums) {
+      if (s.type === StrumType.Tab) hasTab = true;
+      else if (s.type !== StrumType.Pause) return false;
+    }
+    return hasTab;
+  }
+
+  private tabSize(): number {
+    let max = -1;
+    for (const s of this.strums) {
+      if (s.type === StrumType.Tab && s.frets.length > max) {
+        max = s.frets.length;
+      }
+    }
+    return max;
+  }
+}
+
+/** Pads tab lines to have the same length and optionally adds a separator. */
+function padTabLines(lines: string[], addSeparator: boolean) {
+  const max = Math.max(...lines.map((l) => l.length));
+  for (let i = 0; i < lines.length; i++) {
+    lines[i] = lines[i].padEnd(max, " ");
+    if (addSeparator) lines[i] += "|";
   }
 }

@@ -21,7 +21,7 @@ export default function BarsPerLineSelect({
   maxStrumsPerBar,
   onChange,
 }: BarsPerLineSelectProps) {
-  const [val, setVal] = useState<number>(0);
+  const [val, setVal] = useState<number>(1);
   const windowWidth = useRef(0);
   const valRef = useRef(0);
   valRef.current = val;
@@ -75,7 +75,9 @@ export default function BarsPerLineSelect({
           }}
         >
           {BARS_PER_LINE_VALUES.map((v) => (
-            <MenuItem value={v}>{v}</MenuItem>
+            <MenuItem key={v} value={v}>
+              {v}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>

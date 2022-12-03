@@ -1,8 +1,18 @@
 import { Chord } from "./chord";
-import { parseBeats, sumBeats } from "./note";
+import { beatsToString } from "./note";
 import { Pattern } from "./pattern";
 import { assert } from "../util";
 import { TimeSignature } from "./signature";
+import { Token, TokenType } from "./token";
+
+function tokenizeLyric(lyric: string, isLastInLine = false): Token {
+  if (lyric.endsWith("-")) {
+    lyric = lyric.slice(0, -1);
+  } else if (!isLastInLine) {
+    lyric += " ";
+  }
+  return new Token(TokenType.Text, undefined, lyric);
+}
 
 export class Bar {
   private highlightListener?: (highlight: boolean) => void;
@@ -24,17 +34,28 @@ export class Bar {
       `Number of patterns ${patterns.length} must match number indexes` +
         patternIdxs.length
     );
+    this.time = patterns[0].time;
+    assert(
+      this.chords.length === this.beats.length,
+      `Number of chords ${chords.length} must match number of beats ` +
+        `${beats.length}`
+    );
+
     if (this.lyrics.every((l) => !l)) {
       this.lyrics = [];
+      return;
     }
-    this.time = patterns[0].time;
   }
 
   set highlight(highlight: boolean) {
     if (this.highlightListener) {
-      console.log("setting highlight", highlight);
       this.highlightListener(highlight);
     }
+  }
+
+  /** Returns the number of rows or instruments. */
+  get height(): number {
+    return this.patterns.length;
   }
 
   onHighlightChange(listener: (highlight: boolean) => void): void {
@@ -56,196 +77,27 @@ export class Bar {
     }
     return null;
   }
-}
 
-export class BarParagraph {
-  constructor(readonly bars: Bar[]) {}
-
-  /** Returns whether to use a tab notation for this paragraph. */
-  useTab(instrumentIdx = 0): boolean {
-    return this.bars.some((bar) => bar.patterns[instrumentIdx].useTab());
-  }
-
-  /** Returns the maximum number that any pattern has in this bar. */
-  get maxStrumsPerBar(): number {
-    return Math.max(
-      ...this.bars.map((b) =>
-        Math.max(...b.patterns.map((p) => p.strumsPerBar))
-      )
-    );
-  }
-
-  /** Returns the number of ticks per bar. */
-  get ticksPerBar(): number {
-    return this.bars[0]?.patterns[0].ticksPerBar ?? NaN;
-  }
-
-  /** Returns the number of ticks for the entire paragraph. */
-  get ticks(): number {
-    return this.ticksPerBar * this.bars.length;
-  }
-
-  /** Clears the highlight on all bars. */
-  clearHighlight(): void {
-    for (const bar of this.bars) {
-      bar.highlight = false;
+  /** Tokenizes this bar's chords and lyrics about patterns. */
+  tokenizeChordsAndLyrics(isLastInLine = false): Token[] {
+    const tokens = [];
+    if (this.anacrusis) {
+      tokens.push(tokenizeLyric(this.anacrusis));
     }
-  }
+    for (let i = 0; i < this.chords.length; i++) {
+      const chord =
+        (this.chords[i]?.toString() ?? "") +
+        beatsToString(this.beats[i], this.time.beats);
+      tokens.push(new Token(TokenType.Chord, undefined, chord || "_"));
 
-  /**
-   * Returns the patterns used in this bar paragraph for the given instrument.
-   */
-  usedPatterns(instrumentIdx: number): Set<Pattern> {
-    const patterns = new Set<Pattern>();
-    for (const bar of this.bars) {
-      patterns.add(bar.patterns[instrumentIdx]);
+      if (this.lyrics[i])
+        tokens.push(
+          tokenizeLyric(
+            this.lyrics[i],
+            isLastInLine && i === this.chords.length - 1
+          )
+        );
     }
-    return patterns;
-  }
-
-  /** Returns the chords used by the given instrument.*/
-  usedChords(instrumentIdx: number): Set<string> {
-    const chords = new Set<string>();
-    for (const bar of this.bars) {
-      const pattern = bar.patterns[instrumentIdx];
-      const patternIdx = bar.patternIdxs[instrumentIdx];
-      for (let i = 0; i < pattern.strumsPerBar; i++) {
-        const chord = bar.getChordForStrum(i, instrumentIdx);
-        if (chord && pattern.getStrum(i, patternIdx).usesChord()) {
-          chords.add(chord.toString());
-        }
-      }
-    }
-    return chords;
-  }
-}
-
-export class BarParagraphBuilder {
-  private paragraphs = new Array<BarParagraph>();
-  private bars = new Array<Bar>();
-  private beats = new Array<number>();
-  private patternIdxs: number[];
-  private chords = new Array<Chord | null>();
-  private lyrics = new Array<string>();
-  private anacrusis: string = "";
-  private activeChord: Chord | null = null;
-  private chordBeforeParagraph: Chord | null = null;
-
-  constructor(private patterns: Pattern[], private time: TimeSignature) {
-    this.patternIdxs = new Array(patterns.length).fill(0);
-  }
-
-  addLyrics(value: string): void {
-    if (!value.trim()) return;
-    if (value.match(/\w$/)) {
-      value += "-";
-    }
-    value = value.trimEnd();
-
-    if (!this.chords.length) {
-      // Handle anacrusis.
-      assert(!this.anacrusis, "Got 2 lyrics passages before the first chord.");
-      this.anacrusis = value;
-    } else {
-      this.lyrics.push(value);
-      assert(
-        this.chords.length === this.lyrics.length,
-        "Expected chrods to equal the number of lyrics pieces."
-      );
-    }
-  }
-
-  addChord(value: string): void {
-    assert(this.patterns.length, "Expected patterns to be set");
-    this.closeFullChord();
-    const chord = Chord.parse(value);
-    const beat = parseBeats(value, this.time.beats);
-    if (this.chords.length > this.lyrics.length) {
-      this.lyrics.push("");
-    }
-    this.beats.push(beat);
-    this.chords.push(chord);
-    this.activeChord = chord ?? this.activeChord;
-  }
-
-  newLine(): void {
-    while (this.chords.length > this.lyrics.length) {
-      this.lyrics.push("");
-    }
-    if (this.lyrics[this.lyrics.length - 1]?.slice(-1) === "-") {
-      // Remove a dash that was added to the last lyrics element because it was
-      // probably a mistake.
-      this.lyrics[this.lyrics.length - 1] = this.lyrics[
-        this.lyrics.length - 1
-      ].slice(0, -1);
-    }
-    assert(this.closeFullChord(), "Beats in line don't add up to full bars.");
-  }
-
-  newParagraph(): void {
-    this.newLine();
-    this.patternIdxs.fill(0);
-    if (this.bars.length) {
-      this.paragraphs.push(new BarParagraph(this.bars));
-      this.bars = [];
-    }
-  }
-
-  switchPattern(patterns: Pattern[]): void {
-    assert(
-      this.closeFullChord(),
-      "Cannot switch pattern in the middle of a bar."
-    );
-    if (this.patterns.length === 0) {
-      this.patterns = [...patterns];
-      this.patternIdxs = new Array(patterns.length).fill(0);
-      return;
-    }
-    assert(
-      this.patterns.length === patterns.length,
-      "Cannot change number of instruments in the middle of a paragraph"
-    );
-    for (let i = 0; i < patterns.length; i++) {
-      if (patterns[i] === this.patterns[i]) continue;
-      this.patterns[i] = patterns[i];
-      this.patternIdxs[i] = 0;
-    }
-  }
-
-  build(): BarParagraph[] | null {
-    this.newParagraph();
-    if (this.paragraphs.length) {
-      return this.paragraphs;
-    }
-    return null;
-  }
-
-  private closeFullChord(): boolean {
-    const sum = sumBeats(this.beats);
-    if (sum === 0) return true;
-    assert(this.patterns.length, "Expected patterns to be set");
-    if (sum < this.time.beats) return false;
-    assert(
-      sum === this.time.beats,
-      `Beats add up to more than one bar: ${sum}`
-    );
-    this.bars.push(
-      new Bar(
-        this.chords,
-        this.beats,
-        [...this.patterns],
-        [...this.patternIdxs],
-        this.lyrics,
-        this.anacrusis,
-        this.chordBeforeParagraph
-      )
-    );
-    this.chords = [];
-    this.beats = [];
-    this.patternIdxs = this.patternIdxs.map((idx) => idx + 1);
-    this.lyrics = [];
-    this.anacrusis = "";
-    this.chordBeforeParagraph = this.activeChord;
-    return true;
+    return tokens;
   }
 }

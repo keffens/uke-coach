@@ -1,6 +1,7 @@
 import { setUnion } from "../util";
-import { Bar, BarParagraph, BarParagraphBuilder } from "./bar";
-import { Chord } from "./chord";
+import { Bar } from "./bar";
+import { BarParagraph } from "./bar_paragraph";
+import { BarParagraphBuilder } from "./bar_paragraph_builder";
 import { InstrumentLib } from "./instrument_lib";
 import { PartMetadata, SongMetadata } from "./metadata";
 import { Pattern } from "./pattern";
@@ -150,6 +151,32 @@ export class SongPart {
   /** Returns the maximum number that any pattern has in this part. */
   get maxStrumsPerBar(): number {
     return Math.max(...this.paragraphs.map((p) => p.maxStrumsPerBar));
+  }
+
+  /** Tokenizes the song part. */
+  tokenize(
+    parentMetadata: SongMetadata | PartMetadata,
+    instrumentLib: InstrumentLib
+  ): Token[] {
+    const children = [];
+    children.push(...this.metadata.tokenize(parentMetadata));
+
+    const activePatternsInOut = new Array<Pattern | null>(
+      this.paragraphs[0].height
+    ).fill(null);
+    for (const paragraph of this.paragraphs) {
+      if (children.length) {
+        children.push(new Token(TokenType.Paragraph));
+      }
+      children.push(...paragraph.tokenize(instrumentLib, activePatternsInOut));
+    }
+
+    if ([SongPartType.None, SongPartType.Song].includes(this.type)) {
+      return children;
+    }
+    return [
+      new Token(TokenType.StartEnv, this.type, this.metadata.name, children),
+    ];
   }
 
   /** Highlights the specified bar. Any negative value clears all highlights. */

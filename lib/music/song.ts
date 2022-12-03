@@ -33,7 +33,10 @@ export class Song {
     env.children.push(new Token(TokenType.Paragraph));
     env.children.push(...this.instrumentLib.tokenize());
     env.children.push(new Token(TokenType.Paragraph));
-    // TODO: tokenize the song parts
+    for (const part of this.parts) {
+      env.children.push(...part.tokenize(this.metadata, this.instrumentLib));
+      env.children.push(new Token(TokenType.Paragraph));
+    }
     return env;
   }
 
@@ -44,7 +47,7 @@ export class Song {
     chordPro: string,
     deployed = false
   ): SongData {
-    // TODO: supplying ChordPro is optional once `toTokens` is working.
+    // TODO: supplying ChordPro is optional once `tokenize` is working.
     return delUndefined({
       artist: this.metadata.artist,
       chordPro,

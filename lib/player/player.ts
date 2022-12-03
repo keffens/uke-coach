@@ -1,6 +1,6 @@
 import * as Tone from "tone";
 import { Bar, PitchedNote, Song } from "../music";
-import { assert } from "../util";
+import { assert, range } from "../util";
 import { InstrumentPlayer, Woodblock } from "./instruments";
 import { StringInstrument } from "./string_instrument";
 
@@ -258,7 +258,9 @@ class PlayerImpl {
       idx,
     }));
     // The last element stops the playback and resets the player.
-    bars.push({ time: `${bars.length}:0` });
+    // Add additional bars because the playback keeps ending early without this
+    // hack.
+    bars.push(...range(32).map((i) => ({ time: `${bars.length + i}:0` })));
 
     let lastBar: Bar | null = null;
     this.playback = new Tone.Part((time, { bar, idx }) => {

@@ -1,7 +1,11 @@
 import { assert } from "../util";
 import { Instrument } from "./instrument";
 import { InstrumentType } from "./instrument_type";
-import { Pattern } from "./pattern";
+import {
+  getPatternInstrumentAnnotation,
+  getPatternString,
+  Pattern,
+} from "./pattern";
 import { TimeSignature } from "./signature";
 import { Token, TokenType } from "./token";
 
@@ -40,7 +44,7 @@ export class InstrumentLib {
    * Returns the requested instrument. If name is empty, returns the default
    * instrument.
    */
-  getInstrument(name: string): Instrument | null {
+  getInstrument(name: string | null): Instrument | null {
     return this.instruments.find((inst) => inst.name === name) ?? null;
   }
 
@@ -63,8 +67,11 @@ export class InstrumentLib {
    * instrument.
    */
   parseToken(token: Token, time: TimeSignature, instrument?: Instrument): void {
-    if (token.type === TokenType.Pattern && !token.value) {
-      this.setActivePattern(token.key, instrument);
+    if (token.type === TokenType.Pattern && !getPatternString(token)) {
+      this.setActivePattern(
+        token.key,
+        this.getInstrument(getPatternInstrumentAnnotation(token)) || instrument
+      );
       return;
     }
     switch (token.type) {
@@ -98,7 +105,10 @@ export class InstrumentLib {
     const tokens = [];
     for (const instrument of this.instruments) {
       tokens.push(instrument.tokenize());
+    }
+    tokens.push(new Token(TokenType.Paragraph));
 
+    for (const instrument of this.instruments) {
       let env = tokens;
       if (this.instruments.length >= 2) {
         const envToken = new Token(
@@ -113,7 +123,9 @@ export class InstrumentLib {
       env.push(...instrument.chordLib.tokenize());
       for (const [i, pattern] of instrument.getPatterns().entries()) {
         env.push(pattern.tokenize());
-        env.push(new Token(TokenType.LineBreak));
+        if (env.at(-1)?.type === TokenType.Pattern) {
+          env.push(new Token(TokenType.LineBreak));
+        }
       }
 
       tokens.push(new Token(TokenType.Paragraph));
@@ -169,10 +181,8 @@ export class InstrumentLib {
     instrument?: Instrument | null
   ): void {
     const pattern = Pattern.fromToken(token, time);
-    if (!instrument) {
-      const name = token.value.split("@", 2)[1]?.trim();
-      instrument = this.getInstrument(name);
-    }
+    instrument =
+      this.getInstrument(getPatternInstrumentAnnotation(token)) || instrument;
     if (instrument) {
       instrument.setPattern(pattern);
       return;
