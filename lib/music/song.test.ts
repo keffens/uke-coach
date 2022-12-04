@@ -1,5 +1,7 @@
 import { Song } from "./song";
 import { tokenize } from "./tokenizer";
+import { readFile } from "fs/promises";
+import * as path from "path";
 
 const KRIMINAL_TANGO = String.raw`
 {title: Kriminal Tango}
@@ -166,4 +168,30 @@ test("gets used patterns for song", () => {
 test("gets used chords for song", () => {
   const song = Song.fromTokens(tokenize(CHAOTICA_BELLEZA));
   expect([...song.usedChords(0)]).toEqual(["Am", "C", "G"]);
+});
+
+test("writing and reading songs does not change them", async () => {
+  const readSongFromFile = async (filename: string) => {
+    const data = await readFile(
+      path.join(__dirname, "../../songs", filename),
+      "utf8"
+    );
+    return Song.fromTokens(tokenize(data));
+  };
+  const writeAndRead = (song: Song) => {
+    const data = song.tokenize().toString();
+    return Song.fromTokens(tokenize(data));
+  };
+
+  const caoticaBelleza = await readSongFromFile("caotica-belleza.crd");
+  expect(writeAndRead(caoticaBelleza)).toEqual(caoticaBelleza);
+
+  const einKompliment = await readSongFromFile("ein-kompliment.crd");
+  expect(writeAndRead(einKompliment)).toEqual(einKompliment);
+
+  const kriminalTango = await readSongFromFile("kriminal-tango.crd");
+  expect(writeAndRead(kriminalTango)).toEqual(kriminalTango);
+
+  const marineroWawani = await readSongFromFile("marinero-wawani.crd");
+  expect(writeAndRead(marineroWawani)).toEqual(marineroWawani);
 });
