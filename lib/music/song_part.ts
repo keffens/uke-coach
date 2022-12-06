@@ -166,7 +166,7 @@ export class SongPart {
     ).fill(null);
     for (const paragraph of this.paragraphs) {
       if (children.length) {
-        children.push(new Token(TokenType.Paragraph));
+        children.push(Token.Paragraph());
       }
       children.push(...paragraph.tokenize(instrumentLib, activePatternsInOut));
     }

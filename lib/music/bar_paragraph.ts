@@ -98,7 +98,7 @@ export class BarParagraph {
           if (isFirstInLine && tokens.at(-1)?.type === TokenType.Pattern) {
             // Add extra line breaks after patterns at beginning of line. Don't
             // do this for tab environments.
-            tokens.push(new Token(TokenType.LineBreak));
+            tokens.push(Token.LineBreak());
           }
           activePatternsInOut[i] = bar.patterns[i];
         }
@@ -113,7 +113,7 @@ export class BarParagraph {
           (i % 4 === 3 || !!nextBar.anacrusis));
 
       tokens.push(...bar.tokenizeChordsAndLyrics(isLastInLine));
-      if (isLastInLine) tokens.push(new Token(TokenType.LineBreak));
+      if (isLastInLine) tokens.push(Token.LineBreak());
       isFirstInLine = isLastInLine;
     }
     return tokens;

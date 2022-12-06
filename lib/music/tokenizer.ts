@@ -271,16 +271,7 @@ export function tokenize(content: string): Token {
         activeToken.children.length &&
         back(activeToken.children).type != TokenType.Paragraph
       ) {
-        activeToken.children.push(
-          new Token(
-            TokenType.Paragraph,
-            undefined,
-            undefined,
-            undefined,
-            i + 1,
-            1
-          )
-        );
+        activeToken.children.push(Token.Paragraph({ line: i + 1, pos: 1 }));
       }
       continue;
     }
@@ -295,14 +286,7 @@ export function tokenize(content: string): Token {
       ADD_LINEBREAK_AFTER.has(back(activeToken.children).type)
     ) {
       activeToken.children.push(
-        new Token(
-          TokenType.LineBreak,
-          undefined,
-          undefined,
-          undefined,
-          i + 1,
-          line.length
-        )
+        Token.LineBreak({ line: i + 1, pos: line.length })
       );
     }
   }

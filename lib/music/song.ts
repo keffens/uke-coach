@@ -30,12 +30,12 @@ export class Song {
   tokenize(): Token {
     const env = new Token(TokenType.StartEnv, "song");
     env.children.push(...this.metadata.tokenize());
-    env.children.push(new Token(TokenType.Paragraph));
+    env.children.push(Token.Paragraph());
     env.children.push(...this.instrumentLib.tokenize());
-    env.children.push(new Token(TokenType.Paragraph));
+    env.children.push(Token.Paragraph());
     for (const part of this.parts) {
       env.children.push(...part.tokenize(this.metadata, this.instrumentLib));
-      env.children.push(new Token(TokenType.Paragraph));
+      env.children.push(Token.Paragraph());
     }
     return env;
   }

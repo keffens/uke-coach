@@ -106,7 +106,7 @@ export class InstrumentLib {
     for (const instrument of this.instruments) {
       tokens.push(instrument.tokenize());
     }
-    tokens.push(new Token(TokenType.Paragraph));
+    tokens.push(Token.Paragraph());
 
     for (const instrument of this.instruments) {
       let env = tokens;
@@ -124,11 +124,11 @@ export class InstrumentLib {
       for (const [i, pattern] of instrument.getPatterns().entries()) {
         env.push(pattern.tokenize());
         if (env.at(-1)?.type === TokenType.Pattern) {
-          env.push(new Token(TokenType.LineBreak));
+          env.push(Token.LineBreak());
         }
       }
 
-      tokens.push(new Token(TokenType.Paragraph));
+      tokens.push(Token.Paragraph());
     }
     return tokens;
   }

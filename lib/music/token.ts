@@ -23,15 +23,48 @@ export const ADD_LINEBREAK_AFTER = new Set([
   TokenType.Directive,
 ]);
 
+interface TokenInterface {
+  key?: string;
+  value?: string;
+  children?: Token[];
+  line?: number;
+  pos?: number;
+  annotation?: ReadonlyMap<string, string>;
+}
+
 export class Token {
+  readonly key: string;
+
+  // TODO: make the constructor private and expose static factory functions for
+  //   each token type.
   constructor(
     readonly type: TokenType,
-    readonly key: string = "",
+    keyOrInterface: string | TokenInterface = "",
     readonly value: string = "",
     readonly children: Token[] = [],
     readonly line: number = -1,
-    readonly pos: number = -1
-  ) {}
+    readonly pos: number = -1,
+    readonly annotation?: ReadonlyMap<string, string>
+  ) {
+    if (typeof keyOrInterface === "string") {
+      this.key = keyOrInterface;
+      return;
+    }
+    this.key = keyOrInterface.key ?? "";
+    this.value = keyOrInterface.value ?? "";
+    this.children = keyOrInterface.children ?? [];
+    this.line = keyOrInterface.line ?? -1;
+    this.pos = keyOrInterface.pos ?? -1;
+    this.annotation = keyOrInterface.annotation;
+  }
+
+  static LineBreak({ line, pos }: { line?: number; pos?: number } = {}): Token {
+    return new Token(TokenType.LineBreak, { line, pos });
+  }
+
+  static Paragraph({ line, pos }: { line?: number; pos?: number } = {}): Token {
+    return new Token(TokenType.Paragraph, { line, pos });
+  }
 
   /** Converts a token to its string representation */
   toString(includeChildren = true): string {
@@ -69,7 +102,6 @@ export class Token {
       case TokenType.FileComment:
         return `# ${this.value}\n`;
       case TokenType.LineBreak:
-        return "\n";
       case TokenType.Paragraph:
         return "\n";
       case TokenType.EndEnv:

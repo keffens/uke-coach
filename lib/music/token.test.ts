@@ -24,12 +24,8 @@ test("converts tokens to strings", () => {
   expect(new Token(TokenType.FileComment, "key", "value").toString()).toEqual(
     "# value\n"
   );
-  expect(new Token(TokenType.LineBreak, "key", "value").toString()).toEqual(
-    "\n"
-  );
-  expect(new Token(TokenType.Paragraph, "key", "value").toString()).toEqual(
-    "\n"
-  );
+  expect(Token.LineBreak().toString()).toEqual("\n");
+  expect(Token.Paragraph().toString()).toEqual("\n");
 });
 
 test("converts song to string", () => {
