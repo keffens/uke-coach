@@ -173,3 +173,36 @@ test("filters patterns", () => {
   uke.filterPatterns(new Set());
   expect(uke.getPatterns()).toEqual([]);
 });
+
+test("checks for tabs in the patterns", () => {
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const plugged = Pattern.parse("|1234|", TimeSignature.DEFAULT, "plugged");
+  const tab = Pattern.parseTab(
+    ["1---", "-2--", "--4-", "----"],
+    TimeSignature.DEFAULT,
+    "bar"
+  );
+
+  expect(uke.hasTabs()).toBe(false);
+  uke.setPattern(plugged);
+  expect(uke.hasTabs()).toBe(false);
+  uke.setPattern(tab);
+  expect(uke.hasTabs()).toBe(true);
+});
+
+test("converts an instrument", () => {
+  const uke = new Instrument("uke", InstrumentType.Ukulele);
+  const guitar = new Instrument("guitar", InstrumentType.Guitar);
+  const plugged = Pattern.parse("|1234|", TimeSignature.DEFAULT, "plugged");
+  const tab = Pattern.parseTab(
+    ["1---", "-2--", "--4-", "----"],
+    TimeSignature.DEFAULT,
+    "bar"
+  );
+
+  uke.setPattern(plugged);
+  uke.setPattern(tab); // Tabs are not converted.
+  guitar.setPattern(plugged);
+
+  expect(uke.convertTo("guitar", InstrumentType.Guitar)).toEqual(guitar);
+});

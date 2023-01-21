@@ -252,7 +252,10 @@ export class Pattern {
    * Whether a tab should be used to display the pattern, i.e., the patern uses
    * string sets.
    */
-  useTab(): boolean {
+  useTab(ignorePlugged = false): boolean {
+    if (ignorePlugged) {
+      return this.strums.some((s) => s.frets.length);
+    }
     return this.strums.some((s) => s.strings.length || s.frets.length);
   }
 

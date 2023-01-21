@@ -134,6 +134,16 @@ test("gets strum length", () => {
 test("determines whether to use tabs", () => {
   expect(Pattern.parse("|d-du|", TWO_TWO).useTab()).toEqual(false);
   expect(Pattern.parse("|d-2u|", TWO_TWO).useTab()).toEqual(true);
+  const tab = Pattern.parseTab(["|0-3-|", "|-2-4|"], TWO_TWO);
+  expect(tab.useTab()).toEqual(true);
+
+  expect(
+    Pattern.parse("|d-du|", TWO_TWO).useTab(/*ignorePlugged=*/ true)
+  ).toEqual(false);
+  expect(
+    Pattern.parse("|d-2u|", TWO_TWO).useTab(/*ignorePlugged=*/ true)
+  ).toEqual(false);
+  expect(tab.useTab(/*ignorePlugged=*/ true)).toEqual(true);
 });
 
 test("determines whether to display as main pattern", () => {

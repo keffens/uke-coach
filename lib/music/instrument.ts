@@ -75,6 +75,22 @@ export class Instrument {
     return this.activePatternVar;
   }
 
+  convertTo(
+    name: string,
+    type: InstrumentType,
+    sound?: SoundType,
+    tuning?: PitchedNote[]
+  ): Instrument {
+    const instrument = new Instrument(name, type, sound, tuning);
+    instrument.volume = this.volume;
+    for (const pattern of this.patterns.values()) {
+      // TODO: Support conversion of tabs and plugged patterns.
+      if (pattern.useTab(/*ignorePlugged=*/ true)) continue;
+      instrument.setPatternIfCompatible(pattern);
+    }
+    return instrument;
+  }
+
   /** Returns all patterns or only the main patterns */
   getPatterns(onlyMain: boolean = false): Array<Pattern> {
     if (onlyMain) {
@@ -180,6 +196,18 @@ export class Instrument {
     if (this.patterns.has(name)) {
       this.activePatternVar = this.patterns.get(name)!;
       return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns whether there are any tabs in the instrument's patterns. Does not
+   * consider plugged patterns. */
+  hasTabs(): boolean {
+    for (const pattern of this.patterns.values()) {
+      if (pattern.useTab(/*ignorePlugged=*/ true)) {
+        return true;
+      }
     }
     return false;
   }
